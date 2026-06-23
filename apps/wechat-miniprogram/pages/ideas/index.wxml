@@ -1,23 +1,35 @@
-<view class="page">
-  <view class="eyebrow">Idea intake</view>
-  <view class="title">已捕获的项目输入</view>
-  <view class="body">首版使用静态种子数据，后续再接入 Notion 快照与差异摘要。</view>
+<view class="page ideas-page">
+  <view class="hero-shell ideas-hero">
+    <view class="hero-eyebrow">VikiSize Directory</view>
+    <view class="hero-title">项目输入目录</view>
+    <view class="hero-copy">把 Notion、手动记录和系统决策统一放进一个可扫描的工作清单。</view>
+  </view>
+
+  <view class="filter-strip">
+    <view class="filter-chip active">全部</view>
+    <view class="filter-chip">想法</view>
+    <view class="filter-chip">优化</view>
+    <view class="filter-chip">记录</view>
+  </view>
 
   <view class="section" wx:for="{{groups}}" wx:key="status">
-    <view class="section-heading">
-      <view class="section-title">{{item.label}}</view>
-      <view class="count">{{item.ideas.length}}</view>
+    <view class="section-head">
+      <view>
+        <view class="section-title">{{item.label}}</view>
+        <view class="section-note">{{item.ideas.length}} 个条目</view>
+      </view>
+      <view class="status-count">{{item.ideas.length}}</view>
     </view>
 
-    <view class="card idea-card" wx:for="{{item.ideas}}" wx:for-item="idea" wx:key="id">
+    <view class="idea-card surface" wx:for="{{item.ideas}}" wx:for-item="idea" wx:key="id">
       <view class="row">
         <view class="idea-title">{{idea.title}}</view>
         <view class="tag">{{idea.typeLabel}}</view>
       </view>
       <view class="idea-summary">{{idea.summary}}</view>
       <view class="meta-row">
-        <text>{{idea.source}}</text>
-        <text>{{idea.createdAt}}</text>
+        <view class="source-pill">{{idea.source}}</view>
+        <view>{{idea.createdAt}}</view>
       </view>
     </view>
   </view>

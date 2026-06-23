@@ -1,14 +1,23 @@
-const { getPipeline, getProjectMeta } = require("../../utils/state");
+const {
+  getHomeStats,
+  getPipeline,
+  getProjectMeta,
+  getQuickActions
+} = require("../../utils/state");
 
 Page({
   data: {
+    actions: [],
+    highlights: [],
     meta: getProjectMeta(),
-    highlights: []
+    stats: []
   },
 
   onLoad() {
     this.setData({
-      highlights: getPipeline().slice(0, 3)
+      actions: getQuickActions(),
+      highlights: getPipeline().slice(0, 3),
+      stats: getHomeStats()
     });
   },
 
@@ -22,5 +31,13 @@ Page({
     wx.switchTab({
       url: "/pages/progress/index"
     });
+  },
+
+  openAction(event) {
+    const target = event.currentTarget.dataset.target;
+
+    if (target) {
+      wx.switchTab({ url: target });
+    }
   }
 });

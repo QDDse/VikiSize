@@ -2,8 +2,8 @@ const { seedIdeas } = require("../data/seed-ideas");
 
 const projectMeta = {
   name: "VikiSize",
-  direction: "微信小程序优先的产品工作台",
-  currentTarget: "建立可运行的小程序启动骨架",
+  direction: "从灵感目录到小程序交付的轻量工作台",
+  currentTarget: "微信小程序首版启动切片",
   notionSource: "VikiSize Notion project page",
   pagesPreview: "https://qddse.github.io/VikiSize/"
 };
@@ -65,15 +65,15 @@ function getPipeline() {
     },
     {
       id: "implementation",
-      label: "小程序骨架",
+      label: "小程序 UI",
       status: "执行中",
-      detail: "当前切片使用本地数据，不接入后端服务。"
+      detail: "将基础骨架升级为可演示的产品工作台。"
     },
     {
       id: "validation",
-      label: "本地校验",
-      status: "待完成",
-      detail: "完成文件、JSON 与依赖检查后再进入人工体验。"
+      label: "上传验证",
+      status: "已打通",
+      detail: "本地部署链路已配置微信代码上传密钥。"
     },
     {
       id: "ai-skills",
@@ -89,8 +89,36 @@ function getChecklist() {
     { id: "files", label: "小程序必需文件存在", done: true },
     { id: "local-data", label: "首版仅使用本地种子数据", done: true },
     { id: "pages-preview", label: "GitHub Pages 预览保留", done: true },
-    { id: "appid", label: "上传前替换真实 AppID", done: false },
-    { id: "wechat-cli", label: "用微信开发者工具导入检查", done: false }
+    { id: "deploy", label: "微信上传链路可用", done: true },
+    { id: "ai", label: "后续生成 AI 原子能力", done: false }
+  ];
+}
+
+function getHomeStats() {
+  const ideas = getIdeas();
+  const doneCount = getChecklist().filter((item) => item.done).length;
+
+  return [
+    { id: "ideas", label: "目录项", value: String(ideas.length), tone: "teal" },
+    { id: "pipeline", label: "流程节点", value: String(getPipeline().length), tone: "ink" },
+    { id: "checks", label: "已完成", value: `${doneCount}/5`, tone: "copper" }
+  ];
+}
+
+function getQuickActions() {
+  return [
+    {
+      id: "ideas",
+      label: "灵感目录",
+      detail: "查看已捕获的产品输入",
+      target: "/pages/ideas/index"
+    },
+    {
+      id: "progress",
+      label: "交付进度",
+      detail: "检查 Spec、上传和验收状态",
+      target: "/pages/progress/index"
+    }
   ];
 }
 
@@ -100,8 +128,10 @@ function getProjectMeta() {
 
 module.exports = {
   getChecklist,
+  getHomeStats,
   getIdeas,
   getPipeline,
   getProjectMeta,
+  getQuickActions,
   groupIdeasByStatus
 };

@@ -1,41 +1,130 @@
 .home-page {
-  padding-top: 44rpx;
+  padding-top: 28rpx;
 }
 
-.hero-card {
-  background: #ffffff;
-  border: 1rpx solid #d0d5dd;
-  border-radius: 8rpx;
+.dashboard-hero {
+  min-height: 360rpx;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 16rpx;
+  margin-top: -42rpx;
+  padding: 0 18rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-card {
+  background: #fffdf8;
+  border-radius: 20rpx;
+  box-shadow: 0 16rpx 36rpx rgba(55, 46, 35, 0.1);
   box-sizing: border-box;
-  margin-top: 34rpx;
-  padding: 30rpx;
+  min-height: 138rpx;
+  padding: 22rpx 10rpx;
+  text-align: center;
+  flex: 1;
 }
 
-.hero-label {
-  color: #1f6f68;
-  font-size: 24rpx;
-  font-weight: 700;
-  margin-bottom: 12rpx;
+
+.stat-card.teal {
+  border-top: 6rpx solid #0d6b5f;
 }
 
-.hero-title {
-  color: #101828;
-  font-size: 36rpx;
+.stat-card.ink {
+  border-top: 6rpx solid #263f55;
+}
+
+.stat-card.copper {
+  border-top: 6rpx solid #c0663f;
+}
+
+.stat-value {
+  color: #25211c;
+  font-size: 38rpx;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.stat-label {
+  color: #7c756c;
+  font-size: 22rpx;
   font-weight: 700;
+  margin-top: 10rpx;
+}
+
+.action-card {
+  align-items: center;
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 18rpx;
+  padding: 24rpx;
+}
+
+.action-icon {
+  align-items: center;
+  background: #0d6b5f;
+  border-radius: 18rpx;
+  color: #ffffff;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 28rpx;
+  font-weight: 900;
+  height: 74rpx;
+  justify-content: center;
+  width: 74rpx;
+}
+
+.action-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-title,
+.step-label {
+  color: #25211c;
+  font-size: 30rpx;
+  font-weight: 850;
   line-height: 1.25;
 }
 
-.hero-copy {
-  color: #475467;
-  font-size: 28rpx;
-  line-height: 1.5;
-  margin-top: 16rpx;
+.action-detail {
+  color: #7c756c;
+  font-size: 24rpx;
+  line-height: 1.45;
+  margin-top: 8rpx;
 }
 
-.step-label {
-  color: #101828;
-  font-size: 28rpx;
-  font-weight: 700;
+.action-arrow {
+  color: #c0663f;
+  font-size: 48rpx;
+  font-weight: 300;
+}
+
+.timeline-card {
+  align-items: flex-start;
+  display: flex;
+  gap: 18rpx;
+  margin-bottom: 18rpx;
+}
+
+.timeline-dot {
+  background: #c0663f;
+  border: 8rpx solid #fff0e7;
+  border-radius: 50%;
+  box-sizing: border-box;
+  height: 34rpx;
+  margin-top: 24rpx;
+  width: 34rpx;
+}
+
+.timeline-main {
+  background: #fffdf8;
+  border: 1rpx solid rgba(82, 71, 58, 0.08);
+  border-radius: 22rpx;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 24rpx;
 }
 
 .compact {

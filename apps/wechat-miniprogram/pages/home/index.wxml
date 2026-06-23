@@ -1,26 +1,50 @@
 <view class="page home-page">
-  <view class="eyebrow">当前方向</view>
-  <view class="title">{{meta.name}}</view>
-  <view class="body">{{meta.direction}}</view>
-
-  <view class="hero-card">
-    <view class="hero-label">首个目标</view>
-    <view class="hero-title">{{meta.currentTarget}}</view>
-    <view class="hero-copy">从 Notion 想法到 Spec，再进入可运行的小程序源代码。</view>
+  <view class="hero-shell dashboard-hero">
+    <view class="hero-eyebrow">VikiSize Workspace</view>
+    <view class="hero-title">把想法整理成可交付的小程序</view>
+    <view class="hero-copy">{{meta.direction}}</view>
     <view class="button-row">
-      <button class="primary-button" bindtap="openIdeas">查看想法</button>
-      <button class="secondary-button" bindtap="openProgress">看进度</button>
+      <button class="primary-button" bindtap="openIdeas">打开目录</button>
+      <button class="secondary-button" bindtap="openProgress">查看进度</button>
+    </view>
+  </view>
+
+  <view class="stats-grid">
+    <view class="stat-card {{item.tone}}" wx:for="{{stats}}" wx:key="id">
+      <view class="stat-value">{{item.value}}</view>
+      <view class="stat-label">{{item.label}}</view>
     </view>
   </view>
 
   <view class="section">
-    <view class="section-title">工作流</view>
-    <view class="card" wx:for="{{highlights}}" wx:key="id">
-      <view class="row">
-        <view class="step-label">{{item.label}}</view>
-        <view class="tag">{{item.status}}</view>
+    <view class="section-head">
+      <view class="section-title">目录导航</view>
+      <view class="section-note">今日入口</view>
+    </view>
+    <view class="action-card surface" wx:for="{{actions}}" wx:key="id" data-target="{{item.target}}" bindtap="openAction">
+      <view class="action-icon">{{index + 1}}</view>
+      <view class="action-copy">
+        <view class="action-title">{{item.label}}</view>
+        <view class="action-detail">{{item.detail}}</view>
       </view>
-      <view class="body compact">{{item.detail}}</view>
+      <view class="action-arrow">›</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">当前任务</view>
+      <view class="section-note">交付流</view>
+    </view>
+    <view class="timeline-card" wx:for="{{highlights}}" wx:key="id">
+      <view class="timeline-dot"></view>
+      <view class="timeline-main">
+        <view class="row">
+          <view class="step-label">{{item.label}}</view>
+          <view class="tag {{index === 2 ? 'warm' : ''}}">{{item.status}}</view>
+        </view>
+        <view class="body compact">{{item.detail}}</view>
+      </view>
     </view>
   </view>
 </view>

@@ -6,23 +6,23 @@
   ],
   "window": {
     "navigationBarTitleText": "VikiSize",
-    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarBackgroundColor": "#f7f4ef",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f6f7f9"
+    "backgroundColor": "#f7f4ef"
   },
   "tabBar": {
-    "color": "#667085",
-    "selectedColor": "#1f6f68",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "color": "#7c756c",
+    "selectedColor": "#0d6b5f",
+    "backgroundColor": "#fffdf8",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",
-        "text": "首页"
+        "text": "总览"
       },
       {
         "pagePath": "pages/ideas/index",
-        "text": "想法"
+        "text": "目录"
       },
       {
         "pagePath": "pages/progress/index",
