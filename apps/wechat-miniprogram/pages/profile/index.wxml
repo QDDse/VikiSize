@@ -1,0 +1,33 @@
+<view class="page profile-page">
+  <view class="topbar">
+    <view class="page-title">我的</view>
+    <button plain="true" class="top-action" bindtap="showPreparing">设置</button>
+  </view>
+
+  <view class="card account-card">
+    <view class="profile-row">
+      <view class="avatar avatar-dark"></view>
+      <view class="profile-copy">
+        <view class="item-title">{{profile.name}}</view>
+        <view class="item-subtitle">{{profile.summary}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="stats-row">
+    <view class="stat-card" wx:for="{{stats}}" wx:key="id">
+      <view class="stat-value">{{item.value}}</view>
+      <view class="stat-label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="card menu-card">
+    <view class="menu-row" wx:for="{{menus}}" wx:key="id" bindtap="showPreparing">
+      <view class="menu-left">
+        <view class="menu-icon {{item.tone}}"></view>
+        <view class="item-title">{{item.title}}</view>
+      </view>
+      <view class="chevron">›</view>
+    </view>
+  </view>
+</view>

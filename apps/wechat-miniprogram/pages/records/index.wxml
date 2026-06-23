@@ -1,0 +1,35 @@
+<view class="page records-page">
+  <view class="topbar">
+    <view class="page-title">记录</view>
+    <button plain="true" class="top-action" bindtap="showPreparing">新增</button>
+  </view>
+
+  <view class="card profile-card">
+    <view class="card-title">当前档案</view>
+    <view class="profile-row">
+      <view class="avatar avatar-dark"></view>
+      <view class="profile-copy">
+        <view class="item-title">本人档案</view>
+        <view class="item-subtitle">身高 {{profile.height}} / 体重 {{profile.weight}} / 肩宽 {{profile.shoulder}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card trend-card">
+    <view class="card-title">尺码趋势</view>
+    <view class="bar-row">
+      <view class="bar-item" wx:for="{{trendBars}}" wx:key="id">
+        <view class="bar {{item.level}} {{item.active ? 'active' : ''}}"></view>
+        <view class="bar-label">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card purchase-card">
+    <view class="card-title">购买记录</view>
+    <view class="purchase-row" wx:for="{{purchaseRecords}}" wx:key="id">
+      <view class="thumb {{item.tone}}"></view>
+      <view class="item-title">{{item.title}}</view>
+    </view>
+  </view>
+</view>

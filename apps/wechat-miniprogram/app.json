@@ -1,32 +1,37 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/ideas/index",
-    "pages/progress/index"
+    "pages/services/index",
+    "pages/records/index",
+    "pages/profile/index"
   ],
   "window": {
     "navigationBarTitleText": "VikiSize",
-    "navigationBarBackgroundColor": "#f7f4ef",
+    "navigationBarBackgroundColor": "#eef2f5",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f7f4ef"
+    "backgroundColor": "#eef2f5"
   },
   "tabBar": {
-    "color": "#7c756c",
-    "selectedColor": "#0d6b5f",
-    "backgroundColor": "#fffdf8",
+    "color": "#8a96a8",
+    "selectedColor": "#19a66a",
+    "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",
-        "text": "总览"
+        "text": "首页"
       },
       {
-        "pagePath": "pages/ideas/index",
-        "text": "目录"
+        "pagePath": "pages/services/index",
+        "text": "服务"
       },
       {
-        "pagePath": "pages/progress/index",
-        "text": "进度"
+        "pagePath": "pages/records/index",
+        "text": "记录"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
       }
     ]
   },

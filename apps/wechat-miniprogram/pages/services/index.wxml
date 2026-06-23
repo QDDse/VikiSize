@@ -1,0 +1,26 @@
+<view class="page services-page">
+  <view class="topbar">
+    <view class="page-title">服务</view>
+    <button plain="true" class="top-action" bindtap="showPreparing">管理</button>
+  </view>
+
+  <view class="search-box">
+    <view class="search-dot"></view>
+    <view>搜索工具或品牌</view>
+  </view>
+
+  <view class="chip-row">
+    <view class="chip {{index === 0 ? 'active' : ''}}" wx:for="{{categories}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <view class="service-list">
+    <view class="service-card" wx:for="{{services}}" wx:key="id" bindtap="showPreparing">
+      <view class="service-icon {{item.tone}}"></view>
+      <view class="service-copy">
+        <view class="item-title">{{item.title}}</view>
+        <view class="item-subtitle">{{item.detail}}</view>
+      </view>
+      <view class="chevron">›</view>
+    </view>
+  </view>
+</view>

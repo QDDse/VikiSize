@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>微信小程序 UI 导航方案</title>
+  <style>
+    :root {
+      --bg: #eef2f5;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667386;
+      --soft: #f6f8fa;
+      --line: #e4ebf1;
+      --brand: #19a66a;
+      --brand-dark: #123c32;
+      --blue-soft: #eaf7ff;
+      --green-soft: #e8f7ef;
+      --amber-soft: #fff4e6;
+      --violet-soft: #f1edff;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .canvas {
+      min-height: 100vh;
+      padding: 40px;
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      overflow-x: auto;
+    }
+
+    .phone {
+      width: 375px;
+      height: 812px;
+      flex: 0 0 auto;
+      border-radius: 36px;
+      background: var(--soft);
+      overflow: hidden;
+      box-shadow: 0 22px 48px rgba(15, 23, 42, .16);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status {
+      height: 42px;
+      padding: 14px 18px 6px 22px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .topbar {
+      height: 54px;
+      padding: 8px 18px 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .topbar button {
+      border: 0;
+      background: transparent;
+      color: var(--brand);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .content {
+      height: 634px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
+    }
+
+    .search {
+      height: 44px;
+      border-radius: 14px;
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+      color: #8a96a8;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .search::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #cbd4df;
+    }
+
+    .hero {
+      min-height: 150px;
+      border-radius: 22px;
+      background: var(--brand-dark);
+      padding: 18px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #c8f2dd;
+      font-size: 13px;
+      line-height: 20px;
+      font-weight: 600;
+    }
+
+    .actions, .row, .tabs, .stats, .shortcuts, .chips { display: flex; }
+    .actions { gap: 10px; }
+
+    .primary, .ghost {
+      height: 38px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 14px;
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .primary { background: var(--brand); }
+    .ghost { background: rgba(255,255,255,.12); }
+
+    .shortcuts, .stats { gap: 10px; }
+    .shortcut, .stat {
+      width: 105px;
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--panel);
+    }
+
+    .shortcut { height: 90px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; font-weight: 800; }
+    .shortcut:nth-child(1) { background: var(--blue-soft); }
+    .shortcut:nth-child(2) { background: var(--green-soft); }
+    .shortcut:nth-child(3) { background: var(--amber-soft); }
+    .mark { width: 28px; height: 28px; border-radius: 9px; background: var(--brand); }
+
+    .card {
+      border-radius: 18px;
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: 0 5px 18px rgba(15, 23, 42, .06);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .record, .service, .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .thumb, .service-icon, .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--green-soft);
+    }
+
+    .record strong, .service strong, .menu-item strong { display: block; font-size: 14px; }
+    .record span, .service span, .profile span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+
+    .chips { gap: 8px; }
+    .chip {
+      border: 1px solid #d8e0e8;
+      background: var(--panel);
+      color: #526071;
+      height: 32px;
+      border-radius: 999px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chip.active {
+      border-color: var(--brand);
+      background: var(--green-soft);
+      color: #0a7a49;
+    }
+
+    .service {
+      min-height: 76px;
+      border-radius: 16px;
+      background: var(--panel);
+      padding: 14px;
+    }
+
+    .profile { display: flex; align-items: center; gap: 16px; }
+    .avatar { width: 60px; height: 60px; border-radius: 20px; background: var(--brand-dark); }
+
+    .bars {
+      height: 96px;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .bar {
+      width: 42px;
+      border-radius: 10px;
+      background: #d8ede2;
+    }
+
+    .bar.active { background: var(--brand); }
+    .stat { height: 82px; text-align: center; }
+    .stat b { display: block; color: var(--brand); font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .menu-item { justify-content: space-between; padding: 6px 0; }
+    .menu-left { display: flex; align-items: center; gap: 12px; }
+    .menu-icon { width: 30px; height: 30px; border-radius: 10px; background: var(--blue-soft); }
+
+    .nav {
+      height: 82px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+      padding: 7px 16px 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #8a96a8;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .nav-item.active { color: var(--brand); }
+    .nav-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 7px;
+      border: 2px solid currentColor;
+    }
+
+    .cover {
+      background: var(--panel);
+      padding: 28px;
+      gap: 18px;
+    }
+
+    .cover h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 34px;
+      letter-spacing: 0;
+    }
+
+    .cover p {
+      margin: 0;
+      color: #526071;
+      font-size: 14px;
+      line-height: 23px;
+      font-weight: 600;
+    }
+
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .flow div {
+      min-height: 54px;
+      border-radius: 14px;
+      background: var(--soft);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .flow div::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand);
+      flex: 0 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <section class="phone cover">
+      <h1>微信小程序 UI 导航方案</h1>
+      <p>基于常见小程序四栏底部导航设计：首页、服务、记录、我的。截图临时文件已失效，先做一版可编辑方向稿。</p>
+      <div class="flow">
+        <div>首页：搜索、主功能入口、最近记录</div>
+        <div>服务：工具宫格、分类筛选、品牌能力</div>
+        <div>记录：个人尺码档案、趋势、购买记录</div>
+        <div>我的：账户信息、家庭成员、设置菜单</div>
+      </div>
+    </section>
+
+    <section class="phone">
+      <div class="status"><span>9:41</span><span>5G 100%</span></div>
+      <div class="topbar"><h1>VikiSize</h1><button>扫码录入</button></div>
+      <div class="content">
+        <div class="search">搜索尺码、记录、商品</div>
+        <div class="hero">
+          <h2>智能尺码助手</h2>
+          <p>录入身材数据后，自动推荐衣物尺码，减少试错。</p>
+          <div class="actions"><button class="primary">开始测量</button><button class="ghost">导入记录</button></div>
+        </div>
+        <div class="shortcuts">
+          <div class="shortcut"><i class="mark"></i>尺码计算</div>
+          <div class="shortcut"><i class="mark"></i>衣橱档案</div>
+          <div class="shortcut"><i class="mark"></i>家人管理</div>
+        </div>
+        <div class="card">
+          <h3>最近记录</h3>
+          <div class="record"><i class="thumb"></i><div><strong>牛仔裤 / 推荐 L</strong><span>今天 14:20</span></div></div>
+          <div class="record"><i class="thumb"></i><div><strong>衬衫 / 推荐 M</strong><span>昨天 19:08</span></div></div>
+        </div>
+      </div>
+      <nav class="nav"><div class="nav-item active"><i class="nav-dot"></i>首页</div><div class="nav-item"><i class="nav-dot"></i>服务</div><div class="nav-item"><i class="nav-dot"></i>记录</div><div class="nav-item"><i class="nav-dot"></i>我的</div></nav>
+    </section>
+
+    <section class="phone">
+      <div class="status"><span>9:41</span><span>5G 100%</span></div>
+      <div class="topbar"><h1>服务</h1><button>管理</button></div>
+      <div class="content">
+        <div class="search">搜索工具或品牌</div>
+        <div class="chips"><button class="chip active">全部</button><button class="chip">测量</button><button class="chip">换算</button><button class="chip">品牌</button></div>
+        <div class="service"><i class="service-icon"></i><div><strong>拍照测量</strong><span>用参考物估算关键围度</span></div></div>
+        <div class="service"><i class="service-icon"></i><div><strong>尺码换算</strong><span>中美欧日尺码快速转换</span></div></div>
+        <div class="service"><i class="service-icon"></i><div><strong>品牌尺码库</strong><span>按品牌查看推荐规则</span></div></div>
+        <div class="service"><i class="service-icon"></i><div><strong>搭配建议</strong><span>根据身材生成穿搭提示</span></div></div>
+      </div>
+      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>首页</div><div class="nav-item active"><i class="nav-dot"></i>服务</div><div class="nav-item"><i class="nav-dot"></i>记录</div><div class="nav-item"><i class="nav-dot"></i>我的</div></nav>
+    </section>
+
+    <section class="phone">
+      <div class="status"><span>9:41</span><span>5G 100%</span></div>
+      <div class="topbar"><h1>记录</h1><button>新增</button></div>
+      <div class="content">
+        <div class="card"><h3>当前档案</h3><div class="profile"><i class="avatar"></i><div><strong>本人档案</strong><span>身高 172cm / 体重 64kg / 肩宽 43cm</span></div></div></div>
+        <div class="card"><h3>尺码趋势</h3><div class="bars"><i class="bar" style="height:42px"></i><i class="bar" style="height:64px"></i><i class="bar" style="height:48px"></i><i class="bar active" style="height:78px"></i><i class="bar" style="height:56px"></i></div></div>
+        <div class="card"><h3>购买记录</h3><div class="record"><i class="thumb"></i><strong>优衣库 T 恤 / M</strong></div><div class="record"><i class="thumb"></i><strong>Nike 外套 / L</strong></div><div class="record"><i class="thumb"></i><strong>Levi's 牛仔裤 / 31</strong></div></div>
+      </div>
+      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>首页</div><div class="nav-item"><i class="nav-dot"></i>服务</div><div class="nav-item active"><i class="nav-dot"></i>记录</div><div class="nav-item"><i class="nav-dot"></i>我的</div></nav>
+    </section>
+
+    <section class="phone">
+      <div class="status"><span>9:41</span><span>5G 100%</span></div>
+      <div class="topbar"><h1>我的</h1><button>设置</button></div>
+      <div class="content">
+        <div class="card"><div class="profile"><i class="avatar"></i><div><strong>微信用户</strong><span>已保存 12 条尺码记录</span></div></div></div>
+        <div class="stats"><div class="stat"><b>12</b><span>尺码记录</span></div><div class="stat"><b>4</b><span>家庭成员</span></div><div class="stat"><b>8</b><span>品牌收藏</span></div></div>
+        <div class="card">
+          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>我的档案</strong></span><b>&gt;</b></div>
+          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>家人尺码</strong></span><b>&gt;</b></div>
+          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>隐私与授权</strong></span><b>&gt;</b></div>
+          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>帮助反馈</strong></span><b>&gt;</b></div>
+        </div>
+      </div>
+      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>首页</div><div class="nav-item"><i class="nav-dot"></i>服务</div><div class="nav-item"><i class="nav-dot"></i>记录</div><div class="nav-item active"><i class="nav-dot"></i>我的</div></nav>
+    </section>
+  </main>
+</body>
+</html>

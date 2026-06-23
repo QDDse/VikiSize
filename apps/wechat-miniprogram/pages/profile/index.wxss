@@ -1,0 +1,79 @@
+.profile-page {
+  padding-top: 18rpx;
+}
+
+.account-card,
+.menu-card {
+  margin-top: 10rpx;
+}
+
+.profile-row {
+  align-items: center;
+  display: flex;
+  gap: 28rpx;
+}
+
+.profile-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  border-radius: 40rpx;
+  height: 120rpx;
+  width: 120rpx;
+}
+
+.avatar-dark {
+  background: #123c32;
+}
+
+.stats-row {
+  display: flex;
+  gap: 20rpx;
+  margin: 24rpx 0;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 164rpx;
+  padding: 28rpx 10rpx;
+  text-align: center;
+}
+
+.stat-value {
+  color: #19a66a;
+  font-size: 44rpx;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.stat-label {
+  color: #667386;
+  font-size: 22rpx;
+  font-weight: 800;
+  margin-top: 14rpx;
+}
+
+.menu-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 18rpx 0;
+}
+
+
+.menu-left {
+  align-items: center;
+  display: flex;
+  gap: 24rpx;
+}
+
+.menu-icon {
+  border-radius: 20rpx;
+  height: 60rpx;
+  width: 60rpx;
+}

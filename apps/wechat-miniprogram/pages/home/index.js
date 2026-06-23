@@ -1,43 +1,27 @@
-const {
-  getHomeStats,
-  getPipeline,
-  getProjectMeta,
-  getQuickActions
-} = require("../../utils/state");
+const { getHomeData } = require("../../utils/state");
 
 Page({
   data: {
-    actions: [],
-    highlights: [],
-    meta: getProjectMeta(),
-    stats: []
+    recentRecords: [],
+    shortcuts: []
   },
 
   onLoad() {
-    this.setData({
-      actions: getQuickActions(),
-      highlights: getPipeline().slice(0, 3),
-      stats: getHomeStats()
-    });
+    const data = getHomeData();
+    this.setData(data);
   },
 
-  openIdeas() {
-    wx.switchTab({
-      url: "/pages/ideas/index"
-    });
-  },
-
-  openProgress() {
-    wx.switchTab({
-      url: "/pages/progress/index"
-    });
-  },
-
-  openAction(event) {
+  openTarget(event) {
     const target = event.currentTarget.dataset.target;
-
     if (target) {
       wx.switchTab({ url: target });
     }
+  },
+
+  showPreparing() {
+    wx.showToast({
+      title: "功能准备中",
+      icon: "none"
+    });
   }
 });

@@ -1,0 +1,24 @@
+.services-page {
+  padding-top: 18rpx;
+}
+
+.service-list {
+  margin-top: 28rpx;
+}
+
+.service-card {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 20rpx;
+  min-height: 152rpx;
+  padding: 28rpx;
+}
+
+.service-copy {
+  flex: 1;
+  min-width: 0;
+}

@@ -1,0 +1,82 @@
+.records-page {
+  padding-top: 18rpx;
+}
+
+.profile-card,
+.trend-card,
+.purchase-card {
+  margin-bottom: 24rpx;
+}
+
+.profile-row,
+.purchase-row {
+  align-items: center;
+  display: flex;
+  gap: 24rpx;
+}
+
+.profile-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar-dark {
+  background: #123c32;
+}
+
+.bar-row {
+  align-items: flex-end;
+  display: flex;
+  gap: 24rpx;
+  height: 210rpx;
+}
+
+.bar-item {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.bar {
+  background: #d8ede2;
+  border-radius: 20rpx;
+  width: 100%;
+}
+
+.bar.active {
+  background: #19a66a;
+}
+
+.h42 {
+  height: 84rpx;
+}
+
+.h48 {
+  height: 96rpx;
+}
+
+.h56 {
+  height: 112rpx;
+}
+
+.h64 {
+  height: 128rpx;
+}
+
+.h78 {
+  height: 156rpx;
+}
+
+.bar-label {
+  color: #667386;
+  font-size: 20rpx;
+  font-weight: 700;
+  margin-top: 12rpx;
+}
+
+.purchase-row {
+  margin-top: 22rpx;
+}
+
