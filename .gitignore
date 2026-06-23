@@ -1,0 +1,59 @@
+# Local agent state and downloaded tooling
+.codex/
+skills/
+.agents/
+
+# Automation runtime state
+*.snapshot.json
+*.state.json
+*.run.json
+
+# Dependencies
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+
+# Build output and generated reports
+dist/
+build/
+out/
+coverage/
+.next/
+.nuxt/
+.vite/
+.turbo/
+.cache/
+tmp/
+temp/
+artifacts/
+
+# WeChat Mini Program local output
+miniprogram_npm/
+**/miniprogram_npm/
+project.private.config.json
+**/project.private.config.json
+**/.miniprogram/
+**/compile/
+**/unpackage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo

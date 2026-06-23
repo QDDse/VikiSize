@@ -1,15 +1,19 @@
-# 关东东京 8 天旅行计划
+# VikiSize
 
-这是一个可直接静态托管的单文件旅行计划页面。
+VikiSize is the application repository for the VikiSize product work.
 
-## 浏览
+This repo should keep only application-related files:
 
-- 本地打开：双击 `index.html`
-- GitHub Pages：将仓库根目录作为 Pages 发布源即可
+- application source code
+- product and implementation specs
+- automation definitions and scripts
+- repo/agent operating docs
+- intentional public preview files
 
-## 文件
+Local agent state, downloaded skills, generated snapshots, dependencies, build output, logs, private environment files, and editor state should stay out of git. See [project-structure.md](docs/project-structure.md) and [.gitignore](.gitignore).
 
-- `index.html`：公开访问入口
-- `关东东京8天旅行计划.html`：原始中文文件名版本
+## Current Focus
 
-页面为静态 HTML，地图底图、Leaflet CDN 与在线图片需要网络访问。页面中的天气、交通、票价、营业时间等信息均需出行前以官方渠道核实。
+The first implementation target is a WeChat Mini Program. The startup spec is in [vikisize-wechat-miniprogram-startup-spec.md](docs/specs/vikisize-wechat-miniprogram-startup-spec.md).
+
+GitHub Pages remains available as a lightweight public preview or documentation surface while the app source is being built.
