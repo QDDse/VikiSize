@@ -1,5 +1,15 @@
 const path = require("path");
-const ci = require("miniprogram-ci");
+let ci;
+try {
+  ci = require("miniprogram-ci");
+} catch (error) {
+  if (error && error.code === "MODULE_NOT_FOUND") {
+    console.error("Missing dependency: miniprogram-ci. Run `npm install` before `npm run deploy:wechat`.");
+    process.exit(1);
+  }
+
+  throw error;
+}
 const pkg = require("../package.json");
 
 const appid = process.env.WECHAT_APPID;
