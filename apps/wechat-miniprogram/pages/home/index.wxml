@@ -1,0 +1,26 @@
+<view class="page home-page">
+  <view class="eyebrow">当前方向</view>
+  <view class="title">{{meta.name}}</view>
+  <view class="body">{{meta.direction}}</view>
+
+  <view class="hero-card">
+    <view class="hero-label">首个目标</view>
+    <view class="hero-title">{{meta.currentTarget}}</view>
+    <view class="hero-copy">从 Notion 想法到 Spec，再进入可运行的小程序源代码。</view>
+    <view class="button-row">
+      <button class="primary-button" bindtap="openIdeas">查看想法</button>
+      <button class="secondary-button" bindtap="openProgress">看进度</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">工作流</view>
+    <view class="card" wx:for="{{highlights}}" wx:key="id">
+      <view class="row">
+        <view class="step-label">{{item.label}}</view>
+        <view class="tag">{{item.status}}</view>
+      </view>
+      <view class="body compact">{{item.detail}}</view>
+    </view>
+  </view>
+</view>

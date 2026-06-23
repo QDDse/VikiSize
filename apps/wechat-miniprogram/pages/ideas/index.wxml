@@ -1,0 +1,24 @@
+<view class="page">
+  <view class="eyebrow">Idea intake</view>
+  <view class="title">已捕获的项目输入</view>
+  <view class="body">首版使用静态种子数据，后续再接入 Notion 快照与差异摘要。</view>
+
+  <view class="section" wx:for="{{groups}}" wx:key="status">
+    <view class="section-heading">
+      <view class="section-title">{{item.label}}</view>
+      <view class="count">{{item.ideas.length}}</view>
+    </view>
+
+    <view class="card idea-card" wx:for="{{item.ideas}}" wx:for-item="idea" wx:key="id">
+      <view class="row">
+        <view class="idea-title">{{idea.title}}</view>
+        <view class="tag">{{idea.typeLabel}}</view>
+      </view>
+      <view class="idea-summary">{{idea.summary}}</view>
+      <view class="meta-row">
+        <text>{{idea.source}}</text>
+        <text>{{idea.createdAt}}</text>
+      </view>
+    </view>
+  </view>
+</view>

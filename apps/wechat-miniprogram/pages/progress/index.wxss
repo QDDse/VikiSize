@@ -1,0 +1,72 @@
+.pipeline-card {
+  align-items: flex-start;
+  display: flex;
+  gap: 18rpx;
+}
+
+.status-mark {
+  background: #1f6f68;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  height: 18rpx;
+  margin-top: 12rpx;
+  width: 18rpx;
+}
+
+.pipeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pipeline-label {
+  color: #101828;
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.detail {
+  margin-top: 12rpx;
+}
+
+.checklist-row {
+  align-items: center;
+  display: flex;
+  gap: 18rpx;
+}
+
+.check {
+  align-items: center;
+  background: #f2f4f7;
+  border: 1rpx solid #d0d5dd;
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: #ffffff;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 22rpx;
+  font-weight: 700;
+  height: 36rpx;
+  justify-content: center;
+  width: 36rpx;
+}
+
+.check.done {
+  background: #1f6f68;
+  border-color: #1f6f68;
+}
+
+.check-label {
+  color: #344054;
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.4;
+}
+
+.preview-url {
+  color: #1f6f68;
+  font-size: 24rpx;
+  line-height: 1.4;
+  margin-top: 14rpx;
+  word-break: break-all;
+}
