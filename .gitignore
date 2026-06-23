@@ -57,3 +57,7 @@ desktop.ini
 .vscode/
 *.swp
 *.swo
+# WeChat upload secrets
+wechat-upload-key*.pem
+*.private.key
+

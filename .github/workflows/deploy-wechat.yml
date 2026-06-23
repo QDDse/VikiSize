@@ -1,0 +1,47 @@
+name: Deploy WeChat Mini Program
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to upload to WeChat, for example 0.1.0
+        required: true
+        default: 0.1.0
+      desc:
+        description: Upload description shown in WeChat Developer Tools
+        required: false
+        default: Manual GitHub Actions upload
+      robot:
+        description: WeChat upload robot number
+        required: false
+        default: "1"
+  push:
+    tags:
+      - "wechat-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    env:
+      WECHAT_APPID: wxa6892dd697cb738a
+      WECHAT_UPLOAD_PRIVATE_KEY: ${{ secrets.WECHAT_UPLOAD_PRIVATE_KEY }}
+      WECHAT_VERSION: ${{ github.event.inputs.version || github.ref_name }}
+      WECHAT_DESC: ${{ github.event.inputs.desc || github.event.head_commit.message || 'GitHub Actions upload' }}
+      WECHAT_ROBOT: ${{ github.event.inputs.robot || '1' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Upload to WeChat
+        run: npm run deploy:wechat

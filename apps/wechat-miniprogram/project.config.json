@@ -1,7 +1,7 @@
 {
-  "appid": "touristappid",
+  "appid": "wxa6892dd697cb738a",
   "projectname": "VikiSize",
-  "description": "Replace touristappid with the real WeChat Mini Program AppID before upload.",
+  "description": "VikiSize WeChat Mini Program project. Upload secrets are supplied outside the repository.",
   "compileType": "miniprogram",
   "miniprogramRoot": "./",
   "setting": {

@@ -1,0 +1,12 @@
+{
+  "name": "vikisize",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VikiSize application repository",
+  "scripts": {
+    "deploy:wechat": "node scripts/upload-wechat.js"
+  },
+  "devDependencies": {
+    "miniprogram-ci": "2.1.31"
+  }
+}
