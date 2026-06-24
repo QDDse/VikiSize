@@ -12,8 +12,8 @@
       --muted: #667386;
       --soft: #f6f8fa;
       --line: #e4ebf1;
-      --brand: #19a66a;
-      --brand-dark: #123c32;
+      --brand: #2f7dff;
+      --brand-dark: #172554;
       --blue-soft: #eaf7ff;
       --green-soft: #e8f7ef;
       --amber-soft: #fff4e6;
@@ -79,6 +79,7 @@
       color: var(--brand);
       font-weight: 800;
       font-size: 13px;
+      cursor: pointer;
     }
 
     .content {
@@ -87,8 +88,10 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      overflow: hidden;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
+    .content::-webkit-scrollbar { display: none; }
 
     .search {
       height: 44px;
@@ -130,7 +133,7 @@
 
     .hero p {
       margin: 0;
-      color: #c8f2dd;
+      color: #dbeafe;
       font-size: 13px;
       line-height: 20px;
       font-weight: 600;
@@ -147,6 +150,7 @@
       color: white;
       font-size: 13px;
       font-weight: 800;
+      cursor: pointer;
     }
 
     .primary { background: var(--brand); }
@@ -197,6 +201,26 @@
 
     .record strong, .service strong, .menu-item strong { display: block; font-size: 14px; }
     .record span, .service span, .profile span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .item-main { min-width: 0; flex: 1; }
+    .item-actions {
+      display: flex;
+      gap: 6px;
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+    .mini-btn {
+      height: 28px;
+      border: 0;
+      border-radius: 10px;
+      padding: 0 9px;
+      background: #eef4ff;
+      color: #1d5fd1;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .mini-btn.danger { background: #fff0f0; color: #d92d20; }
+    .mini-btn.muted { background: #f1f5f9; color: #526071; }
 
     .chips { gap: 8px; }
     .chip {
@@ -208,12 +232,13 @@
       padding: 0 12px;
       font-size: 12px;
       font-weight: 800;
+      cursor: pointer;
     }
 
     .chip.active {
       border-color: var(--brand);
-      background: var(--green-soft);
-      color: #0a7a49;
+      background: #eaf2ff;
+      color: #1d5fd1;
     }
 
     .service {
@@ -221,6 +246,7 @@
       border-radius: 16px;
       background: var(--panel);
       padding: 14px;
+      justify-content: space-between;
     }
 
     .profile { display: flex; align-items: center; gap: 16px; }
@@ -236,10 +262,19 @@
     .bar {
       width: 42px;
       border-radius: 10px;
-      background: #d8ede2;
+      background: #dbe7ff;
     }
 
     .bar.active { background: var(--brand); }
+    .bar-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
     .stat { height: 82px; text-align: center; }
     .stat b { display: block; color: var(--brand); font-size: 22px; }
     .stat span { color: var(--muted); font-size: 12px; font-weight: 700; }
@@ -322,85 +357,307 @@
       background: var(--brand);
       flex: 0 0 auto;
     }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, .34);
+      z-index: 20;
+      padding: 24px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: min(360px, 100%);
+      border-radius: 22px;
+      background: white;
+      padding: 18px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .24);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal h2 { margin: 0; font-size: 18px; letter-spacing: 0; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .field input {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 12px;
+      font: inherit;
+      color: var(--ink);
+      outline: none;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+    .modal-actions button {
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .cancel { background: #f1f5f9; color: #526071; }
+    .save { background: var(--brand); color: white; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      display: none;
+      min-width: 180px;
+      border-radius: 999px;
+      background: #172033;
+      color: white;
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      z-index: 30;
+    }
+    .toast.show { display: block; }
   </style>
 </head>
 <body>
   <main class="canvas">
     <section class="phone cover">
-      <h1>微信小程序 UI 导航方案</h1>
-      <p>基于常见小程序四栏底部导航设计：首页、服务、记录、我的。截图临时文件已失效，先做一版可编辑方向稿。</p>
+      <h1>生活管理小程序 UI 导航方案</h1>
+      <p>保留总览导航，但业务结构只分成三个模块：菜谱、旅游、曲线。总览只做聚合入口和近期状态，不再承载独立冗余功能。</p>
       <div class="flow">
-        <div>首页：搜索、主功能入口、最近记录</div>
-        <div>服务：工具宫格、分类筛选、品牌能力</div>
-        <div>记录：个人尺码档案、趋势、购买记录</div>
-        <div>我的：账户信息、家庭成员、设置菜单</div>
+        <div>总览：三个业务模块的状态摘要与快捷入口</div>
+        <div>菜谱：菜谱列表、增删改入口、最近编辑</div>
+        <div>旅游：旅游计划、交互行程、旅游归档</div>
+        <div>曲线：蛋白粉、金价、SSD 历史走势</div>
       </div>
     </section>
 
     <section class="phone">
       <div class="status"><span>9:41</span><span>5G 100%</span></div>
-      <div class="topbar"><h1>VikiSize</h1><button>扫码录入</button></div>
+      <div class="topbar"><h1>生活看板</h1><button>同步</button></div>
       <div class="content">
-        <div class="search">搜索尺码、记录、商品</div>
+        <div class="search">搜索菜谱、旅行、价格曲线</div>
         <div class="hero">
-          <h2>智能尺码助手</h2>
-          <p>录入身材数据后，自动推荐衣物尺码，减少试错。</p>
-          <div class="actions"><button class="primary">开始测量</button><button class="ghost">导入记录</button></div>
+          <h2>三模块生活工作台</h2>
+          <p>总览只汇总菜谱、旅游和曲线状态，具体操作进入对应模块完成。</p>
+          <div class="actions"><button class="primary" data-action="add-recipe">新建菜谱</button><button class="ghost" data-action="add-trip">添加旅行计划</button></div>
         </div>
         <div class="shortcuts">
-          <div class="shortcut"><i class="mark"></i>尺码计算</div>
-          <div class="shortcut"><i class="mark"></i>衣橱档案</div>
-          <div class="shortcut"><i class="mark"></i>家人管理</div>
+          <div class="shortcut"><i class="mark"></i>菜谱管理</div>
+          <div class="shortcut"><i class="mark"></i>旅游计划</div>
+          <div class="shortcut"><i class="mark"></i>历史曲线</div>
         </div>
         <div class="card">
-          <h3>最近记录</h3>
-          <div class="record"><i class="thumb"></i><div><strong>牛仔裤 / 推荐 L</strong><span>今天 14:20</span></div></div>
-          <div class="record"><i class="thumb"></i><div><strong>衬衫 / 推荐 M</strong><span>昨天 19:08</span></div></div>
+          <h3>模块状态</h3>
+          <div id="overviewStatus"></div>
         </div>
       </div>
-      <nav class="nav"><div class="nav-item active"><i class="nav-dot"></i>首页</div><div class="nav-item"><i class="nav-dot"></i>服务</div><div class="nav-item"><i class="nav-dot"></i>记录</div><div class="nav-item"><i class="nav-dot"></i>我的</div></nav>
+      <nav class="nav"><div class="nav-item active"><i class="nav-dot"></i>总览</div><div class="nav-item"><i class="nav-dot"></i>菜谱</div><div class="nav-item"><i class="nav-dot"></i>旅游</div><div class="nav-item"><i class="nav-dot"></i>曲线</div></nav>
     </section>
 
     <section class="phone">
       <div class="status"><span>9:41</span><span>5G 100%</span></div>
-      <div class="topbar"><h1>服务</h1><button>管理</button></div>
+      <div class="topbar"><h1>菜谱</h1><button data-action="add-recipe">新增</button></div>
       <div class="content">
-        <div class="search">搜索工具或品牌</div>
-        <div class="chips"><button class="chip active">全部</button><button class="chip">测量</button><button class="chip">换算</button><button class="chip">品牌</button></div>
-        <div class="service"><i class="service-icon"></i><div><strong>拍照测量</strong><span>用参考物估算关键围度</span></div></div>
-        <div class="service"><i class="service-icon"></i><div><strong>尺码换算</strong><span>中美欧日尺码快速转换</span></div></div>
-        <div class="service"><i class="service-icon"></i><div><strong>品牌尺码库</strong><span>按品牌查看推荐规则</span></div></div>
-        <div class="service"><i class="service-icon"></i><div><strong>搭配建议</strong><span>根据身材生成穿搭提示</span></div></div>
+        <div class="search">搜索菜名、食材、标签</div>
+        <div class="chips"><button class="chip active">全部</button><button class="chip">家常</button><button class="chip">备餐</button><button class="chip">待改进</button></div>
+        <div id="recipeList"></div>
       </div>
-      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>首页</div><div class="nav-item active"><i class="nav-dot"></i>服务</div><div class="nav-item"><i class="nav-dot"></i>记录</div><div class="nav-item"><i class="nav-dot"></i>我的</div></nav>
+      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>总览</div><div class="nav-item active"><i class="nav-dot"></i>菜谱</div><div class="nav-item"><i class="nav-dot"></i>旅游</div><div class="nav-item"><i class="nav-dot"></i>曲线</div></nav>
     </section>
 
     <section class="phone">
       <div class="status"><span>9:41</span><span>5G 100%</span></div>
-      <div class="topbar"><h1>记录</h1><button>新增</button></div>
+      <div class="topbar"><h1>旅游</h1><button data-action="archive-trip">归档</button></div>
       <div class="content">
-        <div class="card"><h3>当前档案</h3><div class="profile"><i class="avatar"></i><div><strong>本人档案</strong><span>身高 172cm / 体重 64kg / 肩宽 43cm</span></div></div></div>
-        <div class="card"><h3>尺码趋势</h3><div class="bars"><i class="bar" style="height:42px"></i><i class="bar" style="height:64px"></i><i class="bar" style="height:48px"></i><i class="bar active" style="height:78px"></i><i class="bar" style="height:56px"></i></div></div>
-        <div class="card"><h3>购买记录</h3><div class="record"><i class="thumb"></i><strong>优衣库 T 恤 / M</strong></div><div class="record"><i class="thumb"></i><strong>Nike 外套 / L</strong></div><div class="record"><i class="thumb"></i><strong>Levi's 牛仔裤 / 31</strong></div></div>
+        <div class="card"><h3>旅游计划</h3><div id="tripSummary"></div></div>
+        <div class="card"><h3>交互行程</h3><div class="actions"><button class="primary" data-action="add-trip">添加节点</button><button class="ghost" data-action="archive-trip">归档当前</button></div><div id="tripList"></div></div>
+        <div class="card"><h3>旅游归档</h3><div id="archiveList"></div></div>
       </div>
-      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>首页</div><div class="nav-item"><i class="nav-dot"></i>服务</div><div class="nav-item active"><i class="nav-dot"></i>记录</div><div class="nav-item"><i class="nav-dot"></i>我的</div></nav>
+      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>总览</div><div class="nav-item"><i class="nav-dot"></i>菜谱</div><div class="nav-item active"><i class="nav-dot"></i>旅游</div><div class="nav-item"><i class="nav-dot"></i>曲线</div></nav>
     </section>
 
     <section class="phone">
       <div class="status"><span>9:41</span><span>5G 100%</span></div>
-      <div class="topbar"><h1>我的</h1><button>设置</button></div>
+      <div class="topbar"><h1>历史曲线</h1><button data-action="add-curve">新增</button></div>
       <div class="content">
-        <div class="card"><div class="profile"><i class="avatar"></i><div><strong>微信用户</strong><span>已保存 12 条尺码记录</span></div></div></div>
-        <div class="stats"><div class="stat"><b>12</b><span>尺码记录</span></div><div class="stat"><b>4</b><span>家庭成员</span></div><div class="stat"><b>8</b><span>品牌收藏</span></div></div>
-        <div class="card">
-          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>我的档案</strong></span><b>&gt;</b></div>
-          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>家人尺码</strong></span><b>&gt;</b></div>
-          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>隐私与授权</strong></span><b>&gt;</b></div>
-          <div class="menu-item"><span class="menu-left"><i class="menu-icon"></i><strong>帮助反馈</strong></span><b>&gt;</b></div>
-        </div>
+        <div class="card"><div class="profile"><i class="avatar"></i><div><strong>价格与指标监控</strong><span>关注蛋白粉、金价、SSD 三类长期曲线</span></div></div></div>
+        <div class="stats" id="curveStats"></div>
+        <div class="card"><h3>趋势预览</h3><div class="bars" id="curveBars"></div></div>
+        <div class="card" id="curveList"></div>
       </div>
-      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>首页</div><div class="nav-item"><i class="nav-dot"></i>服务</div><div class="nav-item"><i class="nav-dot"></i>记录</div><div class="nav-item active"><i class="nav-dot"></i>我的</div></nav>
+      <nav class="nav"><div class="nav-item"><i class="nav-dot"></i>总览</div><div class="nav-item"><i class="nav-dot"></i>菜谱</div><div class="nav-item"><i class="nav-dot"></i>旅游</div><div class="nav-item active"><i class="nav-dot"></i>曲线</div></nav>
     </section>
   </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <form class="modal" id="editForm">
+      <h2 id="modalTitle">编辑</h2>
+      <label class="field">名称<input id="modalName" autocomplete="off" /></label>
+      <label class="field">说明 / 数值<input id="modalDesc" autocomplete="off" /></label>
+      <div class="modal-actions"><button class="cancel" type="button" id="modalCancel">取消</button><button class="save" type="submit">保存</button></div>
+    </form>
+  </div>
+  <div class="toast" id="toast">已更新</div>
+
+  <script>
+    const state = {
+      recipes: [
+        { name: '番茄牛腩', desc: '编辑步骤、用料、耗时，可删除或复制' },
+        { name: '鸡胸肉沙拉', desc: '适合健身餐，蛋白质 42g' },
+        { name: '香菇滑鸡饭', desc: '已收藏，最近修改于 6 月 23 日' }
+      ],
+      trips: [
+        { name: 'D1 抵达与入住', desc: '航班、酒店、交通卡' },
+        { name: 'D2 涩谷与表参道', desc: '餐厅预约、路线、购物清单' },
+        { name: 'D3 镰仓一日', desc: '天气提醒、备用路线' }
+      ],
+      archives: [
+        { name: '杭州周末', desc: '2026.05 / 花费 ¥1,420' },
+        { name: '成都 4 日', desc: '2026.03 / 18 张照片' }
+      ],
+      curves: [
+        { name: '蛋白粉', desc: '¥129', value: 56 },
+        { name: '金价', desc: '¥702/g', value: 86 },
+        { name: 'SSD', desc: '¥399', value: 61 }
+      ]
+    };
+
+    let editing = null;
+    const qs = (selector) => document.querySelector(selector);
+    const toast = (text) => {
+      const node = qs('#toast');
+      node.textContent = text;
+      node.classList.add('show');
+      window.clearTimeout(toast.timer);
+      toast.timer = window.setTimeout(() => node.classList.remove('show'), 1300);
+    };
+
+    function openEditor(type, index = null) {
+      editing = { type, index };
+      const item = index === null ? { name: '', desc: '' } : state[type][index];
+      qs('#modalTitle').textContent = index === null ? '新增' : '编辑';
+      qs('#modalName').value = item.name;
+      qs('#modalDesc').value = item.desc;
+      qs('#modalBackdrop').classList.add('open');
+      qs('#modalName').focus();
+    }
+
+    function closeEditor() {
+      qs('#modalBackdrop').classList.remove('open');
+      editing = null;
+    }
+
+    function itemRow(type, item, index, mode = 'service') {
+      const wrap = document.createElement('div');
+      wrap.className = mode;
+      wrap.innerHTML = `
+        <i class="${mode === 'service' ? 'service-icon' : 'thumb'}"></i>
+        <div class="item-main"><strong>${item.name}</strong><span>${item.desc}</span></div>
+        <div class="item-actions">
+          <button class="mini-btn" data-edit="${type}" data-index="${index}">编辑</button>
+          <button class="mini-btn danger" data-delete="${type}" data-index="${index}">删除</button>
+        </div>`;
+      return wrap;
+    }
+
+    function renderRecipes() {
+      const list = qs('#recipeList');
+      list.innerHTML = '';
+      state.recipes.forEach((item, index) => list.appendChild(itemRow('recipes', item, index, 'service')));
+    }
+
+    function renderTrips() {
+      qs('#tripSummary').innerHTML = `<div class="profile"><i class="avatar"></i><div><strong>东京 5 日自由行</strong><span>可编辑行程 ${state.trips.length} 项，预算 ¥8,600</span></div></div>`;
+      const list = qs('#tripList');
+      list.innerHTML = '';
+      state.trips.forEach((item, index) => list.appendChild(itemRow('trips', item, index, 'record')));
+      const archiveList = qs('#archiveList');
+      archiveList.innerHTML = '';
+      state.archives.forEach((item, index) => archiveList.appendChild(itemRow('archives', item, index, 'record')));
+    }
+
+    function renderCurves() {
+      qs('#curveStats').innerHTML = `<div class="stat"><b>${state.curves.length}</b><span>监控品类</span></div><div class="stat"><b>${state.curves.length * 9 + 1}</b><span>采样点</span></div><div class="stat"><b>2</b><span>提醒规则</span></div>`;
+      qs('#curveBars').innerHTML = state.curves.map((item, index) => `<span class="bar-track"><i class="bar ${index % 2 ? 'active' : ''}" style="height:${item.value}px"></i>${item.name}</span>`).join('');
+      const list = qs('#curveList');
+      list.innerHTML = '';
+      state.curves.forEach((item, index) => {
+        const row = itemRow('curves', item, index, 'menu-item');
+        row.querySelector('.thumb')?.classList.replace('thumb', 'menu-icon');
+        list.appendChild(row);
+      });
+    }
+
+    function renderOverview() {
+      qs('#overviewStatus').innerHTML = `
+        <div class="record"><i class="thumb"></i><div><strong>${state.recipes[0]?.name || '暂无菜谱'} / 可增删改</strong><span>菜谱共 ${state.recipes.length} 条</span></div></div>
+        <div class="record"><i class="thumb"></i><div><strong>东京 5 日计划 / 可交互</strong><span>行程节点 ${state.trips.length} 项，归档 ${state.archives.length} 条</span></div></div>
+        <div class="record"><i class="thumb"></i><div><strong>${state.curves[2]?.name || '曲线'} / 价格提醒</strong><span>监控曲线 ${state.curves.length} 条</span></div></div>`;
+    }
+
+    function renderAll() {
+      renderRecipes();
+      renderTrips();
+      renderCurves();
+      renderOverview();
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('button');
+      if (!target) return;
+      const action = target.dataset.action;
+      if (action === 'add-recipe') openEditor('recipes');
+      if (action === 'add-trip') openEditor('trips');
+      if (action === 'add-curve') openEditor('curves');
+      if (action === 'archive-trip') {
+        state.archives.unshift({ name: '东京 5 日自由行', desc: `已归档 / 行程 ${state.trips.length} 项` });
+        toast('旅游计划已归档');
+        renderAll();
+      }
+      if (target.dataset.edit) openEditor(target.dataset.edit, Number(target.dataset.index));
+      if (target.dataset.delete) {
+        const type = target.dataset.delete;
+        state[type].splice(Number(target.dataset.index), 1);
+        toast('已删除');
+        renderAll();
+      }
+    });
+
+    qs('#modalCancel').addEventListener('click', closeEditor);
+    qs('#modalBackdrop').addEventListener('click', (event) => {
+      if (event.target.id === 'modalBackdrop') closeEditor();
+    });
+    qs('#editForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!editing) return;
+      const name = qs('#modalName').value.trim();
+      const desc = qs('#modalDesc').value.trim();
+      if (!name) return;
+      const next = { name, desc: desc || '未填写说明', value: Math.max(34, Math.min(92, Number.parseInt(desc, 10) || 62)) };
+      if (editing.index === null) state[editing.type].unshift(next);
+      else state[editing.type][editing.index] = { ...state[editing.type][editing.index], ...next };
+      closeEditor();
+      toast('已保存');
+      renderAll();
+    });
+
+    renderAll();
+  </script>
+
 </body>
 </html>
