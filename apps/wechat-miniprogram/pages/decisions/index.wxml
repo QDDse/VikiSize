@@ -10,6 +10,7 @@
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
     </view>
+    <view class="hero-copy">跟踪候选商品、目标价、当前价和成员意见，避免购买决策散落在聊天里。</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
       <button plain="true" class="link-button" bindtap="createDecisionCard">新决策</button>
@@ -22,13 +23,14 @@
       <view class="section-note">目标价 / 当前价 / 最终价</view>
     </view>
     <view class="stack" wx:if="{{cards.length}}">
-      <view class="list-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="list-row">
-          <view class="list-main">
-            <view class="item-title">{{item.title}}</view>
-            <view class="item-subtitle">{{item.description}}</view>
+      <view class="service-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle">{{item.description}}</view>
+          <view class="meta-row">
+            <view class="badge">{{item.statusLabel}}</view>
           </view>
-          <view class="badge">{{item.statusLabel}}</view>
         </view>
       </view>
     </view>

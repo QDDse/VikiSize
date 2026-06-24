@@ -8,7 +8,7 @@ page {
 .page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 22rpx 40rpx 64rpx;
+  padding: 18rpx 40rpx 64rpx;
 }
 
 button::after {
@@ -18,7 +18,7 @@ button::after {
 .topbar {
   align-items: center;
   display: flex;
-  height: 86rpx;
+  height: 108rpx;
   justify-content: space-between;
 }
 
@@ -32,7 +32,7 @@ button::after {
 .top-action {
   background: transparent;
   border: 0;
-  color: #19a66a;
+  color: #2f7dff;
   font-size: 26rpx;
   font-weight: 900;
   line-height: 1;
@@ -41,20 +41,36 @@ button::after {
 }
 
 .space-header {
-  background: #123c32;
-  border-radius: 28rpx;
+  background: #172554;
+  border-radius: 44rpx;
   box-sizing: border-box;
   color: #ffffff;
-  margin-top: 10rpx;
-  padding: 28rpx;
+  margin-top: 0;
+  min-height: 300rpx;
+  overflow: hidden;
+  padding: 36rpx;
+  position: relative;
+}
+
+.space-header::after {
+  background: rgba(47, 125, 255, 0.22);
+  border-radius: 50%;
+  content: "";
+  height: 220rpx;
+  position: absolute;
+  right: -76rpx;
+  top: -82rpx;
+  width: 220rpx;
 }
 
 .space-kicker {
-  color: #a7f3d0;
+  color: #dbeafe;
   font-size: 22rpx;
   font-weight: 800;
   letter-spacing: 1rpx;
+  position: relative;
   text-transform: uppercase;
+  z-index: 1;
 }
 
 .space-title-row {
@@ -63,17 +79,19 @@ button::after {
   gap: 16rpx;
   justify-content: space-between;
   margin-top: 12rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .space-title {
   color: #ffffff;
-  font-size: 38rpx;
+  font-size: 44rpx;
   font-weight: 950;
   line-height: 1.2;
 }
 
 .space-role {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 999rpx;
   color: #ffffff;
   flex: 0 0 auto;
@@ -86,6 +104,8 @@ button::after {
   display: flex;
   gap: 16rpx;
   margin-top: 24rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .link-button {
@@ -101,6 +121,15 @@ button::after {
   padding: 0 24rpx;
 }
 
+.hero-copy {
+  color: #dbeafe;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 1.55;
+  margin-top: 20rpx;
+  position: relative;
+  z-index: 1;
+}
 
 .search-box {
   align-items: center;
@@ -124,7 +153,7 @@ button::after {
 }
 
 .hero-card {
-  background: #123c32;
+  background: #172554;
   border-radius: 44rpx;
   box-sizing: border-box;
   color: #ffffff;
@@ -138,14 +167,6 @@ button::after {
   font-size: 48rpx;
   font-weight: 950;
   line-height: 1.16;
-}
-
-.hero-copy {
-  color: #c8f2dd;
-  font-size: 26rpx;
-  font-weight: 700;
-  line-height: 1.55;
-  margin-top: 20rpx;
 }
 
 .action-row {
@@ -170,11 +191,12 @@ button::after {
 }
 
 .pill-button {
-  background: #19a66a;
+  background: #2f7dff;
 }
 
 .ghost-button {
-  background: rgba(255, 255, 255, 0.12);
+  background: #f1f5f9;
+  color: #526071;
 }
 
 .section {
@@ -216,9 +238,27 @@ button::after {
 
 .list-card {
   background: #ffffff;
-  border-radius: 28rpx;
+  border-radius: 32rpx;
   box-sizing: border-box;
+  box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.04);
   padding: 26rpx;
+}
+
+.service-card {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.04);
+  box-sizing: border-box;
+  display: flex;
+  gap: 24rpx;
+  min-height: 152rpx;
+  padding: 28rpx;
+}
+
+.service-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .list-row {
@@ -242,6 +282,11 @@ button::after {
   padding: 8rpx 16rpx;
 }
 
+.badge.soft {
+  background: #f1f5f9;
+  color: #526071;
+}
+
 .muted {
   color: #667386;
 }
@@ -254,6 +299,12 @@ button::after {
   font-weight: 700;
   padding: 34rpx;
   text-align: center;
+}
+
+.space-header .ghost-button,
+.detail-hero .ghost-button {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
 .segmented {
@@ -276,7 +327,7 @@ button::after {
 }
 
 .segment.active {
-  background: #123c32;
+  background: #172554;
   color: #ffffff;
 }
 
@@ -318,7 +369,7 @@ button::after {
 .service-icon,
 .menu-icon,
 .avatar {
-  background: #e8f7ef;
+  background: #eaf7ff;
   border-radius: 28rpx;
   flex: 0 0 auto;
   height: 88rpx;
@@ -335,7 +386,7 @@ button::after {
 }
 
 .icon-brand {
-  background: #19a66a;
+  background: #2f7dff;
 }
 
 .item-title {
@@ -383,7 +434,59 @@ button::after {
 }
 
 .chip.active {
-  background: #e8f7ef;
-  border-color: #19a66a;
-  color: #0a7a49;
+  background: #eaf2ff;
+  border-color: #2f7dff;
+  color: #1d5fd1;
+}
+
+.shortcut-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 28rpx;
+}
+
+.shortcut-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 180rpx;
+  padding: 24rpx;
+}
+
+.shortcut-mark {
+  background: #2f7dff;
+  border-radius: 18rpx;
+  height: 56rpx;
+  width: 56rpx;
+}
+
+.shortcut-title {
+  color: #172033;
+  font-size: 26rpx;
+  font-weight: 900;
+  line-height: 1.25;
+  margin-top: 18rpx;
+}
+
+.shortcut-detail {
+  color: #667386;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 8rpx;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.meta-row {
+  align-items: center;
+  display: flex;
+  gap: 12rpx;
+  margin-top: 14rpx;
+  flex-wrap: wrap;
 }

@@ -1,9 +1,23 @@
+.detail-hero {
+  background: #172554;
+  border-radius: 44rpx;
+  box-sizing: border-box;
+  color: #ffffff;
+  padding: 36rpx;
+}
+
+.detail-hero .badge {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
 .hero-title {
-  color: #172033;
+  color: #ffffff;
   margin-top: 18rpx;
 }
 
 .hero-copy {
+  color: #dbeafe;
   margin-top: 14rpx;
 }
 

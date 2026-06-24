@@ -10,6 +10,7 @@
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
     </view>
+    <view class="hero-copy">旅行计划、任务、预算和活动记录集中在这里，东京模板已复制成当前空间的可编辑实例。</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
       <button plain="true" class="link-button" bindtap="createPlanCard">新任务</button>
@@ -29,9 +30,12 @@
       <view class="section-note" bindtap="openTravelPlan">查看全部</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{instance.days}}" wx:key="id" bindtap="openTravelPlan">
-        <view class="item-title">{{index + 1}}. {{item.theme}}</view>
-        <view class="item-subtitle">{{item.date}} · {{item.weekday}} · {{item.nodes.length}} 个节点</view>
+      <view class="service-card" wx:for="{{instance.days}}" wx:key="id" bindtap="openTravelPlan">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">D{{index + 1}} · {{item.theme}}</view>
+          <view class="item-subtitle">{{item.date}} · {{item.weekday}} · {{item.nodes.length}} 个节点</view>
+        </view>
       </view>
     </view>
   </view>
@@ -42,13 +46,15 @@
       <view class="section-note">{{cards.length}} 张</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="list-row">
-          <view class="list-main">
-            <view class="item-title">{{item.title}}</view>
-            <view class="item-subtitle">{{item.description}}</view>
+      <view class="service-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle">{{item.description}}</view>
+          <view class="meta-row">
+            <view class="badge">{{item.statusLabel}}</view>
+            <view class="badge soft" wx:if="{{item.estimateText}}">{{item.estimateText}}</view>
           </view>
-          <view class="badge">{{item.statusLabel}}</view>
         </view>
       </view>
     </view>
@@ -60,13 +66,14 @@
       <view class="section-note">预估 ¥{{budget.estimatedTotal}} / 已确认 ¥{{budget.confirmedTotal}}</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{budget.categories}}" wx:key="id">
-        <view class="list-row">
-          <view class="list-main">
-            <view class="item-title">{{item.name}}</view>
-            <view class="item-subtitle">已确认 ¥{{item.confirmedCost}}</view>
+      <view class="service-card" wx:for="{{budget.categories}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.name}}</view>
+          <view class="item-subtitle">已确认 ¥{{item.confirmedCost}}</view>
+          <view class="meta-row">
+            <view class="badge">预估 ¥{{item.estimatedCost}}</view>
           </view>
-          <view class="badge">¥{{item.estimatedCost}}</view>
         </view>
       </view>
     </view>
@@ -78,9 +85,12 @@
       <view class="section-note">最近更新</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{activities}}" wx:key="id">
-        <view class="item-title">{{item.summary}}</view>
-        <view class="item-subtitle">{{item.createdAt}}</view>
+      <view class="service-card" wx:for="{{activities}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.summary}}</view>
+          <view class="item-subtitle">{{item.createdAt}}</view>
+        </view>
       </view>
     </view>
   </view>

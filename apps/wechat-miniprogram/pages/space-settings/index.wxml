@@ -9,6 +9,7 @@
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
     </view>
+    <view class="hero-copy">管理成员角色，并生成微信分享卡路径。Guest 只读，Member 可协作编辑。</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="createMemberInvite">邀请 Member</button>
       <button plain="true" class="link-button" bindtap="createGuestInvite">邀请 Guest</button>
@@ -28,13 +29,14 @@
       <view class="section-note">{{members.length}} 人</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{members}}" wx:key="id">
-        <view class="list-row">
-          <view class="list-main">
-            <view class="item-title">{{item.displayName}}</view>
-            <view class="item-subtitle">joined {{item.joinedAt}}</view>
+      <view class="service-card" wx:for="{{members}}" wx:key="id">
+        <view class="avatar"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.displayName}}</view>
+          <view class="item-subtitle">joined {{item.joinedAt}}</view>
+          <view class="meta-row">
+            <view class="badge">{{item.roleLabel}}</view>
           </view>
-          <view class="badge">{{item.roleLabel}}</view>
         </view>
       </view>
     </view>

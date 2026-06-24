@@ -3,10 +3,10 @@
     <view class="page-title">Card</view>
   </view>
 
-  <view class="card">
+  <view class="detail-hero">
     <view class="badge">{{detail.card.statusLabel}}</view>
     <view class="hero-title">{{detail.card.title}}</view>
-    <view class="hero-copy muted">{{detail.card.description}}</view>
+    <view class="hero-copy">{{detail.card.description}}</view>
     <view class="chip-row">
       <view class="chip">{{detail.card.module}}</view>
       <view class="chip" wx:if="{{detail.card.archivedAt}}">已归档</view>
@@ -34,9 +34,12 @@
     <textarea class="comment-box" value="{{commentText}}" placeholder="写一条评论" bindinput="onCommentInput" />
     <button plain="true" class="pill-button comment-button" bindtap="addComment">添加评论</button>
     <view class="stack">
-      <view class="list-card" wx:for="{{detail.comments}}" wx:key="id">
-        <view class="item-title">{{item.body}}</view>
-        <view class="item-subtitle">{{item.createdAt}}</view>
+      <view class="service-card" wx:for="{{detail.comments}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.body}}</view>
+          <view class="item-subtitle">{{item.createdAt}}</view>
+        </view>
       </view>
     </view>
   </view>
@@ -47,9 +50,12 @@
       <view class="section-note">{{detail.opinions.length}} 条</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{detail.opinions}}" wx:key="id">
-        <view class="item-title">{{item.value}}</view>
-        <view class="item-subtitle">{{item.updatedAt}}</view>
+      <view class="service-card" wx:for="{{detail.opinions}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.value}}</view>
+          <view class="item-subtitle">{{item.updatedAt}}</view>
+        </view>
       </view>
     </view>
   </view>
@@ -59,9 +65,12 @@
       <view class="section-title">活动</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{detail.activities}}" wx:key="id">
-        <view class="item-title">{{item.summary}}</view>
-        <view class="item-subtitle">{{item.createdAt}}</view>
+      <view class="service-card" wx:for="{{detail.activities}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.summary}}</view>
+          <view class="item-subtitle">{{item.createdAt}}</view>
+        </view>
       </view>
     </view>
   </view>

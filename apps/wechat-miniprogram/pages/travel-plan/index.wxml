@@ -3,6 +3,15 @@
     <view class="page-title">Itinerary</view>
   </view>
 
+  <view class="space-header">
+    <view class="space-kicker">Interactive Trip</view>
+    <view class="space-title-row">
+      <view class="space-title">东京 D1-D8</view>
+      <view class="space-role">{{instance.days.length}} 天</view>
+    </view>
+    <view class="hero-copy">按天查看路线、交通、预约和预算。点击节点会记录一次行程确认。</view>
+  </view>
+
   <scroll-view scroll-x="true" class="day-tabs">
     <view class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
       D{{index + 1}}
@@ -17,13 +26,18 @@
     </view>
 
     <view class="stack node-stack">
-      <view class="list-card" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="markNodeChecked">
-        <view class="badge">{{item.period}} · {{item.time}}</view>
-        <view class="item-title node-title">{{item.title}}</view>
-        <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
-        <view class="item-subtitle" wx:if="{{item.booking}}">预约：{{item.booking}}</view>
-        <view class="item-subtitle">预算：¥{{item.estimatedCost}}</view>
-        <view class="item-subtitle">{{item.notes}}</view>
+      <view class="service-card" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="markNodeChecked">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="badge">{{item.period}} · {{item.time}}</view>
+          <view class="item-title node-title">{{item.title}}</view>
+          <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
+          <view class="item-subtitle" wx:if="{{item.booking}}">预约：{{item.booking}}</view>
+          <view class="meta-row">
+            <view class="badge soft">预算 ¥{{item.estimatedCost}}</view>
+          </view>
+          <view class="item-subtitle">{{item.notes}}</view>
+        </view>
       </view>
     </view>
   </view>

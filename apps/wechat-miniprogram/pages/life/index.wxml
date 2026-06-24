@@ -10,6 +10,7 @@
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
     </view>
+    <view class="hero-copy">食谱、采购和家务都以共享卡片管理，适合小家庭或同行成员快速协作。</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
       <button plain="true" class="link-button" bindtap="createLifeCard">新清单</button>
@@ -22,9 +23,12 @@
       <view class="section-note">食谱 / 采购 / 家务</view>
     </view>
     <view class="stack" wx:if="{{cards.length}}">
-      <view class="list-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="item-title">{{item.title}}</view>
-        <view class="item-subtitle">{{item.description}}</view>
+      <view class="service-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle">{{item.description}}</view>
+        </view>
       </view>
     </view>
     <view class="empty" wx:else>当前空间还没有生活卡片</view>

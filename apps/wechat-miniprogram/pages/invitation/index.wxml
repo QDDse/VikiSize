@@ -5,7 +5,10 @@
 
   <view class="space-header" wx:if="{{space}}">
     <view class="space-kicker">Invitation</view>
-    <view class="space-title">{{space.name}}</view>
+    <view class="space-title-row">
+      <view class="space-title">{{space.name}}</view>
+      <view class="space-role">{{invitation.role}}</view>
+    </view>
     <view class="hero-copy">邀请角色：{{invitation.role}}</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="accept">加入空间</button>

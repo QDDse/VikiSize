@@ -10,9 +10,28 @@
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
     </view>
+    <view class="hero-copy">聚合当前空间的行程、待办、提醒和最近活动，具体操作进入对应模块完成。</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
       <button plain="true" class="link-button" bindtap="openPlans">旅行小队</button>
+    </view>
+  </view>
+
+  <view class="shortcut-row">
+    <view class="shortcut-card soft-blue" bindtap="openPlans">
+      <view class="shortcut-mark"></view>
+      <view class="shortcut-title">旅行计划</view>
+      <view class="shortcut-detail">D1-D8 行程</view>
+    </view>
+    <view class="shortcut-card soft-green">
+      <view class="shortcut-mark"></view>
+      <view class="shortcut-title">生活清单</view>
+      <view class="shortcut-detail">采购与家务</view>
+    </view>
+    <view class="shortcut-card soft-amber">
+      <view class="shortcut-mark"></view>
+      <view class="shortcut-title">价格决策</view>
+      <view class="shortcut-detail">目标价提醒</view>
     </view>
   </view>
 
@@ -26,9 +45,12 @@
       <view class="section-note">{{searchResults.length}} 条</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{searchResults}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="item-title">{{item.title}}</view>
-        <view class="item-subtitle">{{item.description}}</view>
+      <view class="service-card" wx:for="{{searchResults}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle">{{item.description}}</view>
+        </view>
       </view>
     </view>
   </view>
@@ -41,9 +63,12 @@
     <view class="card">
       <view class="card-title">{{summary.todayItinerary.theme}}</view>
       <view class="item-subtitle">{{summary.todayItinerary.tip}}</view>
-      <view class="list-card" wx:for="{{summary.todayItinerary.nodes}}" wx:key="id">
-        <view class="item-title">{{item.time}} · {{item.title}}</view>
-        <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
+      <view class="service-card" wx:for="{{summary.todayItinerary.nodes}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.time}} · {{item.title}}</view>
+          <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
+        </view>
       </view>
     </view>
   </view>
@@ -54,13 +79,15 @@
       <view class="section-note">默认隐藏归档</view>
     </view>
     <view class="stack" wx:if="{{summary.activeCards.length}}">
-      <view class="list-card" wx:for="{{summary.activeCards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="list-row">
-          <view class="list-main">
-            <view class="item-title">{{item.title}}</view>
-            <view class="item-subtitle">{{item.description}}</view>
+      <view class="service-card" wx:for="{{summary.activeCards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle">{{item.description}}</view>
+          <view class="meta-row">
+            <view class="badge">{{item.statusLabel}}</view>
+            <view class="badge soft">{{item.module}}</view>
           </view>
-          <view class="badge">{{item.statusLabel}}</view>
         </view>
       </view>
     </view>
@@ -73,13 +100,19 @@
       <view class="section-note">{{summary.reminders.length}} 个提醒</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{summary.pendingConfirmations}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="item-title">{{item.title}}</view>
-        <view class="item-subtitle">需要成员确认</view>
+      <view class="service-card" wx:for="{{summary.pendingConfirmations}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle">需要成员确认</view>
+        </view>
       </view>
-      <view class="list-card" wx:for="{{summary.reminders}}" wx:key="id">
-        <view class="item-title">{{item.type}}</view>
-        <view class="item-subtitle">状态：{{item.status}}</view>
+      <view class="service-card" wx:for="{{summary.reminders}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.type}}</view>
+          <view class="item-subtitle">状态：{{item.status}}</view>
+        </view>
       </view>
     </view>
   </view>
@@ -89,9 +122,12 @@
       <view class="section-title">最近活动</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{summary.activities}}" wx:key="id">
-        <view class="item-title">{{item.summary}}</view>
-        <view class="item-subtitle">{{item.createdAt}}</view>
+      <view class="service-card" wx:for="{{summary.activities}}" wx:key="id">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.summary}}</view>
+          <view class="item-subtitle">{{item.createdAt}}</view>
+        </view>
       </view>
     </view>
   </view>

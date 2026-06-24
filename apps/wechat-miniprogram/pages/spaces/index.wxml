@@ -3,15 +3,27 @@
     <view class="page-title">Life Spaces</view>
   </view>
 
+  <view class="space-header">
+    <view class="space-kicker">Space Switcher</view>
+    <view class="space-title-row">
+      <view class="space-title">选择生活空间</view>
+      <view class="space-role">{{spaces.length}} 个</view>
+    </view>
+    <view class="hero-copy">像原型中的模块入口一样，把不同家庭、旅行和购买决策分成独立空间。</view>
+  </view>
+
   <view class="section">
     <view class="section-head">
       <view class="section-title">当前空间</view>
       <view class="section-note">2-6 人可信协作</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{spaces}}" wx:key="id" data-id="{{item.id}}" bindtap="switchSpace">
-        <view class="item-title">{{item.name}}</view>
-        <view class="item-subtitle">{{item.templateType}}</view>
+      <view class="service-card" wx:for="{{spaces}}" wx:key="id" data-id="{{item.id}}" bindtap="switchSpace">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.name}}</view>
+          <view class="item-subtitle">{{item.templateType}}</view>
+        </view>
       </view>
     </view>
   </view>
@@ -22,9 +34,12 @@
       <view class="section-note">内置模板</view>
     </view>
     <view class="stack">
-      <view class="list-card" wx:for="{{templates}}" wx:key="type" data-type="{{item.type}}" bindtap="createSpace">
-        <view class="item-title">{{item.name}}</view>
-        <view class="item-subtitle">{{item.description}}</view>
+      <view class="service-card" wx:for="{{templates}}" wx:key="type" data-type="{{item.type}}" bindtap="createSpace">
+        <view class="service-icon"></view>
+        <view class="service-main">
+          <view class="item-title">{{item.name}}</view>
+          <view class="item-subtitle">{{item.description}}</view>
+        </view>
       </view>
     </view>
   </view>

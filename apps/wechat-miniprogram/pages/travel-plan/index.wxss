@@ -1,5 +1,5 @@
 .day-tabs {
-  margin-top: 18rpx;
+  margin-top: 24rpx;
   white-space: nowrap;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .day-tab.active {
-  background: #123c32;
+  background: #172554;
   color: #ffffff;
 }
 
