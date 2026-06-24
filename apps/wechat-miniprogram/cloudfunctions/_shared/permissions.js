@@ -10,7 +10,7 @@ async function assertPermission(spaceId, profile) {
   const member = members.data[0];
 
   if (!member || member.role === "guest") {
-    const error = new Error("Guest 只能查看，不能修改");
+    const error = new Error("访客只能查看，不能修改");
     error.code = "PERMISSION_DENIED";
     throw error;
   }
@@ -21,7 +21,7 @@ async function assertPermission(spaceId, profile) {
 async function assertOwner(spaceId, profile) {
   const result = await assertPermission(spaceId, profile);
   if (result.member.role !== "owner") {
-    const error = new Error("只有 Owner 可以管理成员");
+    const error = new Error("只有管理员可以管理成员");
     error.code = "OWNER_REQUIRED";
     throw error;
   }

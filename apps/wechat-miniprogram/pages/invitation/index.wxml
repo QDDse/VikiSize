@@ -1,15 +1,15 @@
 <view class="page">
   <view class="topbar">
-    <view class="page-title">Join Space</view>
+    <view class="page-title">加入空间</view>
   </view>
 
   <view class="space-header" wx:if="{{space}}">
-    <view class="space-kicker">Invitation</view>
+    <view class="space-kicker">空间邀请</view>
     <view class="space-title-row">
       <view class="space-title">{{space.name}}</view>
-      <view class="space-role">{{invitation.role}}</view>
+      <view class="space-role">{{roleLabel}}</view>
     </view>
-    <view class="hero-copy">邀请角色：{{invitation.role}}</view>
+    <view class="hero-copy">邀请角色：{{roleLabel}}</view>
     <view class="space-actions">
       <button plain="true" class="link-button" bindtap="accept">加入空间</button>
     </view>

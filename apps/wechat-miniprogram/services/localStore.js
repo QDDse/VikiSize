@@ -1,10 +1,14 @@
 const {
   CardStatuses,
+  ModuleLabels,
   Modules,
   ReminderTypes,
+  ReminderStatusLabels,
+  ReminderTypeLabels,
   Roles,
   StatusLabels,
   TemplateOptions,
+  TemplateTypeLabels,
   TemplateTypes
 } = require("../domain/constants");
 const { tokyoTravelTemplate } = require("../data/tokyoTravelTemplate");
@@ -299,7 +303,11 @@ function getCurrentContext() {
 
 function listSpaces() {
   const state = readRawState();
-  return state.collections.spaces.filter((space) => !space.archivedAt);
+  return state.collections.spaces
+    .filter((space) => !space.archivedAt)
+    .map((space) => Object.assign({}, space, {
+      templateTypeLabel: TemplateTypeLabels[space.templateType] || space.templateType
+    }));
 }
 
 function switchSpace(spaceId) {
@@ -333,6 +341,7 @@ function getCards(spaceId, moduleName, includeArchived) {
     .filter((card) => !moduleName || card.module === moduleName)
     .filter((card) => includeArchived || !card.archivedAt)
     .map((card) => Object.assign({}, card, {
+      moduleLabel: ModuleLabels[card.module] || card.module,
       statusLabel: StatusLabels[card.status],
       estimateText: card.details && card.details.estimatedCost ? `¥${card.details.estimatedCost}` : ""
     }));
@@ -346,7 +355,10 @@ function getCardDetail(cardId) {
   }
 
   return {
-    card: Object.assign({}, card, { statusLabel: StatusLabels[card.status] }),
+    card: Object.assign({}, card, {
+      moduleLabel: ModuleLabels[card.module] || card.module,
+      statusLabel: StatusLabels[card.status]
+    }),
     comments: state.collections.comments.filter((item) => item.cardId === cardId && !item.deletedAt),
     activities: state.collections.activities.filter((item) => item.cardId === cardId),
     attachments: state.collections.attachments.filter((item) => item.cardId === cardId),
@@ -357,7 +369,7 @@ function getCardDetail(cardId) {
 function assertCanWrite(state, spaceId) {
   const member = state.collections.space_members.find((item) => item.spaceId === spaceId && item.userId === state.currentUserId);
   if (!member || member.role === Roles.GUEST) {
-    throw new Error("Guest 只能查看，不能修改");
+    throw new Error("访客只能查看，不能修改");
   }
   return member;
 }
@@ -582,9 +594,15 @@ function getTodaySummary(spaceId) {
   const active = cards.filter((card) => card.status !== CardStatuses.DONE);
   const instance = getTravelInstance(spaceId);
   return {
-    activeCards: active.slice(0, 5).map((card) => Object.assign({}, card, { statusLabel: StatusLabels[card.status] })),
+    activeCards: active.slice(0, 5).map((card) => Object.assign({}, card, {
+      moduleLabel: ModuleLabels[card.module] || card.module,
+      statusLabel: StatusLabels[card.status]
+    })),
     pendingConfirmations: pending.slice(0, 3),
-    reminders: reminders.slice(0, 5),
+    reminders: reminders.slice(0, 5).map((reminder) => Object.assign({}, reminder, {
+      statusLabel: ReminderStatusLabels[reminder.status] || reminder.status,
+      typeLabel: ReminderTypeLabels[reminder.type] || reminder.type
+    })),
     todayItinerary: instance && instance.days.length ? instance.days[0] : null,
     activities: state.collections.activities.filter((item) => item.spaceId === spaceId).slice(0, 6)
   };

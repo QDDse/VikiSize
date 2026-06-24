@@ -43,18 +43,18 @@ store.setCurrentUserRoleForPreview(Roles.GUEST);
 assert.throws(() => store.upsertCard({
   spaceId: context.space.id,
   module: Modules.LIFE,
-  title: "Guest 写入",
+  title: "访客写入",
   description: ""
-}), /Guest 只能查看/);
+}), /访客只能查看/);
 
 store.setCurrentUserRoleForPreview(Roles.MEMBER);
 store.upsertCard({
   spaceId: context.space.id,
   module: Modules.LIFE,
-  title: "Member 可写",
+  title: "成员可写",
   description: "成员可以创建生活卡片"
 });
-assert.ok(store.getCards(context.space.id, Modules.LIFE).some((item) => item.title === "Member 可写"));
+assert.ok(store.getCards(context.space.id, Modules.LIFE).some((item) => item.title === "成员可写"));
 
 const invite = store.createInvitation(Roles.GUEST);
 assert.strictEqual(invite.role, Roles.GUEST);

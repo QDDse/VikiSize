@@ -24,10 +24,30 @@ const TemplateTypes = {
   BLANK: "blank"
 };
 
+const TemplateTypeLabels = {
+  family_life: "家庭生活",
+  travel_team: "旅行空间",
+  purchase_decision: "购买决策",
+  blank: "空白空间"
+};
+
 const ReminderTypes = {
   ASSIGNED_TO_ME: "assigned_to_me",
   DUE_SOON: "due_soon",
   NEEDS_CONFIRMATION: "needs_confirmation"
+};
+
+const ReminderTypeLabels = {
+  assigned_to_me: "分配给我",
+  due_soon: "即将到期",
+  needs_confirmation: "需要确认"
+};
+
+const ReminderStatusLabels = {
+  pending: "待发送",
+  sent: "已发送",
+  failed: "发送失败",
+  cancelled: "已取消"
 };
 
 const OpinionValues = {
@@ -44,15 +64,15 @@ const StatusLabels = {
 };
 
 const RoleLabels = {
-  owner: "Owner",
-  member: "Member",
-  guest: "Guest"
+  owner: "管理员",
+  member: "成员",
+  guest: "访客"
 };
 
 const ModuleLabels = {
-  plans: "Plans",
-  life: "Life",
-  decisions: "Decisions"
+  plans: "计划",
+  life: "生活",
+  decisions: "决策"
 };
 
 const TemplateOptions = [
@@ -63,17 +83,17 @@ const TemplateOptions = [
   },
   {
     type: TemplateTypes.FAMILY_LIFE,
-    name: "Family Life",
+    name: "家庭生活",
     description: "共享家务、购物清单和日常待办"
   },
   {
     type: TemplateTypes.PURCHASE_DECISION,
-    name: "Purchase Decision",
+    name: "购买决策",
     description: "跟踪候选商品、目标价和成员意见"
   },
   {
     type: TemplateTypes.BLANK,
-    name: "Blank Space",
+    name: "空白空间",
     description: "从空白生活空间开始"
   }
 ];
@@ -83,10 +103,13 @@ module.exports = {
   Modules,
   ModuleLabels,
   OpinionValues,
+  ReminderStatusLabels,
+  ReminderTypeLabels,
   ReminderTypes,
   RoleLabels,
   Roles,
   StatusLabels,
   TemplateOptions,
+  TemplateTypeLabels,
   TemplateTypes
 };

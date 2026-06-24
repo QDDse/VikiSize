@@ -6,7 +6,7 @@ exports.main = async (event) => {
   const timestamp = now();
   const space = {
     id: "",
-    name: event.name || "New Life Space",
+    name: event.name || "新的生活空间",
     templateType: event.templateType || "blank",
     ownerUserId: user.id,
     currentTemplateInstanceId: "",

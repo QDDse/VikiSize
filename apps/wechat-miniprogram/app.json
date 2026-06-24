@@ -24,19 +24,19 @@
     "list": [
       {
         "pagePath": "pages/today/index",
-        "text": "Today"
+        "text": "今日"
       },
       {
         "pagePath": "pages/plans/index",
-        "text": "Plans"
+        "text": "计划"
       },
       {
         "pagePath": "pages/life/index",
-        "text": "Life"
+        "text": "生活"
       },
       {
         "pagePath": "pages/decisions/index",
-        "text": "Decisions"
+        "text": "决策"
       }
     ]
   },

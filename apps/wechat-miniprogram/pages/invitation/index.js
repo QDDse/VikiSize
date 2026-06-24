@@ -1,11 +1,13 @@
 const store = require("../../services/localStore");
+const { RoleLabels } = require("../../domain/constants");
 
 Page({
   data: {
     token: "",
     spaceId: "",
     space: null,
-    invitation: null
+    invitation: null,
+    roleLabel: ""
   },
 
   onLoad(options) {
@@ -16,7 +18,8 @@ Page({
       token: options.token || "",
       spaceId: options.spaceId || "",
       invitation,
-      space
+      space,
+      roleLabel: invitation ? RoleLabels[invitation.role] || invitation.role : ""
     });
   },
 

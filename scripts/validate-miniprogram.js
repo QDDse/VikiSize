@@ -65,7 +65,7 @@ requiredPages.forEach((page) => {
 
 const tabPages = appJson.tabBar.list.map((item) => item.pagePath);
 assert(tabPages.length === 4, "tabBar must have exactly four tabs");
-assert(tabPages.join(",") === "pages/today/index,pages/plans/index,pages/life/index,pages/decisions/index", "tabBar must be Today / Plans / Life / Decisions");
+assert(tabPages.join(",") === "pages/today/index,pages/plans/index,pages/life/index,pages/decisions/index", "tabBar must be 今日 / 计划 / 生活 / 决策");
 assert(projectConfig.cloudfunctionRoot === "cloudfunctions/", "project.config.json must set cloudfunctionRoot");
 
 requiredCollections.forEach((collectionName) => {

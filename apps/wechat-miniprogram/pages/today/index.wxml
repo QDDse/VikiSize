@@ -1,11 +1,11 @@
 <view class="page">
   <view class="topbar">
-    <view class="page-title">Today</view>
+    <view class="page-title">今日</view>
     <button plain="true" class="top-action" bindtap="openSettings">设置</button>
   </view>
 
   <view class="space-header">
-    <view class="space-kicker">Current Life Space</view>
+    <view class="space-kicker">当前生活空间</view>
     <view class="space-title-row">
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
@@ -86,7 +86,7 @@
           <view class="item-subtitle">{{item.description}}</view>
           <view class="meta-row">
             <view class="badge">{{item.statusLabel}}</view>
-            <view class="badge soft">{{item.module}}</view>
+            <view class="badge soft">{{item.moduleLabel}}</view>
           </view>
         </view>
       </view>
@@ -110,8 +110,8 @@
       <view class="service-card" wx:for="{{summary.reminders}}" wx:key="id">
         <view class="service-icon"></view>
         <view class="service-main">
-          <view class="item-title">{{item.type}}</view>
-          <view class="item-subtitle">状态：{{item.status}}</view>
+          <view class="item-title">{{item.typeLabel}}</view>
+          <view class="item-subtitle">状态：{{item.statusLabel}}</view>
         </view>
       </view>
     </view>

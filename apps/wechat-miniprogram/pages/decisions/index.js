@@ -31,7 +31,7 @@ Page({
 
   createDecisionCard() {
     if (!this.data.context.canWrite) {
-      wx.showToast({ title: "Guest 只能查看", icon: "none" });
+      wx.showToast({ title: "访客只能查看", icon: "none" });
       return;
     }
     const card = store.upsertCard({

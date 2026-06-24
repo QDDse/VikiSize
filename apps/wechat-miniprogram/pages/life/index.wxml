@@ -1,11 +1,11 @@
 <view class="page">
   <view class="topbar">
-    <view class="page-title">Life</view>
+    <view class="page-title">生活</view>
     <button plain="true" class="top-action" bindtap="openSettings">设置</button>
   </view>
 
   <view class="space-header">
-    <view class="space-kicker">Shared Life</view>
+    <view class="space-kicker">共享生活</view>
     <view class="space-title-row">
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>

@@ -1,10 +1,10 @@
 <view class="page" wx:if="{{instance}}">
   <view class="topbar">
-    <view class="page-title">Itinerary</view>
+    <view class="page-title">行程</view>
   </view>
 
   <view class="space-header">
-    <view class="space-kicker">Interactive Trip</view>
+    <view class="space-kicker">旅行计划</view>
     <view class="space-title-row">
       <view class="space-title">东京 D1-D8</view>
       <view class="space-role">{{instance.days.length}} 天</view>
