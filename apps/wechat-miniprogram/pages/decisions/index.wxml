@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="topbar">
+    <view class="page-title">Decisions</view>
+    <button plain="true" class="top-action" bindtap="openSettings">设置</button>
+  </view>
+
+  <view class="space-header">
+    <view class="space-kicker">Shared Decisions</view>
+    <view class="space-title-row">
+      <view class="space-title">{{context.space.name}}</view>
+      <view class="space-role">{{roleLabel}}</view>
+    </view>
+    <view class="space-actions">
+      <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
+      <button plain="true" class="link-button" bindtap="createDecisionCard">新决策</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">价格与意见</view>
+      <view class="section-note">目标价 / 当前价 / 最终价</view>
+    </view>
+    <view class="stack" wx:if="{{cards.length}}">
+      <view class="list-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="list-row">
+          <view class="list-main">
+            <view class="item-title">{{item.title}}</view>
+            <view class="item-subtitle">{{item.description}}</view>
+          </view>
+          <view class="badge">{{item.statusLabel}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="empty" wx:else>当前空间还没有购买决策</view>
+  </view>
+</view>

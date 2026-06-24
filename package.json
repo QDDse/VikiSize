@@ -4,7 +4,9 @@
   "private": true,
   "description": "VikiSize application repository",
   "scripts": {
-    "deploy:wechat": "node scripts/upload-wechat.js"
+    "deploy:wechat": "node scripts/upload-wechat.js",
+    "validate:wechat": "node scripts/validate-miniprogram.js",
+    "test:domain": "node scripts/test-domain.js"
   },
   "devDependencies": {
     "miniprogram-ci": "2.1.31"

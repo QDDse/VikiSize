@@ -1,0 +1,68 @@
+<view class="page" wx:if="{{detail}}">
+  <view class="topbar">
+    <view class="page-title">Card</view>
+  </view>
+
+  <view class="card">
+    <view class="badge">{{detail.card.statusLabel}}</view>
+    <view class="hero-title">{{detail.card.title}}</view>
+    <view class="hero-copy muted">{{detail.card.description}}</view>
+    <view class="chip-row">
+      <view class="chip">{{detail.card.module}}</view>
+      <view class="chip" wx:if="{{detail.card.archivedAt}}">已归档</view>
+      <view class="chip" wx:if="{{detail.card.details.estimatedCost}}">¥{{detail.card.details.estimatedCost}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="space-actions detail-actions">
+      <button plain="true" class="pill-button" bindtap="advanceStatus">推进状态</button>
+      <button plain="true" class="ghost-button" bindtap="archiveCard">{{detail.card.archivedAt ? '取消归档' : '归档'}}</button>
+    </view>
+    <view class="space-actions detail-actions">
+      <button plain="true" class="ghost-button" bindtap="scheduleAssigned">分配提醒</button>
+      <button plain="true" class="ghost-button" bindtap="scheduleDueSoon">到期提醒</button>
+      <button plain="true" class="ghost-button" bindtap="setAgree">同意</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">评论</view>
+      <view class="section-note">{{detail.comments.length}} 条</view>
+    </view>
+    <textarea class="comment-box" value="{{commentText}}" placeholder="写一条评论" bindinput="onCommentInput" />
+    <button plain="true" class="pill-button comment-button" bindtap="addComment">添加评论</button>
+    <view class="stack">
+      <view class="list-card" wx:for="{{detail.comments}}" wx:key="id">
+        <view class="item-title">{{item.body}}</view>
+        <view class="item-subtitle">{{item.createdAt}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">成员意见</view>
+      <view class="section-note">{{detail.opinions.length}} 条</view>
+    </view>
+    <view class="stack">
+      <view class="list-card" wx:for="{{detail.opinions}}" wx:key="id">
+        <view class="item-title">{{item.value}}</view>
+        <view class="item-subtitle">{{item.updatedAt}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">活动</view>
+    </view>
+    <view class="stack">
+      <view class="list-card" wx:for="{{detail.activities}}" wx:key="id">
+        <view class="item-title">{{item.summary}}</view>
+        <view class="item-subtitle">{{item.createdAt}}</view>
+      </view>
+    </view>
+  </view>
+</view>

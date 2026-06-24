@@ -1,0 +1,16 @@
+<view class="page">
+  <view class="topbar">
+    <view class="page-title">Join Space</view>
+  </view>
+
+  <view class="space-header" wx:if="{{space}}">
+    <view class="space-kicker">Invitation</view>
+    <view class="space-title">{{space.name}}</view>
+    <view class="hero-copy">邀请角色：{{invitation.role}}</view>
+    <view class="space-actions">
+      <button plain="true" class="link-button" bindtap="accept">加入空间</button>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>邀请无效或已过期</view>
+</view>

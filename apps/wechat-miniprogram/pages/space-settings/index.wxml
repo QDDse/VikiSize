@@ -1,0 +1,42 @@
+<view class="page">
+  <view class="topbar">
+    <view class="page-title">Settings</view>
+  </view>
+
+  <view class="space-header">
+    <view class="space-kicker">Members & Invite</view>
+    <view class="space-title-row">
+      <view class="space-title">{{context.space.name}}</view>
+      <view class="space-role">{{roleLabel}}</view>
+    </view>
+    <view class="space-actions">
+      <button plain="true" class="link-button" bindtap="createMemberInvite">邀请 Member</button>
+      <button plain="true" class="link-button" bindtap="createGuestInvite">邀请 Guest</button>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{sharePath}}">
+    <view class="card">
+      <view class="card-title">分享路径</view>
+      <view class="item-subtitle">{{sharePath}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">成员</view>
+      <view class="section-note">{{members.length}} 人</view>
+    </view>
+    <view class="stack">
+      <view class="list-card" wx:for="{{members}}" wx:key="id">
+        <view class="list-row">
+          <view class="list-main">
+            <view class="item-title">{{item.displayName}}</view>
+            <view class="item-subtitle">joined {{item.joinedAt}}</view>
+          </view>
+          <view class="badge">{{item.roleLabel}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

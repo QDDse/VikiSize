@@ -1,0 +1,30 @@
+<view class="page" wx:if="{{instance}}">
+  <view class="topbar">
+    <view class="page-title">Itinerary</view>
+  </view>
+
+  <scroll-view scroll-x="true" class="day-tabs">
+    <view class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
+      D{{index + 1}}
+    </view>
+  </scroll-view>
+
+  <view class="section" wx:if="{{selectedDay}}">
+    <view class="card">
+      <view class="card-title">{{selectedDay.theme}}</view>
+      <view class="item-subtitle">{{selectedDay.date}} · {{selectedDay.weekday}}</view>
+      <view class="item-subtitle">{{selectedDay.tip}}</view>
+    </view>
+
+    <view class="stack node-stack">
+      <view class="list-card" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="markNodeChecked">
+        <view class="badge">{{item.period}} · {{item.time}}</view>
+        <view class="item-title node-title">{{item.title}}</view>
+        <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
+        <view class="item-subtitle" wx:if="{{item.booking}}">预约：{{item.booking}}</view>
+        <view class="item-subtitle">预算：¥{{item.estimatedCost}}</view>
+        <view class="item-subtitle">{{item.notes}}</view>
+      </view>
+    </view>
+  </view>
+</view>

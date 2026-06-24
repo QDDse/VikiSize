@@ -4,6 +4,7 @@
   "description": "VikiSize WeChat Mini Program project. Upload secrets are supplied outside the repository.",
   "compileType": "miniprogram",
   "miniprogramRoot": "./",
+  "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
     "urlCheck": true,
     "es6": true,

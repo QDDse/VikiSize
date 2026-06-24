@@ -1,10 +1,14 @@
 {
   "pages": [
-    "pages/home/index",
-    "pages/services/index",
-    "pages/travel/index",
-    "pages/records/index",
-    "pages/profile/index"
+    "pages/today/index",
+    "pages/plans/index",
+    "pages/life/index",
+    "pages/decisions/index",
+    "pages/spaces/index",
+    "pages/space-settings/index",
+    "pages/card-detail/index",
+    "pages/travel-plan/index",
+    "pages/invitation/index"
   ],
   "window": {
     "navigationBarTitleText": "VikiSize",
@@ -19,20 +23,20 @@
     "borderStyle": "white",
     "list": [
       {
-        "pagePath": "pages/home/index",
-        "text": "首页"
+        "pagePath": "pages/today/index",
+        "text": "Today"
       },
       {
-        "pagePath": "pages/services/index",
-        "text": "服务"
+        "pagePath": "pages/plans/index",
+        "text": "Plans"
       },
       {
-        "pagePath": "pages/records/index",
-        "text": "记录"
+        "pagePath": "pages/life/index",
+        "text": "Life"
       },
       {
-        "pagePath": "pages/profile/index",
-        "text": "我的"
+        "pagePath": "pages/decisions/index",
+        "text": "Decisions"
       }
     ]
   },

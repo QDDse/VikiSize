@@ -1,0 +1,8 @@
+input.search-box {
+  border: 0;
+  width: 100%;
+}
+
+.card .list-card {
+  margin-top: 18rpx;
+}

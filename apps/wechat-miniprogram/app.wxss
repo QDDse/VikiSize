@@ -11,6 +11,10 @@ page {
   padding: 22rpx 40rpx 64rpx;
 }
 
+button::after {
+  border: 0;
+}
+
 .topbar {
   align-items: center;
   display: flex;
@@ -34,6 +38,67 @@ page {
   line-height: 1;
   margin: 0;
   padding: 0;
+}
+
+.space-header {
+  background: #123c32;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+  color: #ffffff;
+  margin-top: 10rpx;
+  padding: 28rpx;
+}
+
+.space-kicker {
+  color: #a7f3d0;
+  font-size: 22rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+}
+
+.space-title-row {
+  align-items: center;
+  display: flex;
+  gap: 16rpx;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.space-title {
+  color: #ffffff;
+  font-size: 38rpx;
+  font-weight: 950;
+  line-height: 1.2;
+}
+
+.space-role {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999rpx;
+  color: #ffffff;
+  flex: 0 0 auto;
+  font-size: 22rpx;
+  font-weight: 900;
+  padding: 10rpx 18rpx;
+}
+
+.space-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.link-button {
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 999rpx;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 64rpx;
+  margin: 0;
+  min-height: 64rpx;
+  padding: 0 24rpx;
 }
 
 
@@ -141,6 +206,78 @@ page {
   box-shadow: 0 10rpx 36rpx rgba(15, 23, 42, 0.06);
   box-sizing: border-box;
   padding: 32rpx;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.list-card {
+  background: #ffffff;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+  padding: 26rpx;
+}
+
+.list-row {
+  align-items: center;
+  display: flex;
+  gap: 20rpx;
+}
+
+.list-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.badge {
+  background: #eef4ff;
+  border-radius: 999rpx;
+  color: #1d5fd1;
+  display: inline-flex;
+  font-size: 22rpx;
+  font-weight: 900;
+  padding: 8rpx 16rpx;
+}
+
+.muted {
+  color: #667386;
+}
+
+.empty {
+  background: #ffffff;
+  border-radius: 28rpx;
+  color: #667386;
+  font-size: 26rpx;
+  font-weight: 700;
+  padding: 34rpx;
+  text-align: center;
+}
+
+.segmented {
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  gap: 8rpx;
+  margin-top: 24rpx;
+  padding: 8rpx;
+}
+
+.segment {
+  border-radius: 22rpx;
+  color: #667386;
+  flex: 1;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 64rpx;
+  text-align: center;
+}
+
+.segment.active {
+  background: #123c32;
+  color: #ffffff;
 }
 
 .card-title {
