@@ -22,3 +22,9 @@
   flex: 1;
   min-width: 0;
 }
+
+
+.travel-feature {
+  background: #f1edff;
+  border: 2rpx solid rgba(25, 166, 106, 0.18);
+}

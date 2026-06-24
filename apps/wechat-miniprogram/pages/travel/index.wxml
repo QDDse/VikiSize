@@ -1,0 +1,68 @@
+<view class="page travel-page">
+  <view class="topbar">
+    <view class="page-title">旅游</view>
+    <button plain="true" class="top-action" bindtap="showPreparing">地图</button>
+  </view>
+
+  <view class="travel-hero">
+    <view class="travel-kicker">{{plan.kicker}}</view>
+    <view class="travel-title">{{plan.title}}</view>
+    <view class="travel-subtitle">{{plan.subtitle}}</view>
+  </view>
+
+  <view class="travel-summary">
+    <view class="summary-pill" wx:for="{{plan.summary}}" wx:key="label">
+      <view class="summary-value">{{item.value}}</view>
+      <view class="summary-label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">出发前提醒</view>
+      <view class="section-note">按提前天数</view>
+    </view>
+    <view class="reminder-card" wx:for="{{plan.reminders}}" wx:key="id">
+      <view class="lead-badge">提前{{item.leadDays}}天</view>
+      <view class="reminder-text">{{item.item}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">每日行程</view>
+      <view class="section-note">8 天</view>
+    </view>
+    <view class="day-card" wx:for="{{plan.days}}" wx:key="id" wx:for-item="day" wx:for-index="dayIndex">
+      <view class="day-head">
+        <view class="day-index">Day {{dayIndex + 1}}</view>
+        <view class="day-date">{{day.date}} · {{day.weekday}}</view>
+      </view>
+      <view class="day-theme">{{day.theme}}</view>
+      <view class="day-tip">{{day.tip}}</view>
+
+      <view class="slot-card" wx:for="{{day.slots}}" wx:key="name" wx:for-item="slot">
+        <view class="slot-time">{{slot.period}} · {{slot.time}}</view>
+        <view class="slot-name">{{slot.name}}</view>
+        <view class="slot-note">{{slot.note}}</view>
+        <view class="slot-meta">
+          <view>{{slot.transport}}</view>
+          <view>{{slot.ticket}}</view>
+          <view wx:if="{{slot.booking}}">{{slot.booking}}</view>
+        </view>
+      </view>
+
+      <view class="dining-box">
+        <view class="dining-title">餐饮建议</view>
+        <view class="dining-item" wx:for="{{day.dining}}" wx:key="*this">{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section tips-section">
+    <view class="section-head">
+      <view class="section-title">旅行原则</view>
+    </view>
+    <view class="tip-row" wx:for="{{plan.tips}}" wx:key="*this">{{item}}</view>
+  </view>
+</view>

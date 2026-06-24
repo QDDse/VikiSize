@@ -1,0 +1,209 @@
+.travel-page {
+  padding-top: 18rpx;
+}
+
+.travel-hero {
+  background: #123c32;
+  border-radius: 44rpx;
+  box-sizing: border-box;
+  color: #ffffff;
+  min-height: 320rpx;
+  padding: 38rpx;
+}
+
+.travel-kicker {
+  color: #c8f2dd;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.travel-title {
+  color: #ffffff;
+  font-size: 48rpx;
+  font-weight: 950;
+  line-height: 1.16;
+  margin-top: 18rpx;
+}
+
+.travel-subtitle {
+  color: #c8f2dd;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 1.56;
+  margin-top: 20rpx;
+}
+
+.travel-summary {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.summary-pill {
+  background: #ffffff;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 128rpx;
+  padding: 24rpx 10rpx;
+  text-align: center;
+}
+
+.summary-value {
+  color: #19a66a;
+  font-size: 34rpx;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.summary-label {
+  color: #667386;
+  font-size: 22rpx;
+  font-weight: 800;
+  margin-top: 12rpx;
+}
+
+.reminder-card {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 30rpx;
+  box-sizing: border-box;
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 18rpx;
+  padding: 24rpx;
+}
+
+.lead-badge {
+  background: #fff4e6;
+  border-radius: 999rpx;
+  color: #9c5d00;
+  flex: 0 0 auto;
+  font-size: 22rpx;
+  font-weight: 900;
+  padding: 12rpx 16rpx;
+}
+
+.reminder-text {
+  color: #172033;
+  flex: 1;
+  font-size: 26rpx;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.day-card {
+  background: #ffffff;
+  border-radius: 38rpx;
+  box-shadow: 0 10rpx 36rpx rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
+  margin-bottom: 28rpx;
+  padding: 30rpx;
+}
+
+.day-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.day-index {
+  background: #e8f7ef;
+  border-radius: 999rpx;
+  color: #0a7a49;
+  font-size: 24rpx;
+  font-weight: 950;
+  padding: 12rpx 18rpx;
+}
+
+.day-date {
+  color: #667386;
+  font-size: 23rpx;
+  font-weight: 800;
+}
+
+.day-theme {
+  color: #172033;
+  font-size: 34rpx;
+  font-weight: 950;
+  line-height: 1.28;
+  margin-top: 22rpx;
+}
+
+.day-tip {
+  color: #667386;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1.5;
+  margin-top: 12rpx;
+}
+
+.slot-card {
+  background: #f6f8fa;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+  margin-top: 20rpx;
+  padding: 24rpx;
+}
+
+.slot-time {
+  color: #19a66a;
+  font-size: 23rpx;
+  font-weight: 900;
+}
+
+.slot-name {
+  color: #172033;
+  font-size: 30rpx;
+  font-weight: 950;
+  line-height: 1.35;
+  margin-top: 10rpx;
+}
+
+.slot-note {
+  color: #526071;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1.48;
+  margin-top: 10rpx;
+}
+
+.slot-meta {
+  color: #667386;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-top: 14rpx;
+}
+
+.dining-box {
+  background: #fff4e6;
+  border-radius: 28rpx;
+  margin-top: 20rpx;
+  padding: 22rpx;
+}
+
+.dining-title {
+  color: #9c5d00;
+  font-size: 24rpx;
+  font-weight: 950;
+}
+
+.dining-item {
+  color: #172033;
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-top: 12rpx;
+}
+
+.tip-row {
+  background: #ffffff;
+  border-radius: 28rpx;
+  color: #172033;
+  font-size: 25rpx;
+  font-weight: 800;
+  line-height: 1.48;
+  margin-bottom: 16rpx;
+  padding: 24rpx;
+}

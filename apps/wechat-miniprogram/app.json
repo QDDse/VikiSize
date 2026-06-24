@@ -2,6 +2,7 @@
   "pages": [
     "pages/home/index",
     "pages/services/index",
+    "pages/travel/index",
     "pages/records/index",
     "pages/profile/index"
   ],

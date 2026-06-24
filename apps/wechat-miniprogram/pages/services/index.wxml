@@ -6,7 +6,7 @@
 
   <view class="search-box">
     <view class="search-dot"></view>
-    <view>搜索工具或品牌</view>
+    <view>搜索工具、品牌或旅行计划</view>
   </view>
 
   <view class="chip-row">
@@ -14,7 +14,7 @@
   </view>
 
   <view class="service-list">
-    <view class="service-card" wx:for="{{services}}" wx:key="id" bindtap="showPreparing">
+    <view class="service-card {{item.id === 'travel-tokyo' ? 'travel-feature' : ''}}" wx:for="{{services}}" wx:key="id" data-target="{{item.target}}" bindtap="openService">
       <view class="service-icon {{item.tone}}"></view>
       <view class="service-copy">
         <view class="item-title">{{item.title}}</view>
