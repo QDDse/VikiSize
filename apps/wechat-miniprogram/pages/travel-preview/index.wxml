@@ -1,0 +1,8 @@
+<web-view wx:if="{{previewUrl && !failed}}" src="{{previewUrl}}" binderror="onError" bindmessage="onMessage" />
+<view class="page preview-fallback" wx:else>
+  <view class="empty">完整攻略暂时无法加载</view>
+  <view class="space-actions">
+    <button plain="true" class="ghost-button" bindtap="retry">重新加载</button>
+    <button plain="true" class="pill-button" bindtap="useTemplate">直接使用此计划</button>
+  </view>
+</view>

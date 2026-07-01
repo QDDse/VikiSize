@@ -26,3 +26,8 @@
 .node-title {
   margin-top: 16rpx;
 }
+.node-actions { display: flex; gap: 12rpx; margin-top: 18rpx; }
+.mini-action { background: #f1f5f9; border: 0; border-radius: 12rpx; color: #526071; font-size: 22rpx; line-height: 52rpx; margin: 0; min-height: 52rpx; padding: 0 18rpx; }
+.mini-action.primary { background: #2f7dff; color: #fff; }
+.add-node { margin-top: 20rpx; width: 100%; }
+.view-switch { background: #dfe6ee; border-radius: 16rpx; display: flex; margin-top: 24rpx; padding: 6rpx; }.switch-item { border-radius: 12rpx; color: #667386; flex: 1; font-size: 26rpx; font-weight: 800; padding: 16rpx; text-align: center; }.switch-item.active { background: #fff; color: #172033; }.travel-map { height: 720rpx; width: 100%; }.map-panel { overflow: hidden; }.empty-map { color: #667386; text-align: center; }.active-node { outline: 4rpx solid #2f7dff; }

@@ -45,6 +45,10 @@ Page({
     wx.navigateTo({ url: "/pages/travel-plan/index" });
   },
 
+  openTravelTemplates() {
+    wx.navigateTo({ url: "/pages/travel-templates/index" });
+  },
+
   openCard(event) {
     wx.navigateTo({ url: `/pages/card-detail/index?id=${event.currentTarget.dataset.id}` });
   },

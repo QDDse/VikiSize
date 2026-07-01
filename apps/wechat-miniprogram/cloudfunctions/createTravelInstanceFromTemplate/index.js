@@ -4,11 +4,23 @@ const { assertPermission } = require("../_shared/permissions");
 exports.main = async (event) => {
   const { user } = await assertPermission(event.spaceId, event.profile || {});
   const timestamp = now();
-  const templates = await collection("travel_templates").where({ id: event.templateId || "template-travel-tokyo-8d-v1" }).limit(1).get();
+  const templateQuery = { id: event.templateId || "tokyo-kanto-8d" };
+  if (event.templateVersion) templateQuery.version = event.templateVersion;
+  const templates = await collection("travel_templates").where(templateQuery).limit(1).get();
   const template = templates.data[0];
 
   if (!template) {
     throw new Error("旅行模板不存在");
+  }
+
+  const existing = await collection("travel_plan_instances").where({
+    spaceId: event.spaceId,
+    sourceTemplateId: template.id,
+    sourceVersion: template.version,
+    archivedAt: null
+  }).limit(1).get();
+  if (existing.data.length) {
+    return { instance: existing.data[0], created: false };
   }
 
   const instance = {
@@ -19,8 +31,17 @@ exports.main = async (event) => {
     sourceVersion: template.version,
     importedAt: timestamp,
     initialSnapshot: template,
+    title: template.title,
+    startDate: template.startDate,
+    endDate: template.days.length ? template.days[template.days.length - 1].date : "",
+    timezone: "Asia/Tokyo",
+    status: "planning",
+    candidatePlaces: [],
+    modules: [],
     days: template.days,
     budgetCategories: template.budgetCategories || [],
+    createdBy: user.id,
+    revision: 1,
     createdAt: timestamp,
     updatedAt: timestamp,
     archivedAt: null
@@ -40,5 +61,5 @@ exports.main = async (event) => {
     }
   });
   await collection("activities").doc(activityResult._id).update({ data: { id: activityResult._id } });
-  return { instance: Object.assign({}, instance, { id: result._id }) };
+  return { instance: Object.assign({}, instance, { id: result._id }), created: true };
 };

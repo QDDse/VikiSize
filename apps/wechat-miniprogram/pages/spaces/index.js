@@ -19,6 +19,10 @@ Page({
 
   createSpace(event) {
     const templateType = event.currentTarget.dataset.type;
+    if (templateType === "travel_team") {
+      wx.navigateTo({ url: "/pages/travel-templates/index" });
+      return;
+    }
     store.createSpace({ templateType });
     wx.showToast({ title: "已创建空间", icon: "success" });
     wx.switchTab({ url: "/pages/today/index" });

@@ -1,0 +1,18 @@
+const assert = require("assert");
+const { buildMapViewModel, toMiniProgramCoordinate } = require("../apps/wechat-miniprogram/services/mapAdapter");
+const { resolveExecutionState, resolveTravelDay } = require("../apps/wechat-miniprogram/services/travelExecution");
+const template = require("../apps/wechat-miniprogram/data/travelTemplateRegistry").getById("tokyo-kanto-8d", "1.0.0");
+const tokyo = toMiniProgramCoordinate({ latitude: 35.6812, longitude: 139.7671, system: "wgs84" });
+assert.deepStrictEqual(tokyo, { latitude: 35.6812, longitude: 139.7671 });
+assert.strictEqual(toMiniProgramCoordinate({ latitude: "bad", longitude: 10 }), null);
+const map = buildMapViewModel(template.days[0]);
+assert.strictEqual(map.markers.length, template.days[0].nodes.filter((node) => node.coordinate).length);
+assert.deepStrictEqual(map.markers.map((item) => item.nodeId), template.days[0].nodes.filter((node) => node.coordinate).map((node) => node.id));
+const instance = { timezone: "Asia/Tokyo", days: template.days, archivedAt: null };
+assert.strictEqual(resolveTravelDay(instance, new Date("2026-09-20T00:00:00Z")).travelState, "before");
+assert.strictEqual(resolveTravelDay(instance, new Date("2026-09-24T03:00:00Z")).travelState, "during");
+assert.strictEqual(resolveTravelDay(instance, new Date("2026-10-10T00:00:00Z")).travelState, "after");
+assert.strictEqual(resolveTravelDay(Object.assign({}, instance, { archivedAt: "2026-01-01" }), new Date()).travelState, "none");
+const execution = resolveExecutionState({ nodes: [{ id: "a", startTime: "09:00", endTime: "10:00", status: "planned" }, { id: "b", startTime: "11:00", endTime: "", status: "planned" }] }, new Date("2026-09-24T00:30:00Z"), "Asia/Tokyo");
+assert.strictEqual(execution.currentNode.id, "a"); assert.strictEqual(execution.nextNode.id, "b");
+console.log("Travel map and today tests passed.");

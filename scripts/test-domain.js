@@ -14,7 +14,7 @@ assert.strictEqual(travelInstance.days.length, 8);
 assert.strictEqual(store.getCards(context.space.id, Modules.PLANS).length, 6);
 
 const originalTemplateNote = context.state.collections.travel_templates[0].days[0].nodes[0].notes;
-store.updateTravelNode(travelInstance.id, "day1", "d1-arrive", { notes: "本地实例已编辑" });
+store.updateTravelNode(travelInstance.id, "day-01", "day-01-node-01", { notes: "本地实例已编辑" });
 context = store.getCurrentContext();
 assert.strictEqual(context.state.collections.travel_templates[0].days[0].nodes[0].notes, originalTemplateNote);
 

@@ -21,7 +21,7 @@
     <view class="shortcut-card soft-blue" bindtap="openPlans">
       <view class="shortcut-mark"></view>
       <view class="shortcut-title">旅行计划</view>
-      <view class="shortcut-detail">D1-D8 行程</view>
+      <view class="shortcut-detail">第 1-8 天行程</view>
     </view>
     <view class="shortcut-card soft-green">
       <view class="shortcut-mark"></view>
@@ -61,13 +61,16 @@
       <view class="section-note">{{summary.todayItinerary.date}}</view>
     </view>
     <view class="card">
-      <view class="card-title">{{summary.todayItinerary.theme}}</view>
+      <view class="card-title">{{summary.travelState === 'before' ? '行程预告' : summary.travelState === 'after' ? '旅行已结束' : summary.todayItinerary.theme}}</view>
+      <view class="item-subtitle" wx:if="{{summary.travelState === 'before'}}">距出发还有 {{summary.daysUntilStart}} 天</view>
       <view class="item-subtitle">{{summary.todayItinerary.tip}}</view>
-      <view class="service-card" wx:for="{{summary.todayItinerary.nodes}}" wx:key="id">
+      <view class="service-card execution-card" wx:if="{{summary.currentTravelNode}}" data-kind="current" bindtap="openTravelLocation"><view class="service-main"><view class="badge">当前行程</view><view class="item-title">{{summary.currentTravelNode.startTime}} · {{summary.currentTravelNode.title}}</view><view class="item-subtitle">{{summary.currentTravelNode.locationName}}</view></view></view>
+      <view class="service-card execution-card next" wx:if="{{summary.nextTravelNode}}" data-kind="next" bindtap="openTravelLocation"><view class="service-main"><view class="badge soft">下一站</view><view class="item-title">{{summary.nextTravelNode.startTime}} · {{summary.nextTravelNode.title}}</view><view class="item-subtitle">{{summary.nextTravelNode.locationName}}</view></view></view>
+      <view class="service-card" wx:for="{{summary.todayItinerary.nodes}}" wx:key="id" bindtap="openTravelPlan">
         <view class="service-icon"></view>
         <view class="service-main">
-          <view class="item-title">{{item.time}} · {{item.title}}</view>
-          <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
+          <view class="item-title">{{item.startTime || item.time}} · {{item.title}}</view>
+          <view class="item-subtitle">{{item.locationName || item.location}} · {{item.transport.mode || item.route}}</view>
         </view>
       </view>
     </view>

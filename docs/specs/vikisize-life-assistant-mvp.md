@@ -40,6 +40,23 @@ The bottom navigation should use four tabs:
 
 Personal profile, space settings, and member management should be accessed from the current space switcher or the top-right entry, not as a primary bottom tab.
 
+## Research-Driven Product Model
+
+Product research completed on 2026-07-01 found one reusable planning model across travel and recipes:
+
+`source or template -> unscheduled collection -> scheduled plan -> derived action list -> today execution -> archive`
+
+The detailed evidence and decisions are stored in `docs/iterations/2026-07-01-travel-recipe-research/`.
+
+The product should implement these shared capabilities instead of building unrelated travel and recipe subsystems:
+
+- An unscheduled pool for places, recipes, or other items the group may use later.
+- A scheduled plan that assigns an item to a date, time range, or meal type.
+- A source-to-instance relationship that keeps imported or template content separate from editable space data.
+- Derived action items with source traceability, such as booking tasks from itinerary nodes or grocery items from recipes.
+- A focused Today execution view that removes editing noise during travel, shopping, or cooking.
+- Shared editing for Owner and Member, read-only access for Guest, and default protection for sensitive confirmation data.
+
 ## Collaboration Unit
 
 The base collaboration unit is a Life Space.
@@ -127,6 +144,18 @@ Module-specific fields should extend this model instead of creating unrelated sy
 - Plan cards: date, time, location, route, budget estimate, responsible member.
 - Life cards: checklist items, quantities, grocery owner, recipe or prep notes.
 - Decision cards: target price, current price, final price, candidates, member opinions.
+
+Cards remain the shared work and collaboration object. Rich domain content such as a full recipe or a travel plan instance should use its own structured model and link to cards for tasks, reminders, comments, and confirmations.
+
+Derived cards and list items should retain source metadata:
+
+```js
+{
+  sourceType: "travel_node" | "recipe" | "meal_plan" | "manual",
+  sourceId: string | null,
+  generated: boolean
+}
+```
 
 ## Card Status Flow
 
@@ -284,6 +313,78 @@ Inside a Travel Team space, the first version should organize travel work throug
 
 The global bottom navigation remains Today, Plans, Life, and Decisions. These travel views live inside the Plans module for the current travel space.
 
+## Travel Planning Editor Requirements
+
+The travel editor should support a planning loop inspired by mature itinerary products:
+
+1. Save a place into an unscheduled candidate list.
+2. Schedule the place into a specific trip day.
+3. Set start time, end time or duration, transport mode, notes, booking details, and estimated cost.
+4. Reorder places within a day.
+5. View the same itinerary nodes as a timeline and as map markers.
+6. Open the next leg in WeChat Maps or another supported map surface.
+7. Generate linked booking, hotel, document, packing, and confirmation tasks.
+
+P0 requirements:
+
+- Candidate places and scheduled nodes must not be stored as unrelated duplicate records.
+- Map and timeline views must project the same node IDs and ordering.
+- Reservations should use typed entries for flights, lodging, transport, activities, restaurants, and other bookings.
+- Images and booking screenshots should attach to the relevant reservation or itinerary node.
+- Guests can view the shared itinerary but should not see sensitive confirmation fields by default.
+
+P1 requirements:
+
+- Optimize a single-day route and allow the user to review or revert the result.
+- Cache critical itinerary details and attachment thumbnails for weak-network access.
+
+## Recipe and Meal Planning MVP
+
+The Life module should implement a second complete collaboration loop:
+
+`save recipe -> schedule meal -> generate grocery list -> shop together -> cook -> keep history`
+
+### Structured Recipe
+
+A recipe is structured domain content, not only an Item Card. Required fields:
+
+- Title and cover image.
+- Servings.
+- Preparation and cooking time.
+- Ingredients with quantity, unit, name, and note.
+- Ordered cooking steps.
+- Tags, source URL, personal notes, and attachments.
+- Creator, update time, and archive state.
+
+Changing servings should scale displayed ingredient quantities without overwriting the original quantities.
+
+### Meal Plan
+
+- Recipes can remain in an unscheduled queue or be assigned to a date and meal type.
+- Meal types include breakfast, lunch, dinner, and snack, with future custom types allowed.
+- The first useful view is a one-week plan.
+- Owners and members can add, move, or remove meals.
+- Reusable menus and meal history are P1.
+
+### Grocery List Generation
+
+- Generate a shared grocery list from one day or one week of planned meals.
+- Consolidate ingredients only when normalized names and units are compatible.
+- Preserve source recipe IDs for every generated item.
+- Allow users to exclude ingredients already at home before generation.
+- Keep manual grocery items when regenerating a list.
+- Allow members to check items off and record who checked them.
+
+### Cooking View
+
+- Show ingredients and steps without planning controls.
+- Allow ingredients to be checked off and the current step to be highlighted.
+- Cooking timers and keep-screen-awake behavior are P1.
+
+### Recipe Scope Boundaries
+
+P0 uses manual structured recipe entry. URL import is P1 and must allow manual correction. OCR/video import, nutrition calculation, public recipe communities, food commerce, and AI-generated recipes are out of scope.
+
 ## Tokyo Travel Template
 
 `关东东京8天旅行计划.html` is the authoritative source for the first Travel Team template.
@@ -365,6 +466,16 @@ The first version should not include:
 - Item cards support status, owner, participants, due time, comments, activity, image attachments, reminders, archive, and module-specific fields.
 - WeChat reminders cover assigned-to-me, due-soon, and needs-confirmation cases.
 - The first version has no AI features.
+- A place can move from the travel candidate list into a specific day and appear consistently in timeline and map views.
+- Travel tasks can retain a link to their source itinerary node.
+- A recipe can be scheduled into a weekly meal plan and converted into a shared grocery list.
+- Compatible ingredients from multiple recipes are consolidated while preserving their source recipes.
+- Recipe serving changes scale the display without overwriting original ingredient quantities.
+- Guests cannot modify travel plans, recipes, meal plans, or grocery lists, and sensitive confirmation fields are hidden by default.
+
+## Change Log
+
+- 2026-07-01: Added research-driven shared planning model, travel candidate and map requirements, structured recipes, weekly meal planning, grocery-list generation, execution views, and priority boundaries. Evidence: `docs/iterations/2026-07-01-travel-recipe-research/`.
 
 ## Handoff Prompt For Follow-Up Agent
 

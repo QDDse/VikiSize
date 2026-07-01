@@ -4,9 +4,18 @@
   "private": true,
   "description": "VikiSize application repository",
   "scripts": {
+    "build:travel-previews": "node scripts/travel-templates/build-h5.js",
+    "build:travel-seed": "node scripts/travel-templates/build-miniprogram-seed.js",
     "deploy:wechat": "node scripts/upload-wechat.js",
+    "migrate:travel-template": "node scripts/travel-templates/migrate-legacy.js",
+    "test:travel-templates": "node scripts/test-travel-templates.js",
+    "validate:travel-templates": "node scripts/travel-templates/validate.js",
     "validate:wechat": "node scripts/validate-miniprogram.js",
-    "test:domain": "node scripts/test-domain.js"
+    "test:domain": "node scripts/test-domain.js",
+    "test:travel-editor": "node scripts/test-travel-editor.js",
+    "test:travel-map-today": "node scripts/test-travel-map-today.js",
+    "test:travel-collaboration": "node scripts/test-travel-collaboration.js",
+    "test:travel-browse": "node scripts/test-travel-template-browse.js"
   },
   "devDependencies": {
     "miniprogram-ci": "2.1.31"

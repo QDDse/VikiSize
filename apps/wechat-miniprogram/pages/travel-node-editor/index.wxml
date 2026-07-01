@@ -1,0 +1,17 @@
+<view class="page form-page">
+  <view class="topbar"><view class="page-title">{{nodeId ? '编辑行程' : '新增行程'}}</view></view>
+  <view class="card form-card">
+    <view class="field-label">名称</view><input class="field-input" value="{{form.title}}" data-field="title" bindinput="change" placeholder="景点、餐厅或交通"/>
+    <view class="two-cols"><view><view class="field-label">开始</view><input class="field-input" value="{{form.startTime}}" data-field="startTime" bindinput="change" placeholder="09:00"/></view><view><view class="field-label">结束</view><input class="field-input" value="{{form.endTime}}" data-field="endTime" bindinput="change" placeholder="11:00"/></view></view>
+    <view class="field-label">地点</view><input class="field-input" value="{{form.locationName}}" data-field="locationName" bindinput="change" placeholder="地点名称"/>
+    <view class="field-label">地址</view><input class="field-input" value="{{form.address}}" data-field="address" bindinput="change" placeholder="详细地址"/>
+    <view class="field-label">交通方式</view><input class="field-input" value="{{form.transport.mode}}" data-field="mode" bindinput="changeTransport" placeholder="地铁、步行、出租车"/>
+    <view class="two-cols"><view><view class="field-label">票价</view><input class="field-input" value="{{form.ticketPrice}}" data-field="ticketPrice" bindinput="change"/></view><view><view class="field-label">预计费用</view><input class="field-input" type="number" value="{{form.estimatedCost}}" data-field="estimatedCost" bindinput="change"/></view></view>
+    <view class="switch-row"><text>需要预约</text><switch checked="{{form.needsBooking}}" bindchange="toggleBooking" color="#2f7dff"/></view>
+    <view class="field-label">备注</view><textarea class="field-textarea" value="{{form.notes}}" data-field="notes" bindinput="change" placeholder="开放时间、注意事项等"/>
+    <view class="field-label">行程图片</view><view class="image-grid"><view class="image-item" wx:for="{{attachments}}" wx:key="id"><image src="{{item.cloudFileId}}" mode="aspectFill" data-url="{{item.cloudFileId}}" bindtap="previewImage"/><button class="image-delete" data-id="{{item.id}}" bindtap="deleteImage">删除</button></view></view>
+    <button class="ghost-button full-button" bindtap="chooseImage">添加图片</button><button class="ghost-button full-button" wx:if="{{nodeId}}" bindtap="createTask">生成关联任务</button>
+    <view class="sensitive-title">敏感信息（访客不可见）</view><view class="field-label">确认号</view><input class="field-input" value="{{form.sensitiveFields.confirmationCode}}" data-field="sensitiveFields.confirmationCode" bindinput="change" password="true"/>
+    <button class="pill-button full-button" bindtap="save">保存行程</button><button class="danger-button" wx:if="{{nodeId}}" bindtap="remove">删除行程</button>
+  </view>
+</view>

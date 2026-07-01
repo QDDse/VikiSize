@@ -6,10 +6,14 @@
   <view class="space-header">
     <view class="space-kicker">旅行计划</view>
     <view class="space-title-row">
-      <view class="space-title">东京 D1-D8</view>
-      <view class="space-role">{{instance.days.length}} 天</view>
+      <view class="space-title">{{instance.title}}</view>
+      <view class="space-role">{{context.member.role === 'owner' ? '管理员' : context.member.role === 'member' ? '成员' : '访客'}}</view>
     </view>
-    <view class="hero-copy">按天查看路线、交通、预约和预算。点击节点会记录一次行程确认。</view>
+    <view class="hero-copy">{{instance.startDate}} 至 {{instance.endDate}} · {{instance.days.length}} 天 · {{instance.status === 'planning' ? '规划中' : instance.status}}</view>
+    <view class="space-actions">
+      <button class="link-button" bindtap="openCandidates">待安排 {{instance.candidatePlaces.length}}</button>
+      <button class="link-button" wx:if="{{context.canWrite}}" bindtap="openDayEditor">新增日期</button>
+    </view>
   </view>
 
   <scroll-view scroll-x="true" class="day-tabs">
@@ -18,27 +22,41 @@
     </view>
   </scroll-view>
 
-  <view class="section" wx:if="{{selectedDay}}">
+  <view class="view-switch"><view class="switch-item {{viewMode === 'timeline' ? 'active' : ''}}" data-mode="timeline" bindtap="switchView">时间线</view><view class="switch-item {{viewMode === 'map' ? 'active' : ''}}" data-mode="map" bindtap="switchView">地图</view></view>
+
+  <view class="section map-panel" wx:if="{{viewMode === 'map'}}"><map wx:if="{{mapView.markers.length}}" class="travel-map" latitude="{{mapView.latitude}}" longitude="{{mapView.longitude}}" scale="{{mapView.scale}}" markers="{{mapView.markers}}" polyline="{{mapView.polyline}}" bindmarkertap="markerTap"/><view class="card empty-map" wx:else>当天还没有可显示的坐标，请在节点中补充地点。</view></view>
+
+  <view class="section" wx:if="{{selectedDay && viewMode === 'timeline'}}">
     <view class="card">
-      <view class="card-title">{{selectedDay.theme}}</view>
+      <view class="section-head">
+        <view class="card-title">{{selectedDay.theme}}</view>
+        <button class="top-action" wx:if="{{context.canWrite}}" data-id="{{selectedDay.id}}" bindtap="openDayEditor">编辑日期</button>
+      </view>
       <view class="item-subtitle">{{selectedDay.date}} · {{selectedDay.weekday}}</view>
       <view class="item-subtitle">{{selectedDay.tip}}</view>
     </view>
 
     <view class="stack node-stack">
-      <view class="service-card" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="markNodeChecked">
+      <view class="service-card {{activeNodeId === item.id ? 'active-node' : ''}}" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="activateNode">
         <view class="service-icon"></view>
         <view class="service-main">
-          <view class="badge">{{item.period}} · {{item.time}}</view>
-          <view class="item-title node-title">{{item.title}}</view>
-          <view class="item-subtitle">{{item.location}} · {{item.route}}</view>
-          <view class="item-subtitle" wx:if="{{item.booking}}">预约：{{item.booking}}</view>
+          <view class="badge">{{item.period}} · {{item.startTime || item.time}}</view>
+          <view class="item-title node-title" data-id="{{item.id}}" bindtap="openNodeEditor">{{item.title}}</view>
+          <view class="item-subtitle">{{item.locationName || item.location}} · {{item.transport.mode || item.route}}</view>
+          <view class="item-subtitle" wx:if="{{item.needsBooking}}">需要预约</view>
           <view class="meta-row">
             <view class="badge soft">预算 ¥{{item.estimatedCost}}</view>
           </view>
           <view class="item-subtitle">{{item.notes}}</view>
+          <view class="node-actions" wx:if="{{context.canWrite}}">
+            <button class="mini-action" data-id="{{item.id}}" data-direction="up" bindtap="moveNode">上移</button>
+            <button class="mini-action" data-id="{{item.id}}" data-direction="down" bindtap="moveNode">下移</button>
+            <button class="mini-action primary" data-id="{{item.id}}" bindtap="openNodeEditor">编辑</button>
+            <button class="mini-action" wx:if="{{item.coordinate}}" data-id="{{item.id}}" catchtap="openLocation">地图</button>
+          </view>
         </view>
       </view>
+      <button class="pill-button add-node" wx:if="{{context.canWrite}}" bindtap="openNodeEditor">新增行程节点</button>
     </view>
   </view>
 </view>

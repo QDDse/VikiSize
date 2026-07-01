@@ -12,6 +12,7 @@ const {
   TemplateTypes
 } = require("../domain/constants");
 const { tokyoTravelTemplate } = require("../data/tokyoTravelTemplate");
+const { buildTodayTravelView } = require("./travelExecution");
 
 const STORAGE_KEY = "vikisize_life_assistant_state_v1";
 let memoryState = null;
@@ -26,6 +27,61 @@ function clone(value) {
 
 function newId(prefix) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function normalizeNode(node, index) {
+  const updatedAt = now();
+  return Object.assign({
+    id: node.id || newId("travel-node"),
+    order: index + 1,
+    type: "place",
+    period: "",
+    startTime: "",
+    endTime: "",
+    title: "未命名行程",
+    locationName: node.location || "",
+    address: "",
+    coordinate: null,
+    photoUrl: "",
+    rating: null,
+    review: "",
+    openingHours: "",
+    ticketPrice: "",
+    transport: { mode: node.route || "", fare: "", duration: "" },
+    needsBooking: Boolean(node.booking),
+    leadDays: 0,
+    estimatedCost: 0,
+    notes: "",
+    status: "planned",
+    sensitiveFields: { confirmationCode: "", internalBudgetNote: "", documentAttachmentIds: [] },
+    attachmentIds: [],
+    linkedCardIds: [],
+    revision: 1,
+    createdAt: updatedAt,
+    updatedAt
+  }, node, { order: index + 1 });
+}
+
+function migrateState(saved) {
+  const state = clone(saved);
+  if (state.version >= 2) return state;
+  state.version = 2;
+  state.collections.travel_plan_instances = (state.collections.travel_plan_instances || []).map((instance) => Object.assign({
+    title: instance.sourceName || "旅行计划",
+    startDate: instance.days && instance.days[0] ? instance.days[0].date : "",
+    endDate: instance.days && instance.days.length ? instance.days[instance.days.length - 1].date : "",
+    timezone: "Asia/Tokyo",
+    status: instance.archivedAt ? "archived" : "planning",
+    candidatePlaces: [],
+    createdBy: state.currentUserId,
+    revision: 1
+  }, instance, {
+    days: (instance.days || []).map((day, dayIndex) => Object.assign({ order: dayIndex + 1 }, day, {
+      order: dayIndex + 1,
+      nodes: (day.nodes || []).map(normalizeNode)
+    }))
+  }));
+  return state;
 }
 
 function getStorage() {
@@ -48,9 +104,15 @@ function readRawState() {
   }
 
   const saved = storage.getStorageSync(STORAGE_KEY);
-  if (saved && saved.version === 1) {
-    memoryState = saved;
-    return clone(memoryState);
+  if (saved && (saved.version === 1 || saved.version === 2)) {
+    try {
+      memoryState = migrateState(saved);
+      storage.setStorageSync(STORAGE_KEY, memoryState);
+      return clone(memoryState);
+    } catch (error) {
+      storage.setStorageSync(`${STORAGE_KEY}_backup_v1`, saved);
+      throw new Error("本地旅行数据升级失败，原始数据已备份，请重试或联系支持");
+    }
   }
 
   memoryState = createInitialState();
@@ -78,7 +140,7 @@ function createInitialState() {
   };
 
   const state = {
-    version: 1,
+    version: 2,
     currentUserId: user.id,
     currentSpaceId: "",
     collections: {
@@ -166,6 +228,13 @@ function createSpaceRecord(state, input) {
 function createTravelInstanceFromTemplateRecord(state, spaceId, userId) {
   const createdAt = now();
   const template = state.collections.travel_templates[0];
+  const existing = state.collections.travel_plan_instances.find((item) => (
+    item.spaceId === spaceId
+    && item.sourceTemplateId === template.id
+    && item.sourceVersion === template.version
+    && !item.archivedAt
+  ));
+  if (existing) return existing;
   const instance = {
     id: newId("travel-instance"),
     spaceId,
@@ -174,8 +243,19 @@ function createTravelInstanceFromTemplateRecord(state, spaceId, userId) {
     sourceVersion: template.version,
     importedAt: createdAt,
     initialSnapshot: clone(template),
-    days: clone(template.days),
+    title: template.title,
+    startDate: template.startDate,
+    endDate: template.days[template.days.length - 1].date,
+    timezone: "Asia/Tokyo",
+    status: "planning",
+    candidatePlaces: [],
+    days: clone(template.days).map((day, dayIndex) => Object.assign({}, day, {
+      order: dayIndex + 1,
+      nodes: day.nodes.map(normalizeNode)
+    })),
     budgetCategories: clone(template.budgetCategories),
+    createdBy: userId,
+    revision: 1,
     createdAt,
     updatedAt: createdAt,
     archivedAt: null
@@ -207,14 +287,16 @@ function createTravelInstanceFromTemplateRecord(state, spaceId, userId) {
     });
   });
 
-  template.reminderSuggestions.forEach((suggestion) => {
-    const card = state.collections.cards.find((item) => item.spaceId === spaceId && item.title === suggestion.title);
+  const reminderSuggestions = template.reminders || template.reminderSuggestions || [];
+  reminderSuggestions.forEach((suggestion) => {
+    const title = suggestion.title || suggestion.item;
+    const card = state.collections.cards.find((item) => item.spaceId === spaceId && item.title === title);
     state.collections.reminders.push({
       id: newId("reminder"),
       spaceId,
       cardId: card ? card.id : "",
       recipientUserId: userId,
-      type: suggestion.type,
+      type: suggestion.type || ReminderTypes.DUE_SOON,
       scheduledAt: "",
       status: "pending",
       wechatTemplateId: "",
@@ -232,6 +314,26 @@ function createTravelInstanceFromTemplateRecord(state, spaceId, userId) {
   });
 
   return instance;
+}
+
+function createTravelInstanceFromTemplate(input) {
+  const state = readRawState();
+  assertCanWrite(state, input.spaceId);
+  const template = state.collections.travel_templates.find((item) => (
+    item.id === input.templateId
+    && (!input.templateVersion || item.version === input.templateVersion)
+  ));
+  if (!template) throw new Error("旅行模板不存在");
+  const existing = state.collections.travel_plan_instances.find((item) => (
+    item.spaceId === input.spaceId
+    && item.sourceTemplateId === template.id
+    && item.sourceVersion === template.version
+    && !item.archivedAt
+  ));
+  if (existing) return { instance: existing, created: false };
+  const instance = createTravelInstanceFromTemplateRecord(state, input.spaceId, state.currentUserId);
+  saveRawState(state);
+  return { instance, created: true };
 }
 
 function createCardRecord(state, input) {
@@ -558,32 +660,369 @@ function getTravelInstance(spaceId) {
   if (!space || !space.currentTemplateInstanceId) {
     return null;
   }
-  return state.collections.travel_plan_instances.find((item) => item.id === space.currentTemplateInstanceId) || null;
+  const instance = state.collections.travel_plan_instances.find((item) => item.id === space.currentTemplateInstanceId) || null;
+  const member = state.collections.space_members.find((item) => item.spaceId === spaceId && item.userId === state.currentUserId);
+  return instance ? projectTravelInstanceForRole(instance, member ? member.role : Roles.GUEST) : null;
+}
+
+function projectTravelInstanceForRole(instance, role) {
+  const projected = clone(instance);
+  if (role !== Roles.GUEST) return projected;
+  projected.days.forEach((day) => day.nodes.forEach((node) => {
+    node.sensitiveFields = {};
+    node.attachmentIds = [];
+  }));
+  projected.modules = (projected.modules || []).map((item) => item.sensitive ? Object.assign({}, item, { content: "" }) : item);
+  return projected;
+}
+
+function getTravelInstanceRecord(state, instanceId) {
+  const instance = state.collections.travel_plan_instances.find((item) => item.id === instanceId);
+  if (!instance) throw new Error("旅行实例不存在");
+  assertCanWrite(state, instance.spaceId);
+  return instance;
+}
+
+function touchTravelInstance(instance) {
+  instance.updatedAt = now();
+  instance.revision = Number(instance.revision || 0) + 1;
+}
+
+function recordTravelActivity(state, instance, type, summary) {
+  addActivityRecord(state, {
+    spaceId: instance.spaceId,
+    cardId: "",
+    actorUserId: state.currentUserId,
+    type,
+    summary
+  });
+}
+
+function createTravelDay(instanceId, input) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const day = {
+    id: newId("travel-day"),
+    order: instance.days.length + 1,
+    date: input.date,
+    weekday: input.weekday || "",
+    theme: input.theme || "新的一天",
+    tips: [],
+    alternatives: [],
+    nodes: [],
+    dining: []
+  };
+  if (instance.days.some((item) => item.date === day.date)) throw new Error("该日期已存在");
+  instance.days.push(day);
+  instance.endDate = instance.days[instance.days.length - 1].date;
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_day_created", `新增了日期「${day.date}」`);
+  saveRawState(state);
+  return day;
+}
+
+function updateTravelDay(instanceId, dayId, patch) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const day = instance.days.find((item) => item.id === dayId);
+  if (!day) throw new Error("旅行日期不存在");
+  if (patch.date && instance.days.some((item) => item.id !== dayId && item.date === patch.date)) throw new Error("该日期已存在");
+  ["date", "weekday", "theme"].forEach((field) => {
+    if (patch[field] !== undefined) day[field] = patch[field];
+  });
+  instance.startDate = instance.days[0] ? instance.days[0].date : "";
+  instance.endDate = instance.days.length ? instance.days[instance.days.length - 1].date : "";
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_day_updated", `更新了日期「${day.date}」`);
+  saveRawState(state);
+  return day;
+}
+
+function deleteTravelDay(instanceId, dayId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const index = instance.days.findIndex((item) => item.id === dayId);
+  if (index < 0) throw new Error("旅行日期不存在");
+  if (instance.days[index].nodes.length) throw new Error("请先清空当天行程");
+  const removed = instance.days.splice(index, 1)[0];
+  instance.days.forEach((day, dayIndex) => { day.order = dayIndex + 1; });
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_day_deleted", `删除了日期「${removed.date}」`);
+  saveRawState(state);
+  return removed;
+}
+
+function reorderTravelDays(instanceId, orderedIds) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  if (orderedIds.length !== instance.days.length || new Set(orderedIds).size !== orderedIds.length) {
+    throw new Error("日期排序数据无效");
+  }
+  const byId = new Map(instance.days.map((day) => [day.id, day]));
+  if (orderedIds.some((id) => !byId.has(id))) throw new Error("日期排序数据无效");
+  instance.days = orderedIds.map((id, index) => Object.assign(byId.get(id), { order: index + 1 }));
+  instance.startDate = instance.days[0] ? instance.days[0].date : "";
+  instance.endDate = instance.days.length ? instance.days[instance.days.length - 1].date : "";
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_day_reordered", "调整了旅行日期顺序");
+  saveRawState(state);
+  return instance.days;
+}
+
+function createTravelNode(instanceId, dayId, input) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const day = instance.days.find((item) => item.id === dayId);
+  if (!day) throw new Error("旅行日期不存在");
+  const node = normalizeNode(Object.assign({}, input, {
+    id: newId("travel-node"),
+    createdBy: state.currentUserId,
+    updatedBy: state.currentUserId
+  }), day.nodes.length);
+  day.nodes.push(node);
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_node_created", `新增了行程「${node.title}」`);
+  saveRawState(state);
+  return node;
 }
 
 function updateTravelNode(instanceId, dayId, nodeId, patch) {
   const state = readRawState();
-  const instance = state.collections.travel_plan_instances.find((item) => item.id === instanceId);
-  if (!instance) {
-    throw new Error("旅行实例不存在");
-  }
-  assertCanWrite(state, instance.spaceId);
+  const instance = getTravelInstanceRecord(state, instanceId);
   const day = instance.days.find((item) => item.id === dayId);
   const node = day ? day.nodes.find((item) => item.id === nodeId) : null;
   if (!node) {
     throw new Error("行程节点不存在");
   }
-  Object.assign(node, patch);
-  instance.updatedAt = now();
-  addActivityRecord(state, {
-    spaceId: instance.spaceId,
-    cardId: "",
-    actorUserId: state.currentUserId,
-    type: "itinerary_node_updated",
-    summary: `更新了行程「${node.title}」`
+  if (patch.expectedRevision !== undefined && Number(patch.expectedRevision) !== Number(node.revision || 1)) {
+    const error = new Error("内容已被其他成员更新，请刷新后重试");
+    error.code = "CONFLICT";
+    throw error;
+  }
+  const allowed = ["type", "period", "startTime", "endTime", "title", "locationName", "address", "coordinate", "photoUrl", "rating", "review", "openingHours", "ticketPrice", "transport", "needsBooking", "leadDays", "estimatedCost", "notes", "status", "sensitiveFields"];
+  allowed.forEach((field) => {
+    if (patch[field] !== undefined) node[field] = patch[field];
   });
+  node.updatedBy = state.currentUserId;
+  node.updatedAt = now();
+  node.revision = Number(node.revision || 0) + 1;
+  state.collections.cards.filter((card) => card.details && card.details.sourceType === "travel_node" && card.details.sourceId === node.id).forEach((card) => {
+    card.details.sourceChanged = card.details.sourceUpdatedAt !== node.updatedAt;
+  });
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_node_updated", `更新了行程「${node.title}」`);
+  if (patch.sensitiveFields !== undefined) recordTravelActivity(state, instance, "sensitive_field_updated", "更新了敏感字段：确认信息");
   saveRawState(state);
   return node;
+}
+
+function deleteTravelNode(instanceId, dayId, nodeId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const day = instance.days.find((item) => item.id === dayId);
+  const index = day ? day.nodes.findIndex((item) => item.id === nodeId) : -1;
+  if (index < 0) throw new Error("行程节点不存在");
+  const removed = day.nodes.splice(index, 1)[0];
+  state.collections.cards.filter((card) => card.details && card.details.sourceType === "travel_node" && card.details.sourceId === removed.id).forEach((card) => {
+    card.details.sourceDeleted = true;
+  });
+  day.nodes.forEach((node, nodeIndex) => { node.order = nodeIndex + 1; });
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_node_deleted", `删除了行程「${removed.title}」`);
+  saveRawState(state);
+  return removed;
+}
+
+function duplicateTravelNode(instanceId, dayId, nodeId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const day = instance.days.find((item) => item.id === dayId);
+  const source = day ? day.nodes.find((item) => item.id === nodeId) : null;
+  if (!source) throw new Error("行程节点不存在");
+  const copy = normalizeNode(Object.assign({}, clone(source), {
+    id: newId("travel-node"),
+    title: `${source.title}（副本）`,
+    attachmentIds: [],
+    linkedCardIds: [],
+    createdBy: state.currentUserId,
+    updatedBy: state.currentUserId
+  }), day.nodes.length);
+  day.nodes.push(copy);
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_node_duplicated", `复制了行程「${source.title}」`);
+  saveRawState(state);
+  return copy;
+}
+
+function reorderTravelNodes(instanceId, dayId, orderedIds) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const day = instance.days.find((item) => item.id === dayId);
+  if (!day || orderedIds.length !== day.nodes.length) throw new Error("行程排序数据无效");
+  const byId = new Map(day.nodes.map((node) => [node.id, node]));
+  if (orderedIds.some((id) => !byId.has(id))) throw new Error("行程排序数据无效");
+  day.nodes = orderedIds.map((id, index) => Object.assign(byId.get(id), { order: index + 1 }));
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_node_reordered", `调整了「${day.theme}」的行程顺序`);
+  saveRawState(state);
+  return day.nodes;
+}
+
+function upsertTravelCandidate(instanceId, input) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  let candidate = input.id ? instance.candidatePlaces.find((item) => item.id === input.id) : null;
+  if (!candidate) {
+    candidate = {
+      id: newId("travel-candidate"), title: input.title || "未命名地点", locationName: input.locationName || "",
+      address: input.address || "", coordinate: input.coordinate || null, category: input.category || "place",
+      photoUrl: input.photoUrl || "", notes: input.notes || "", sourceUrl: input.sourceUrl || "",
+      scheduledDayId: null, scheduledNodeId: null, createdBy: state.currentUserId, createdAt: now(), updatedAt: now()
+    };
+    instance.candidatePlaces.push(candidate);
+    recordTravelActivity(state, instance, "travel_candidate_created", `收藏了地点「${candidate.title}」`);
+  } else {
+    ["title", "locationName", "address", "coordinate", "category", "photoUrl", "notes", "sourceUrl"].forEach((field) => {
+      if (input[field] !== undefined) candidate[field] = input[field];
+    });
+    candidate.updatedAt = now();
+    recordTravelActivity(state, instance, "travel_candidate_updated", `更新了候选地点「${candidate.title}」`);
+  }
+  touchTravelInstance(instance);
+  saveRawState(state);
+  return candidate;
+}
+
+function scheduleTravelCandidate(instanceId, candidateId, dayId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const candidate = instance.candidatePlaces.find((item) => item.id === candidateId);
+  const day = instance.days.find((item) => item.id === dayId);
+  if (!candidate || !day) throw new Error("候选地点或日期不存在");
+  if (candidate.scheduledNodeId) throw new Error("该地点已安排");
+  const node = normalizeNode({
+    id: newId("travel-node"), type: candidate.category || "place", title: candidate.title,
+    locationName: candidate.locationName, address: candidate.address, coordinate: candidate.coordinate,
+    photoUrl: candidate.photoUrl, notes: candidate.notes, sourceCandidateId: candidate.id,
+    createdBy: state.currentUserId, updatedBy: state.currentUserId
+  }, day.nodes.length);
+  day.nodes.push(node);
+  candidate.scheduledDayId = day.id;
+  candidate.scheduledNodeId = node.id;
+  candidate.updatedAt = now();
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_candidate_scheduled", `把「${candidate.title}」安排到 ${day.date}`);
+  saveRawState(state);
+  return node;
+}
+
+function unscheduleTravelCandidate(instanceId, candidateId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const candidate = instance.candidatePlaces.find((item) => item.id === candidateId);
+  if (!candidate) throw new Error("候选地点不存在");
+  if (!candidate.scheduledNodeId) return candidate;
+  const day = instance.days.find((item) => item.id === candidate.scheduledDayId);
+  if (day) {
+    const node = day.nodes.find((item) => item.id === candidate.scheduledNodeId);
+    if (node && ((node.attachmentIds || []).length || (node.linkedCardIds || []).length)) {
+      throw new Error("该行程已有附件或任务，暂不能撤回");
+    }
+    day.nodes = day.nodes.filter((item) => item.id !== candidate.scheduledNodeId);
+    day.nodes.forEach((item, index) => { item.order = index + 1; });
+  }
+  candidate.scheduledDayId = null;
+  candidate.scheduledNodeId = null;
+  candidate.updatedAt = now();
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_candidate_unscheduled", `将「${candidate.title}」移回待安排`);
+  saveRawState(state);
+  return candidate;
+}
+
+function upsertTravelModule(instanceId, input) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  instance.modules = instance.modules || [];
+  let module = input.id ? instance.modules.find((item) => item.id === input.id) : null;
+  const created = !module;
+  if (!module) {
+    module = { id: newId("travel-module"), type: input.type || "note", createdBy: state.currentUserId, createdAt: now() };
+    instance.modules.push(module);
+  }
+  ["type", "title", "content", "dayId", "order"].forEach((field) => {
+    if (input[field] !== undefined) module[field] = input[field];
+  });
+  module.updatedAt = now();
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, created ? "travel_module_created" : "travel_module_updated", `${created ? "新增" : "更新"}了模块「${module.title || "未命名模块"}」`);
+  saveRawState(state);
+  return module;
+}
+
+function deleteTravelModule(instanceId, moduleId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  const index = (instance.modules || []).findIndex((item) => item.id === moduleId);
+  if (index < 0) throw new Error("旅行模块不存在");
+  const removed = instance.modules.splice(index, 1)[0];
+  touchTravelInstance(instance);
+  recordTravelActivity(state, instance, "travel_module_deleted", `删除了模块「${removed.title || "未命名模块"}」`);
+  saveRawState(state);
+  return removed;
+}
+
+function createAttachmentRecord(input) {
+  const state = readRawState();
+  assertCanWrite(state, input.spaceId);
+  if (!["image/jpeg", "image/png", "image/webp"].includes(input.mimeType)) throw new Error("仅支持 JPEG、PNG、WebP 图片");
+  if (Number(input.sizeBytes || 0) > 10 * 1024 * 1024) throw new Error("图片不能超过 10MB");
+  const instance = state.collections.travel_plan_instances.find((item) => item.spaceId === input.spaceId && !item.archivedAt);
+  const node = instance && instance.days.flatMap((day) => day.nodes).find((item) => item.id === input.scopeId);
+  if (input.scopeType !== "travel_node" || !node) throw new Error("附件关联的行程不存在");
+  if (state.collections.attachments.filter((item) => item.scopeId === input.scopeId && !item.deletedAt).length >= 9) throw new Error("每个行程最多上传 9 张图片");
+  const timestamp = now();
+  const attachment = { id: newId("attachment"), spaceId: input.spaceId, scopeType: input.scopeType, scopeId: input.scopeId, category: input.category || "image", sensitive: input.sensitive !== undefined ? input.sensitive : ["ticket", "booking", "document"].includes(input.category), uploadedBy: state.currentUserId, cloudFileId: input.cloudFileId, mimeType: input.mimeType, width: input.width || 0, height: input.height || 0, sizeBytes: input.sizeBytes || 0, createdAt: timestamp, deletedAt: null };
+  state.collections.attachments.push(attachment); node.attachmentIds = node.attachmentIds || []; node.attachmentIds.push(attachment.id);
+  if (attachment.sensitive) node.sensitiveFields.documentAttachmentIds.push(attachment.id);
+  touchTravelInstance(instance); recordTravelActivity(state, instance, "travel_attachment_added", `为「${node.title}」添加了图片`); saveRawState(state); return attachment;
+}
+
+function listAttachmentsForScope(spaceId, scopeId) {
+  const state = readRawState(); const member = state.collections.space_members.find((item) => item.spaceId === spaceId && item.userId === state.currentUserId);
+  return state.collections.attachments.filter((item) => item.spaceId === spaceId && item.scopeId === scopeId && !item.deletedAt && ((member && member.role !== Roles.GUEST) || !item.sensitive));
+}
+
+function deleteAttachment(attachmentId) {
+  const state = readRawState(); const attachment = state.collections.attachments.find((item) => item.id === attachmentId && !item.deletedAt); if (!attachment) throw new Error("附件不存在"); assertCanWrite(state, attachment.spaceId);
+  const instance = state.collections.travel_plan_instances.find((item) => item.spaceId === attachment.spaceId && !item.archivedAt); const node = instance && instance.days.flatMap((day) => day.nodes).find((item) => item.id === attachment.scopeId); attachment.deletedAt = now();
+  if (node) { node.attachmentIds = (node.attachmentIds || []).filter((value) => value !== attachment.id); node.sensitiveFields.documentAttachmentIds = (node.sensitiveFields.documentAttachmentIds || []).filter((value) => value !== attachment.id); }
+  touchTravelInstance(instance); recordTravelActivity(state, instance, "travel_attachment_deleted", `删除了「${node ? node.title : "行程"}」的图片`); saveRawState(state); return attachment;
+}
+
+function createTravelTaskFromNode(instanceId, dayId, nodeId, category) {
+  const state = readRawState(); const instance = getTravelInstanceRecord(state, instanceId); const day = instance.days.find((item) => item.id === dayId); const node = day && day.nodes.find((item) => item.id === nodeId); if (!node) throw new Error("行程节点不存在");
+  const existing = state.collections.cards.find((card) => !card.archivedAt && card.details && card.details.sourceType === "travel_node" && card.details.sourceId === node.id && card.details.category === category); if (existing) return { card: existing, created: false };
+  const card = createCardRecord(state, { spaceId: instance.spaceId, module: Modules.PLANS, title: `处理：${node.title}`, description: node.notes || node.locationName, ownerUserId: state.currentUserId, createdBy: state.currentUserId, details: { category: category || "confirmations", sourceType: "travel_node", sourceId: node.id, generated: true, sourceUpdatedAt: node.updatedAt } });
+  node.linkedCardIds = node.linkedCardIds || []; node.linkedCardIds.push(card.id); recordTravelActivity(state, instance, "travel_task_created", `从「${node.title}」创建了任务`); saveRawState(state); return { card, created: true };
+}
+
+function archiveTravelInstance(instanceId, archived) {
+  const state = readRawState();
+  const instance = state.collections.travel_plan_instances.find((item) => item.id === instanceId);
+  if (!instance) throw new Error("旅行实例不存在");
+  const member = assertCanWrite(state, instance.spaceId);
+  if (member.role !== Roles.OWNER) throw new Error("只有管理员可以归档旅行");
+  instance.archivedAt = archived ? now() : null;
+  instance.status = archived ? "archived" : "planning";
+  touchTravelInstance(instance);
+  if (archived) {
+    const space = state.collections.spaces.find((item) => item.id === instance.spaceId);
+    if (space && space.currentTemplateInstanceId === instance.id) space.currentTemplateInstanceId = "";
+  }
+  recordTravelActivity(state, instance, archived ? "travel_instance_archived" : "travel_instance_unarchived", archived ? "归档了旅行计划" : "恢复了旅行计划");
+  saveRawState(state);
+  return instance;
 }
 
 function getTodaySummary(spaceId) {
@@ -593,6 +1032,7 @@ function getTodaySummary(spaceId) {
   const pending = cards.filter((card) => card.status === CardStatuses.PENDING_CONFIRMATION);
   const active = cards.filter((card) => card.status !== CardStatuses.DONE);
   const instance = getTravelInstance(spaceId);
+  const travel = buildTodayTravelView(instance, new Date());
   return {
     activeCards: active.slice(0, 5).map((card) => Object.assign({}, card, {
       moduleLabel: ModuleLabels[card.module] || card.module,
@@ -603,7 +1043,11 @@ function getTodaySummary(spaceId) {
       statusLabel: ReminderStatusLabels[reminder.status] || reminder.status,
       typeLabel: ReminderTypeLabels[reminder.type] || reminder.type
     })),
-    todayItinerary: instance && instance.days.length ? instance.days[0] : null,
+    todayItinerary: travel.day,
+    travelState: travel.travelState,
+    daysUntilStart: travel.daysUntilStart,
+    currentTravelNode: travel.currentNode,
+    nextTravelNode: travel.nextNode,
     activities: state.collections.activities.filter((item) => item.spaceId === spaceId).slice(0, 6)
   };
 }
@@ -702,8 +1146,19 @@ module.exports = {
   addComment,
   advanceCardStatus,
   archiveCard,
+  archiveTravelInstance,
+  createAttachmentRecord,
+  createTravelDay,
+  createTravelInstanceFromTemplate,
+  createTravelNode,
+  createTravelTaskFromNode,
   createInvitation,
   createSpace,
+  deleteTravelDay,
+  deleteTravelNode,
+  deleteTravelModule,
+  deleteAttachment,
+  duplicateTravelNode,
   getBudgetSummary,
   getCardDetail,
   getCards,
@@ -712,12 +1167,21 @@ module.exports = {
   getTodaySummary,
   getTravelInstance,
   listSpaces,
+  listAttachmentsForScope,
+  projectTravelInstanceForRole,
   resetLocalState,
+  reorderTravelNodes,
+  reorderTravelDays,
   scheduleReminder,
   searchCurrentSpace,
   setMemberOpinion,
   setCurrentUserRoleForPreview,
   switchSpace,
+  scheduleTravelCandidate,
+  unscheduleTravelCandidate,
+  updateTravelDay,
   updateTravelNode,
+  upsertTravelCandidate,
+  upsertTravelModule,
   upsertCard
 };

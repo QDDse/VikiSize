@@ -1,0 +1,5 @@
+.template-list { display: grid; gap: 18rpx; }
+.template-card { overflow: hidden; border-radius: 8px; background: #fff; border: 1rpx solid #e2e8f0; }
+.template-cover { width: 100%; height: 330rpx; display: block; background: #dce5e8; }
+.template-body { padding: 24rpx; }
+.template-desc { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; margin: 12rpx 0; }

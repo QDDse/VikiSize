@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>关东东京 8 天旅行计划</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQGo1vsABp6Y6lR0/uzp3B44Y8iG9g=" crossorigin="">
+  <style>
+    :root {
+      --bg: #f7f2e8;
+      --ink: #20201c;
+      --muted: #686052;
+      --card: #fffaf0;
+      --line: rgba(32,32,28,.14);
+      --accent: #d4472f;
+      --accent-2: #006c67;
+      --gold: #b8832e;
+      --soft: #eadfca;
+      --shadow: 0 16px 42px rgba(62, 45, 23, .12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(180deg, rgba(247,242,232,.9), rgba(247,242,232,1) 420px),
+        url("https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo%20Tower%20and%20around%20Skyscrapers.jpg?width=1600") center 0 / cover no-repeat fixed;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .page {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 18px 14px 44px;
+    }
+    .hero {
+      min-height: 78vh;
+      display: grid;
+      align-content: end;
+      padding: 18vh 0 34px;
+    }
+    .kicker {
+      display: inline-flex;
+      width: fit-content;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.55);
+      background: rgba(255,250,240,.72);
+      backdrop-filter: blur(10px);
+      border-radius: 999px;
+      color: #4b3329;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 16px 0 12px;
+      max-width: 850px;
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-size: clamp(42px, 9vw, 90px);
+      line-height: .98;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+    .subtitle {
+      max-width: 720px;
+      margin: 0;
+      color: #3d372f;
+      font-size: 17px;
+      font-weight: 520;
+    }
+    .quick-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .quick-nav a, .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 11px;
+      background: rgba(255,250,240,.78);
+      text-decoration: none;
+      color: #443a31;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    section {
+      margin-top: 20px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,250,240,.92);
+      box-shadow: var(--shadow);
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    h3 { margin: 0 0 8px; font-size: 18px; }
+    .note { margin: 0; color: var(--muted); font-size: 14px; }
+    .grid { display: grid; gap: 12px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      overflow: hidden;
+    }
+    .card-body { padding: 14px; }
+    .todo-panel {
+      background: #253835;
+      color: #fff9ed;
+      border-color: transparent;
+    }
+    .todo-panel h2, .todo-panel .note { color: inherit; }
+    .pretrip-todo {
+      list-style: none;
+      margin: 12px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .todo-item {
+      display: grid;
+      grid-template-columns: 22px 92px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+    }
+    .todo-deadline { color: #ffd789; font-weight: 800; }
+    .todo-text { color: #fff; }
+    .flight, .hotel-option, .tip, .source-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.42);
+    }
+    .flag {
+      display: inline-flex;
+      margin-bottom: 7px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(212,71,47,.12);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .flag.alt { background: rgba(0,108,103,.12); color: var(--accent-2); }
+    .disclaimer {
+      border-color: rgba(212,71,47,.28);
+      background: #fff2e8;
+    }
+    #map {
+      height: 460px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background: var(--soft);
+    }
+    .route-pin {
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(0,0,0,.28);
+      border: 2px solid #fff;
+      font-weight: 900;
+    }
+    .day {
+      border-left: 5px solid var(--accent-2);
+    }
+    .day-head {
+      padding: 15px;
+      background: linear-gradient(90deg, rgba(0,108,103,.14), rgba(212,71,47,.06));
+      border-bottom: 1px solid var(--line);
+    }
+    .slots { display: grid; gap: 12px; padding: 12px; }
+    .slot {
+      display: grid;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+    }
+    .photo {
+      position: relative;
+      min-height: 176px;
+      aspect-ratio: 16 / 10;
+      background: linear-gradient(135deg, rgba(0,108,103,.22), rgba(212,71,47,.2));
+      overflow: hidden;
+    }
+    .photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .photo img[data-empty="true"] { display: none; }
+    .slot-main { padding: 13px; }
+    .slot-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 8px;
+    }
+    .period {
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .rating {
+      white-space: nowrap;
+      color: #6c4b10;
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .meta span, .reminder-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f0e4cf;
+      color: #49392a;
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .reminder-badge {
+      background: #ffe2d3;
+      color: #a63322;
+    }
+    .dining { padding: 0 12px 12px; }
+    .dish {
+      display: inline-flex;
+      margin: 4px 5px 0 0;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(184,131,46,.13);
+      color: #5f431c;
+      font-size: 12px;
+      font-weight: 760;
+    }
+    .alternatives {
+      display: grid;
+      gap: 8px;
+      padding: 0 12px 12px;
+    }
+    .alt-card {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px dashed rgba(0,108,103,.35);
+      background: rgba(0,108,103,.06);
+    }
+    .sources {
+      font-size: 13px;
+    }
+    @media (min-width: 768px) {
+      .page { padding: 24px 20px 64px; }
+      .hero { min-height: 72vh; }
+      section { padding: 22px; }
+      .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flight-grid, .hotel-grid, .tips-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .slot { grid-template-columns: 280px 1fr; }
+      .slots { gap: 14px; }
+      .photo { min-height: auto; aspect-ratio: auto; }
+      .dining { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .sources { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="kicker">2026.09.24 出发 · 关东 · 8 天左右</div>
+      <h1>关东东京 8 天旅行计划</h1>
+      <p class="subtitle">给两个人安排的东京进出方案：市区经典、台场夜景、镰仓海边、箱根温泉与迪士尼海洋。9 月下旬仍可能闷热下雨，户外尽量放在上午和傍晚。</p>
+      <nav class="quick-nav">
+        <a href="#todos">出发前待办</a>
+        <a href="#pretrip">行前须知</a>
+        <a href="#flights">航班酒店</a>
+        <a href="#map-section">地图</a>
+        <a href="#itinerary">每日行程</a>
+      </nav>
+    </header>
+
+    <section id="todos" class="todo-panel">
+      <div class="section-head">
+        <div>
+          <h2>出发前待办清单</h2>
+          <p class="note">按 2026-09-24 自动倒推，勾选状态仅保存在本次页面会话。</p>
+        </div>
+      </div>
+      <div id="todoMount"></div>
+    </section>
+
+    <section id="pretrip">
+      <div class="section-head">
+        <div>
+          <h2>行前须知</h2>
+          <p class="note">按东京 9 月下旬和关东短途移动定制。</p>
+        </div>
+      </div>
+      <div id="preTripMount" class="grid info-grid"></div>
+    </section>
+
+    <section id="flights">
+      <div class="section-head">
+        <div>
+          <h2>航班与住宿</h2>
+          <p class="note">默认按上海出发做候选；如从其他城市出发，把候选航班替换即可。</p>
+        </div>
+      </div>
+      <div class="grid flight-grid" id="flightMount"></div>
+      <div class="card disclaimer" style="margin-top:12px"><div class="card-body" id="disclaimerMount"></div></div>
+      <div class="grid hotel-grid" id="hotelMount" style="margin-top:12px"></div>
+    </section>
+
+    <section id="map-section">
+      <div class="section-head">
+        <div>
+          <h2>交互地图</h2>
+          <p class="note">按每天时间线顺序连线；点击点位可用手机地图导航。</p>
+        </div>
+      </div>
+      <div id="map"></div>
+    </section>
+
+    <section id="itinerary">
+      <div class="section-head">
+        <div>
+          <h2>每日时间轴</h2>
+          <p class="note">节奏按情侣旅行做得偏松，保留午后休息和雨天替代。</p>
+        </div>
+      </div>
+      <div id="daysMount" class="grid"></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>全程贴士</h2>
+          <p class="note">到东京后最常用的判断规则。</p>
+        </div>
+      </div>
+      <div id="tipsMount" class="grid tips-grid"></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>参考来源</h2>
+          <p class="note">页面内容基于公开资料整理，不替代官方核实。</p>
+        </div>
+      </div>
+      <div class="grid sources">
+        <div class="source-item"><a href="https://www.data.jma.go.jp/cpd/longfcst/en/tourist.html">日本气象厅：日本气候概况</a></div>
+        <div class="source-item"><a href="https://www.jreast.co.jp/en/multi/nex/">JR East：Narita Express</a></div>
+        <div class="source-item"><a href="https://www.tokyo-skytree.jp/en/ticket/">东京晴空塔官方票务</a></div>
+        <div class="source-item"><a href="https://www.teamlab.art/e/planets/">teamLab Planets 官方页面</a></div>
+        <div class="source-item"><a href="https://www.ghibli-museum.jp/en/tickets/">三鹰之森吉卜力美术馆票务</a></div>
+        <div class="source-item"><a href="https://www.tokyodisneyresort.jp/en/ticket/">东京迪士尼度假区票务</a></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+// Leaflet 地图引擎。纯函数（buildNavLink/routeCoordinates）可单元测试；
+// initTravelMap 需浏览器 + Leaflet (L)。浏览器与 Node 双用。
+
+// HTML 转义，防止 XSS
+function escapeHTML(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 生成跳转手机地图导航的通用 geo 链接
+function buildNavLink(lat, lng, label) {
+  return 'geo:' + lat + ',' + lng + '?q=' + lat + ',' + lng + '(' + encodeURIComponent(label) + ')';
+}
+
+// 从有序点位提取 [lat,lng] 数组，用于连线
+function routeCoordinates(points) {
+  return points.map(function (p) { return [p.lat, p.lng]; });
+}
+
+// 初始化地图：编号 divIcon 标记、按序虚线路线、点击弹出 名称+时间+导航链接。
+// elementId: 容器 id；points: [{lat, lng, name, time}]（按行程顺序）
+function initTravelMap(elementId, points) {
+  var map = L.map(elementId);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19,
+  }).addTo(map);
+
+  points.forEach(function (p, i) {
+    var icon = L.divIcon({
+      className: 'route-pin',
+      html: '<span class="route-pin__num">' + (i + 1) + '</span>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+    });
+    L.marker([p.lat, p.lng], { icon: icon }).addTo(map).bindPopup(
+      '<b>' + (i + 1) + '. ' + escapeHTML(p.name) + '</b><br>'
+      + (p.time ? escapeHTML(p.time) + '<br>' : '')
+      + '<a href="' + buildNavLink(p.lat, p.lng, p.name) + '">导航</a>'
+    );
+  });
+
+  var coords = routeCoordinates(points);
+  if (coords.length > 1) {
+    L.polyline(coords, { dashArray: '6 8', weight: 2 }).addTo(map);
+  }
+  map.fitBounds(coords.length ? coords : [[0, 0]], { padding: [30, 30] });
+  return map;
+}
+  </script>
+
+  <script>
+// 出发前提醒：截止日期计算 + 渲染。浏览器与 Node 双用。
+
+// startDateISO: 'YYYY-MM-DD'；items: [{item, leadDays}]
+// 返回按 deadline 升序的 [{item, leadDays, deadline}]，deadline 为 'YYYY-MM-DD'
+// 用 UTC 做日期运算，避免本地时区导致的偏移。
+function computeReminders(startDateISO, items) {
+  return items
+    .map(function (it) {
+      var d = new Date(startDateISO + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() - it.leadDays);
+      return { item: it.item, leadDays: it.leadDays, deadline: d.toISOString().slice(0, 10) };
+    })
+    .sort(function (a, b) {
+      return a.deadline < b.deadline ? -1 : a.deadline > b.deadline ? 1 : 0;
+    });
+}
+
+function escapeHTML(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderChecklistHTML(reminders) {
+  var lis = reminders.map(function (r) {
+    return '<li class="todo-item">'
+      + '<input type="checkbox"> '
+      + '<span class="todo-deadline">' + r.deadline + '前</span> '
+      + '<span class="todo-text">' + escapeHTML(r.item) + '（建议提前' + r.leadDays + '天）</span>'
+      + '</li>';
+  }).join('');
+  return '<ul class="pretrip-todo">' + lis + '</ul>';
+}
+
+function reminderBadgeHTML(leadDays) {
+  return '<span class="reminder-badge">⚠️ 建议提前' + leadDays + '天订</span>';
+}
+  </script>
+
+  <script>
+    const trip = __TRIP_DATA__;
+
+    function e(s) { return escapeHTML(s == null ? "" : s); }
+    function mount(id, html) { document.getElementById(id).innerHTML = html; }
+    function tag(text) { return '<span>' + e(text) + '</span>'; }
+    function imgTag(url, name) {
+      const empty = !url;
+      return '<div class="photo"><img src="' + e(url || '') + '" alt="' + e(name) + '" data-empty="' + (empty ? 'true' : 'false') + '" onerror="this.dataset.empty=\'true\';this.removeAttribute(\'src\')"></div>';
+    }
+    function periodText(period) {
+      return { morning: "上午", noon: "中午", evening: "晚上" }[period] || period;
+    }
+    function renderPreTrip() {
+      const p = trip.preTrip;
+      return [
+        ["天气", p.weather.summary],
+        ["台风与变更", p.weather.typhoon],
+        ["穿搭", p.packing],
+        ["支付", p.payment],
+        ["必备 App", p.apps.join(" / ")],
+        ["购票时机", p.ticketTip]
+      ].map(([title, body]) => '<div class="card"><div class="card-body"><span class="flag alt">' + e(title) + '</span><p>' + e(body) + '</p></div></div>').join('');
+    }
+    function renderFlights() {
+      const booked = trip.flights.booked.map(f => '<div class="flight"><span class="flag">已预订</span><h3>' + e(f.label) + '</h3><p>' + e(f.code) + ' · ' + e(f.time) + '</p></div>').join('');
+      const candidates = trip.flights.candidates.map(f => '<div class="flight"><span class="flag alt">待选 · 请自行核实预订</span><h3>' + e(f.label) + '</h3><p><strong>' + e(f.code) + '</strong></p><p>' + e(f.time) + '</p><p class="note">' + e(f.note) + '</p></div>').join('');
+      return booked + candidates;
+    }
+    function renderHotels() {
+      return trip.hotelAreas.map(area => '<div class="card"><div class="card-body"><span class="flag alt">' + e(area.area) + '</span><h3>' + e(area.reason) + '</h3><div class="grid">' + area.options.map(o => '<div class="hotel-option"><strong>' + e(o.tier) + ' · ' + e(o.name) + '</strong><p>' + e(o.priceRange) + '</p><p class="note">' + e(o.note) + '</p></div>').join('') + '</div></div></div>').join('');
+    }
+    function renderSlot(slot) {
+      const meta = [];
+      if (slot.openingHours) meta.push(tag('营业 ' + slot.openingHours));
+      if (slot.closedDays) meta.push(tag('休息 ' + slot.closedDays));
+      if (slot.ticketPrice) meta.push(tag('门票 ' + slot.ticketPrice));
+      if (slot.transport) meta.push(tag(slot.transport.mode + ' · ' + slot.transport.fare + ' · ' + slot.transport.duration));
+      if (slot.seasonal) meta.push(tag('时令 ' + slot.seasonal));
+      if (slot.needsBooking) meta.push(reminderBadgeHTML(slot.leadDays || 7));
+      return '<article class="slot">' + imgTag(slot.photo, slot.name) + '<div class="slot-main"><div class="slot-top"><div><div class="period">' + e(periodText(slot.period)) + ' · ' + e(slot.time) + '</div><h3>' + e(slot.name) + '</h3></div><div class="rating">' + e(slot.rating) + ' / 5</div></div><p>' + e(slot.review) + '</p><div class="meta">' + meta.join('') + '</div></div></article>';
+    }
+    function renderDining(items) {
+      return '<div class="dining">' + items.map(d => '<div class="card"><div class="card-body"><span class="flag">' + e(d.meal) + '</span><h3>' + e(d.place) + '</h3><p class="note">' + e(d.hours) + '</p><div>' + d.dishes.map(x => '<span class="dish">' + e(x.name) + ' · ' + e(x.price) + '</span>').join('') + '</div></div></div>').join('') + '</div>';
+    }
+    function renderAlternatives(items) {
+      if (!items || !items.length) return '';
+      return '<div class="alternatives">' + items.map(a => '<div class="alt-card"><strong>' + e(a.label) + '</strong><p class="note">' + e(a.summary) + '</p></div>').join('') + '</div>';
+    }
+    function renderDays() {
+      return trip.days.map((day, index) => '<article class="card day"><div class="day-head"><span class="flag alt">Day ' + (index + 1) + ' · ' + e(day.date) + ' · ' + e(day.weekday) + '</span><h3>' + e(day.theme) + '</h3>' + (day.tips || []).map(t => '<p class="note">' + e(t) + '</p>').join('') + '</div><div class="slots">' + day.slots.map(renderSlot).join('') + '</div>' + renderAlternatives(day.alternatives) + renderDining(day.dining || []) + '</article>').join('');
+    }
+    function renderTips() {
+      return trip.tips.map(t => '<div class="tip">' + e(t) + '</div>').join('');
+    }
+
+    mount('todoMount', renderChecklistHTML(computeReminders(trip.startDate, trip.reminders)));
+    mount('preTripMount', renderPreTrip());
+    mount('flightMount', renderFlights());
+    mount('disclaimerMount', '<strong>重要免责声明</strong><p>' + e(trip.disclaimer) + '</p>');
+    mount('hotelMount', renderHotels());
+    mount('daysMount', renderDays());
+    mount('tipsMount', renderTips());
+  </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    window.addEventListener('load', function () {
+      const points = trip.days.flatMap(day => day.slots)
+        .filter(slot => Number.isFinite(slot.lat) && Number.isFinite(slot.lng))
+        .map(slot => ({ lat: slot.lat, lng: slot.lng, name: slot.name, time: slot.time }));
+      initTravelMap('map', points);
+    });
+  </script>
+</body>
+</html>

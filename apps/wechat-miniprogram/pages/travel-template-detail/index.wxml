@@ -1,0 +1,31 @@
+<view class="page" wx:if="{{template}}">
+  <image class="detail-cover" src="{{template.coverImageUrl}}" mode="aspectFill" />
+  <view class="detail-hero">
+    <view class="badge">模板 {{template.version}}</view>
+    <view class="hero-title">{{template.title}}</view>
+    <view class="hero-copy">{{template.desc}}</view>
+    <view class="meta-row">
+      <view class="badge soft">{{template.durationDays}} 天</view>
+      <view class="badge soft">{{template.placeCount}} 个节点</view>
+      <view class="badge soft">{{template.bookingCount}} 个预约项</view>
+    </view>
+    <view class="space-actions detail-actions">
+      <button plain="true" class="pill-button" bindtap="useTemplate">使用此计划</button>
+      <button plain="true" class="ghost-button" bindtap="openPreview">浏览完整攻略</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head"><view class="section-title">8 天路线</view><view class="section-note">预算参考 ¥{{template.estimatedBudget}}</view></view>
+    <view class="stack">
+      <view class="service-card" wx:for="{{template.dayThemes}}" wx:key="id">
+        <view class="service-main">
+          <view class="item-title">第 {{item.order}} 天 · {{item.theme}}</view>
+          <view class="item-subtitle">{{item.date}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="section"><view class="card"><view class="card-title">信息说明</view><view class="item-subtitle">{{template.disclaimer}}</view></view></view>
+</view>
+<view class="page" wx:else><view class="empty">{{error}}</view></view>

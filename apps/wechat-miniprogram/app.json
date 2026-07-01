@@ -8,6 +8,12 @@
     "pages/space-settings/index",
     "pages/card-detail/index",
     "pages/travel-plan/index",
+    "pages/travel-day-editor/index",
+    "pages/travel-node-editor/index",
+    "pages/travel-candidates/index",
+    "pages/travel-templates/index",
+    "pages/travel-template-detail/index",
+    "pages/travel-preview/index",
     "pages/invitation/index"
   ],
   "window": {

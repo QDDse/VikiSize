@@ -1,0 +1,30 @@
+<view class="page">
+  <view class="topbar"><view class="page-title">旅行模板</view></view>
+  <view class="space-header">
+    <view class="space-kicker">先浏览，再使用</view>
+    <view class="space-title">选择一份旅行计划</view>
+    <view class="hero-copy">完整攻略用于浏览，使用后会在你的空间中生成独立、可编辑的旅行计划。</view>
+  </view>
+
+  <view class="empty" wx:if="{{loading}}">正在加载旅行模板</view>
+  <view class="empty" wx:elif="{{error}}" bindtap="loadTemplates">{{error}}，点击重试</view>
+  <view class="empty" wx:elif="{{!templates.length}}">暂无可用旅行模板</view>
+
+  <view class="section template-list" wx:else>
+    <view class="template-card" wx:for="{{templates}}" wx:key="id">
+      <image class="template-cover" src="{{item.coverImageUrl}}" mode="aspectFill" data-id="{{item.id}}" data-version="{{item.version}}" bindtap="openDetail" />
+      <view class="template-body">
+        <view class="item-title">{{item.title}}</view>
+        <view class="item-subtitle template-desc">{{item.desc}}</view>
+        <view class="meta-row">
+          <view class="badge">{{item.durationDays}} 天</view>
+          <view class="badge soft" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</view>
+        </view>
+        <view class="space-actions">
+          <button plain="true" class="ghost-button" data-id="{{item.id}}" data-version="{{item.version}}" bindtap="openPreview">浏览攻略</button>
+          <button plain="true" class="pill-button" data-id="{{item.id}}" data-version="{{item.version}}" data-state="{{item.instanceState}}" bindtap="useTemplate">{{item.instanceState === 'current_space' ? '继续编辑' : '使用此计划'}}</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,14 @@
+const assert = require("assert");
+const store = require("../apps/wechat-miniprogram/services/localStore");
+const { Roles } = require("../apps/wechat-miniprogram/domain/constants");
+store.resetLocalState();
+let context = store.getCurrentContext(); let instance = store.getTravelInstance(context.space.id); const day = instance.days[0]; const node = day.nodes[0];
+store.updateTravelNode(instance.id, day.id, node.id, { sensitiveFields: { confirmationCode: "SECRET", internalBudgetNote: "PRIVATE", documentAttachmentIds: [] }, expectedRevision: node.revision });
+assert.throws(() => store.updateTravelNode(instance.id, day.id, node.id, { title: "冲突更新", expectedRevision: node.revision }), /其他成员更新/);
+const attachment = store.createAttachmentRecord({ spaceId: context.space.id, scopeType: "travel_node", scopeId: node.id, category: "ticket", cloudFileId: "wxcloud://ticket.jpg", mimeType: "image/jpeg", sizeBytes: 1024 });
+assert.strictEqual(store.listAttachmentsForScope(context.space.id, node.id).length, 1);
+assert.throws(() => store.createAttachmentRecord({ spaceId: context.space.id, scopeType: "travel_node", scopeId: node.id, cloudFileId: "bad.pdf", mimeType: "application/pdf", sizeBytes: 1 }), /仅支持/);
+const task1 = store.createTravelTaskFromNode(instance.id, day.id, node.id, "tickets"); const task2 = store.createTravelTaskFromNode(instance.id, day.id, node.id, "tickets"); assert.strictEqual(task1.created, true); assert.strictEqual(task2.created, false); assert.strictEqual(task1.card.id, task2.card.id);
+store.setCurrentUserRoleForPreview(Roles.GUEST); instance = store.getTravelInstance(context.space.id); const guestNode = instance.days[0].nodes[0]; assert.deepStrictEqual(guestNode.sensitiveFields, {}); assert.deepStrictEqual(guestNode.attachmentIds, []); assert.strictEqual(store.listAttachmentsForScope(context.space.id, node.id).length, 0); assert.throws(() => store.deleteAttachment(attachment.id), /访客只能查看/);
+store.setCurrentUserRoleForPreview(Roles.OWNER); store.deleteAttachment(attachment.id); assert.strictEqual(store.listAttachmentsForScope(context.space.id, node.id).length, 0);
+console.log("Travel collaboration tests passed.");
