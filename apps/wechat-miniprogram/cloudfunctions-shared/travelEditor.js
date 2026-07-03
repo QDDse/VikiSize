@@ -11,8 +11,14 @@ async function load(instanceId, profile, ownerOnly) {
   return { instance, auth };
 }
 async function save(instanceId, instance, auth, type, summary) {
-  instance.updatedAt = now(); instance.revision = Number(instance.revision || 0) + 1;
-  await collection("travel_plan_instances").doc(instanceId).set({ data: instance });
+  // 以加载时的 revision 做条件写入：并发编辑中只有一个写入者能命中旧版本，
+  // 消除"内存里比较、整文档覆盖"的读写间隙（TOCTOU）。
+  const loadedRevision = Number(instance.revision || 0);
+  instance.updatedAt = now(); instance.revision = loadedRevision + 1;
+  const data = Object.assign({}, instance); delete data._id;
+  const written = await collection("travel_plan_instances").where({ _id: instanceId, revision: loadedRevision }).update({ data });
+  const updatedCount = written.stats ? written.stats.updated : written.updated;
+  if (!updatedCount) { const error = new Error("内容已被其他成员更新，请刷新后重试"); error.code = "CONFLICT"; throw error; }
   await collection("activities").add({ data: { id: id("activity"), spaceId: instance.spaceId, cardId: "", actorUserId: auth.user.id, type, summary, createdAt: now() } });
   return { instance };
 }

@@ -28,7 +28,9 @@ Page({
     }
     store.createSpace({
       templateType: TemplateTypes.TRAVEL_TEAM,
-      name: this.data.template.title.replace("计划", "小队")
+      name: this.data.template.title.replace("计划", "小队"),
+      sourceTemplateId: this.data.template.id,
+      sourceTemplateVersion: this.data.template.version
     });
     wx.showToast({ title: "旅行计划已创建", icon: "success" });
     wx.switchTab({ url: "/pages/plans/index" });

@@ -1,14 +1,20 @@
 const store = require("../../services/localStore");
 const { Modules, RoleLabels } = require("../../domain/constants");
+const { safeRefresh } = require("../../utils/pageGuard");
 
 Page({
   data: {
     context: {},
     roleLabel: "",
-    cards: []
+    cards: [],
+    loadError: ""
   },
 
   onShow() {
+    safeRefresh(this, () => this.refresh());
+  },
+
+  refresh() {
     const context = store.getCurrentContext();
     this.setData({
       context,

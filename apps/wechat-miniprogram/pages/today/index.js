@@ -1,6 +1,7 @@
 const store = require("../../services/localStore");
 const { RoleLabels } = require("../../domain/constants");
 const { toMiniProgramCoordinate } = require("../../services/mapAdapter");
+const { safeRefresh } = require("../../utils/pageGuard");
 
 Page({
   data: {
@@ -8,11 +9,12 @@ Page({
     roleLabel: "",
     summary: {},
     searchKeyword: "",
-    searchResults: []
+    searchResults: [],
+    loadError: ""
   },
 
   onShow() {
-    this.refresh();
+    safeRefresh(this, () => this.refresh());
   },
 
   refresh() {

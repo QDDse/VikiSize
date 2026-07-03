@@ -12,6 +12,7 @@ const {
   TemplateTypes
 } = require("../domain/constants");
 const { tokyoTravelTemplate } = require("../data/tokyoTravelTemplate");
+const travelTemplateRegistry = require("../data/travelTemplateRegistry");
 const { buildTodayTravelView } = require("./travelExecution");
 
 const STORAGE_KEY = "vikisize_life_assistant_state_v1";
@@ -27,6 +28,20 @@ function clone(value) {
 
 function newId(prefix) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+const INVITATION_TTL_MS = 72 * 60 * 60 * 1000;
+
+// 邀请 token 是加入空间的凭证，不能带可推算的时间戳前缀。
+// 小程序运行时没有同步的加密随机 API，本地适配器用加长随机串 + 过期时间兜底；
+// 生产凭证由云函数用 Node crypto 生成（cloudfunctions-shared/repo.js）。
+function randomToken() {
+  const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let token = "";
+  for (let index = 0; index < 48; index += 1) {
+    token += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return token;
 }
 
 function normalizeNode(node, index) {
@@ -115,6 +130,12 @@ function readRawState() {
     }
   }
 
+  if (saved) {
+    // 未知版本（更高版本应用写入或数据损坏）：先备份再报错，绝不静默重置用户数据
+    storage.setStorageSync(`${STORAGE_KEY}_backup_unknown`, saved);
+    throw new Error("本地数据版本无法识别，原始数据已备份，请升级小程序后重试");
+  }
+
   memoryState = createInitialState();
   storage.setStorageSync(STORAGE_KEY, memoryState);
   return clone(memoryState);
@@ -194,7 +215,7 @@ function createSpaceRecord(state, input) {
   });
 
   if (input.templateType === TemplateTypes.TRAVEL_TEAM) {
-    createTravelInstanceFromTemplateRecord(state, space.id, input.ownerUserId);
+    createTravelInstanceFromTemplateRecord(state, space.id, input.ownerUserId, input.sourceTemplateId, input.sourceTemplateVersion);
   }
 
   if (input.templateType === TemplateTypes.FAMILY_LIFE) {
@@ -225,9 +246,29 @@ function createSpaceRecord(state, input) {
   return space;
 }
 
-function createTravelInstanceFromTemplateRecord(state, spaceId, userId) {
+// 按 id 解析旅行模板：优先用本地集合内已有的，否则从生成的模板注册表取并落入集合。
+// 不传 id 时保持历史行为（首个内置模板）。
+function resolveTravelTemplate(state, sourceTemplateId, sourceVersion) {
+  if (!sourceTemplateId) {
+    return state.collections.travel_templates[0];
+  }
+  const seeded = state.collections.travel_templates.find((item) => (
+    item.id === sourceTemplateId && (!sourceVersion || item.version === sourceVersion)
+  ));
+  if (seeded) {
+    return seeded;
+  }
+  const registryTemplate = travelTemplateRegistry.getById(sourceTemplateId, sourceVersion);
+  if (!registryTemplate) {
+    throw new Error("旅行模板不存在");
+  }
+  state.collections.travel_templates.push(registryTemplate);
+  return registryTemplate;
+}
+
+function createTravelInstanceFromTemplateRecord(state, spaceId, userId, sourceTemplateId, sourceVersion) {
   const createdAt = now();
-  const template = state.collections.travel_templates[0];
+  const template = resolveTravelTemplate(state, sourceTemplateId, sourceVersion);
   const existing = state.collections.travel_plan_instances.find((item) => (
     item.spaceId === spaceId
     && item.sourceTemplateId === template.id
@@ -429,7 +470,9 @@ function createSpace(input) {
   const space = createSpaceRecord(state, {
     name: input.name || template.name,
     templateType: template.type,
-    ownerUserId: userId
+    ownerUserId: userId,
+    sourceTemplateId: input.sourceTemplateId,
+    sourceTemplateVersion: input.sourceTemplateVersion
   });
   state.currentSpaceId = space.id;
   saveRawState(state);
@@ -1067,15 +1110,19 @@ function getBudgetSummary(spaceId) {
 function createInvitation(role) {
   const state = readRawState();
   const context = getCurrentContext();
+  if (!context.space) {
+    throw new Error("请先创建或加入一个空间");
+  }
   assertCanWrite(state, context.space.id);
   const createdAt = now();
   const invitation = {
     id: newId("invite"),
     spaceId: context.space.id,
-    token: newId("token"),
+    token: randomToken(),
     invitedBy: state.currentUserId,
     role: role || Roles.MEMBER,
     status: "pending",
+    expiresAt: new Date(Date.now() + INVITATION_TTL_MS).toISOString(),
     createdAt,
     updatedAt: createdAt
   };
@@ -1090,8 +1137,14 @@ function acceptInvitation(token) {
   if (!invitation || invitation.status !== "pending") {
     throw new Error("邀请无效或已使用");
   }
-  const exists = state.collections.space_members.find((item) => item.spaceId === invitation.spaceId && item.userId === state.currentUserId);
   const createdAt = now();
+  if (invitation.expiresAt && invitation.expiresAt < createdAt) {
+    invitation.status = "expired";
+    invitation.updatedAt = createdAt;
+    saveRawState(state);
+    throw new Error("邀请已过期");
+  }
+  const exists = state.collections.space_members.find((item) => item.spaceId === invitation.spaceId && item.userId === state.currentUserId);
   if (!exists) {
     state.collections.space_members.push({
       id: newId("member"),

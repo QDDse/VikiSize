@@ -57,9 +57,15 @@ Page({
   },
 
   onShareAppMessage() {
-    const invitation = this.data.invitation || store.createInvitation(Roles.MEMBER);
+    // 分享回调必须保持只读：写操作（生成邀请）在 createInvite 按钮里完成，
+    // 这里只消费已生成的邀请；未生成或无空间时降级为普通分享。
+    const invitation = this.data.invitation;
+    const space = this.data.context && this.data.context.space;
+    if (!invitation || !space) {
+      return { title: "VikiSize 生活助手", path: "/pages/today/index" };
+    }
     return {
-      title: `加入 ${this.data.context.space.name}`,
+      title: `加入 ${space.name}`,
       path: `/pages/invitation/index?spaceId=${invitation.spaceId}&token=${invitation.token}`
     };
   }

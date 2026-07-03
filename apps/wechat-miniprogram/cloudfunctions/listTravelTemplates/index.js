@@ -1,7 +1,9 @@
 const { collection } = require("./_shared/cloud");
+const { MAX_QUERY_LIMIT } = require("./_shared/repo");
 
 exports.main = async () => {
-  const result = await collection("travel_templates").where({ status: "published" }).get();
+  // 服务端 get 默认只返回 20 条，必须显式 limit，否则超过 20 个模板会被静默截断
+  const result = await collection("travel_templates").where({ status: "published" }).limit(MAX_QUERY_LIMIT).get();
   return {
     templates: result.data.map((template) => ({
       id: template.id,

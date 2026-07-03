@@ -52,7 +52,7 @@ function validateTemplate(template) {
     });
   });
   (template.sources || []).forEach((source) => {
-    if (!source.url.startsWith("https://")) errors.push(`${source.id}: source URL must use HTTPS`);
+    if (!source.url || !source.url.startsWith("https://")) errors.push(`${source.id}: source URL must use HTTPS`);
   });
   return errors;
 }

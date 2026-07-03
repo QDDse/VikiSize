@@ -5,6 +5,10 @@ Page({
   data: { instanceId: "", dayId: "", nodeId: "", spaceId: "", form: emptyForm, attachments: [], dirty: false },
   onLoad(query) {
     const context = store.getCurrentContext();
+    if (!context.space) {
+      wx.redirectTo({ url: "/pages/spaces/index" });
+      return;
+    }
     const instance = store.getTravelInstance(context.space.id);
     const day = instance && instance.days.find((item) => item.id === query.dayId);
     const node = query.nodeId && day ? day.nodes.find((item) => item.id === query.nodeId) : null;
