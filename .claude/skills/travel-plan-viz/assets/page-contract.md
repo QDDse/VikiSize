@@ -1,0 +1,136 @@
+# 页面内容契约（给设计步骤）
+
+生成 HTML 时，**设计步骤**（frontend-design / huashu-design / 内置美学准则，见 SKILL.md）负责布局与美学，但必须包含以下区块与数据结构，并接入 `map.js` / `reminders.js` 两个引擎脚本（用 `<script>` 内联到单文件 HTML）。生成后用 `assets/validate.js` 机械校验（见 SKILL.md）。
+
+## 输入数据结构
+
+```js
+const trip = {
+  title: "香港 4 天 3 晚",
+  startDate: "2026-07-15",           // ISO，用于提醒日期计算
+  colorScheme: "<每趟行程不同，由设计步骤决定>",
+
+  // 行前须知（按出发日期/季节定制）
+  preTrip: {
+    weather: {
+      summary: "7 月平均 31°C / 26°C，午后 3–6 点常有短时强雷暴，上午与晚上多晴",
+      typhoon: "7–9 月为台风季，出发前 3 天起关注香港天文台预警（8 号风球以上交通景点关闭）"
+    },
+    packing: "短袖短裤 + 轻薄防晒衣 + 防滑凉鞋 + 晴雨两用伞；室内空调极冷，务必带一件长袖外套",
+    payment: "推荐电子八达通（Apple/华为钱包可加，内地卡可充值），另备 500–800 港币现金给传统茶餐厅/红色小巴",
+    apps: ["MTR Mobile（港铁）", "香港天文台（天气）", "景点官方 App（如迪士尼查排队）"],
+    ticketTip: "热门景点门票建议提前 3–7 天网上购买，避免现场排队"
+  },
+
+  // 航班：已预订高亮；未预订时给 3-5 个待选班次供自行核实
+  // actionLink 可选：仅当链接来自用户已装的官方 skill（如飞猪）时给，{label,url}；否则省略，别手拼。
+  flights: {
+    booked: [ { label, code, time } ],
+    candidates: [ { label, code, time, note, actionLink } ]   // note 写机型/直飞或经停/大致价位区间
+  },
+
+  // 酒店：综合各景点位置，按"片区 + 价位"推荐
+  hotelAreas: [
+    {
+      area: "尖沙咀",
+      reason: "靠近星光大道、天星小轮，地铁交通便利",
+      // option 可选 actionLink={label,url}：仅当来自官方 skill（如飞猪酒店/高德周边搜索）返回的预订/详情链接
+      options: [
+        { tier: "经济", name: "...", priceRange: "约 ¥500/晚", note: "..." },
+        { tier: "中档", name: "...", priceRange: "约 ¥1000/晚", note: "..." },
+        { tier: "高端", name: "...", priceRange: "约 ¥2000/晚", note: "..." }
+      ]
+    }
+  ],
+
+  disclaimer: "本页全部信息（天气、航班、酒店、餐厅、景点、门票、价格、营业时间、评分、活动等）均为 AI 基于公开资料整理的参考建议，可能不准确或已过时，不保证与实时情况一致；请务必在官方渠道 / 订票订房 / 地图等 App 上核实后再做决定或前往。",
+
+  // 可选：本次若用了用户已装的官方旅行 skill（飞猪/高德/腾讯地图/滴滴等）补数据，在此登记来源，页面据此注明；没用到就整个省略。
+  // 责任边界：这些来源的数据实时性/真实性由对方官方 skill 负责，本页只适配呈现、不背书，措辞中性、不替任一家打广告。
+  dataSources: [
+    { name: "高德地图 skill", scope: "点到点路线规划、坐标", realtime: true },
+    { name: "飞猪 flyai",     scope: "航班候选",            realtime: true }
+  ],
+
+  // 全程通用避坑贴士
+  tips: [
+    "户外活动尽量排在上午 9 点前与晚上 7 点后，下午雷暴时段安排室内（商场/博物馆/乐园）",
+    "热门餐厅避开 12–13 点、18–20 点高峰；非高峰几乎不排队",
+    "如遇台风预警（8 号风球以上），公共交通与景点会关闭，留酒店休息"
+  ],
+
+  reminders: [ { item: "迪士尼乐园门票", leadDays: 7 } ],  // 喂给 computeReminders
+
+  days: [
+    {
+      date: "2026-07-15",
+      weekday: "周二",
+      theme: "港岛经典 · 都市印象",        // 当日主题（可选）
+      tips: ["上午先排户外，午后转室内避雷暴"],   // 当日小贴士（可选）
+      alternatives: [                          // 单日二选一（可选）
+        { label: "方案A 香港迪士尼", summary: "暑期皮克斯限定，成人约 ¥580 起，港铁迪士尼线直达" },
+        { label: "方案B 海洋公园",   summary: "水上乐园重开，联票约 ¥800，南港岛线海洋公园站直达" }
+      ],
+      slots: [   // 早/中/晚
+        {
+          period: "morning|noon|evening",
+          name: "维多利亚港",
+          time: "09:00–12:00",            // 可为单点或时间段
+          lat: 22.293, lng: 114.169,      // 坐标一律 WGS-84；高德/腾讯返回的是 GCJ-02，须先经 map.js 的 gcj02ToWgs84 转换再写入
+          photo: "https://...缩略图URL",
+          rating: 4.7,
+          review: "一句话点评",
+          openingHours: "全天开放",        // 可选
+          closedDays: "周一休",            // 可选，无则省略
+          ticketPrice: "免费 / 缆车套票约 ¥88",  // 可选，参考价（非实时）
+          transport: { mode: "天星小轮", fare: "约 ¥3", duration: "约 10 分钟", actionLink }, // 可选：如何到达本点；actionLink 可选={label,url}，仅当来自官方地图 skill 的路线规划/导航链接（高德/腾讯/滴滴）
+          seasonal: "暑期限定灯光秀（6/12–8/31）",  // 可选：时令活动
+          needsBooking: false,
+          leadDays: 0
+        }
+      ],
+      dining: [   // 当日餐饮（替代旧的 meals.food）；每餐可带必点菜 + 参考价
+        {
+          meal: "午餐",
+          place: "九记牛腩",
+          hours: "12:30–22:30，周日休",
+          dishes: [ { name: "清汤牛腩面", price: "¥68" }, { name: "咖喱牛腩面", price: "¥72" } ]
+        }
+      ]
+    }
+  ]
+};
+```
+
+## 必须包含的区块（顺序可由美学微调，内容不可缺）
+
+1. **页顶**：行程标题 + 出发前待办清单。清单用 `reminders.js` 的 `computeReminders(trip.startDate, trip.reminders)` 再 `renderChecklistHTML(...)` 生成。
+2. **行前须知区块**：展示 `preTrip` 全部——天气与台风提醒、穿搭、支付、必备 App、购票时机。突出"日期/季节定制"。
+3. **航班区**：`flights.booked` 高亮标"已预订"；`flights.candidates` 列表展示 3-5 个待选班次，每项标"待选 · 请自行核实预订"并显示 `note`。
+4. **酒店区（片区 + 价位）**：遍历 `hotelAreas`，每片区显示 `area` + `reason`，其下按 `经济/中档/高端` 列出 `options`（名称 + `priceRange` + `note`）。
+5. **免责声明**：在航班/酒店区域附近显著展示 `trip.disclaimer` 全文。
+6. **交互地图**：`<div id="map">`，调用 `initTravelMap('map', points)`，`points` 为所有 slot 按行程顺序汇总的 `{lat,lng,name,time}`。引入 Leaflet CSS/JS（CDN）。
+7. **每日时间轴**：按天分组，显示当日 `weekday`/`theme`；早/中/晚分段，每个 slot 卡片含 `photo`、`rating`、`review`，并展示存在的可选字段（`openingHours`、`closedDays`、`ticketPrice`、`transport` 的方式/票价/耗时、`seasonal`）；`needsBooking` 为 true 时插入 `reminderBadgeHTML(leadDays)`。当日若有 `tips`、`alternatives`（二选一卡片）也要展示。
+8. **每日餐饮**：展示当日 `dining`，每餐含 `place`、`hours` 与必点菜（`dishes` 的名称 + `price`）。
+9. **全程实用贴士**：展示 `trip.tips` 列表。
+
+## 可选适配元素（仅当数据来自用户已装的官方旅行 skill 时才出现，详见 research-guide「第三方 skill 适配」）
+
+- **行动链接 `actionLink`**：航班 `candidates`、酒店 `options`、`slot.transport` 等若带 `actionLink={label,url}`，渲染成一个明确的「去预订 / 导航 / 叫车」按钮或链接（新标签打开）。**没有就不渲染**，绝不为此手拼链接。
+- **数据来源 `dataSources`**：若 `trip.dataSources` 非空，在相关区块或免责声明附近用一行小字中性注明（如「实时航班/酒店来源：飞猪 skill；路线规划与天气来源：高德 skill，时效性由其官方保证」）。措辞**中性、不夸、不推荐某一家**；与 AI 静态整理的内容（标"参考·可能过时"）做视觉区分即可。
+- 这些是**渐进增强**：缺这些字段时页面与现在完全一致，不留空块、不报错。
+
+## 硬性约束
+
+- 单个 `.html` 文件，手机优先。**离线能力如实分层**：文字行程（时间轴/清单/须知/贴士）离线可读；地图瓦片与图片需联网，离线时须优雅降级（见下面图片降级约束），不许出现破图图标或报错弹窗。对用户的表述用「离线可读」，不夸大成"完全离线可用"。
+- **数据与呈现分离（迭代修改的基础）**：完整 `trip` 对象必须以 `<script id="trip-data" type="application/json">…</script>` 原样内嵌进页面（包括 `actionLink`、`dataSources`、`leadDays` 等不直接可见的字段）。后续用户把 HTML 丢回来改行程时，**直接解析这块 JSON 修改后重渲染**，不要反向解析渲染后的 DOM（必丢字段）。
+- **坐标一律 WGS-84**：OSM 瓦片是 WGS-84；来自高德/腾讯（GCJ-02）的坐标必须先用 `map.js` 的 `gcj02ToWgs84` 转换，否则境内点位会偏移一百到几百米。
+- **响应式（手机和桌面都要好看，不能只做窄列）**：手机端单列；桌面端（约 ≥768px）主容器加宽到 **约 880–960px 居中**，卡片列表（航班 / 酒店 / 行前须知 / 餐饮 / 景点）改用**多列网格**、地图区更宽，别在大屏上留成一条窄列两边大片空白。必须包含相应的 `@media` 断点。
+- `map.js` 与 `reminders.js` 的内容必须内联进 HTML（不外链本地文件），保证单文件自包含。
+- 每趟行程用不同配色以便区分。
+- 图片**严禁变形**：图片容器固定尺寸/比例，`<img>` 用 `object-fit: cover` + `display:block`（推荐绝对定位 `inset:0` 填满容器），只裁切不拉伸。
+- 图片**统一降级**：每个 `<img>` 加 `onerror="this.style.display='none'"`，容器自带与主题配色一致的中性底（纯色/渐变均可，可叠景点名文字）——加载失败或离线时呈现为体面的色块，绝不露浏览器破图图标。
+- 地图瓦片源可按需替换：`initTravelMap(id, points, { tileUrl, attribution })` 支持传入替代瓦片源（默认 OSM；若目标读者所在网络访问 OSM 不稳，可换镜像源，注明 attribution）。
+- 所有联网信息（**含天气、餐厅、景点、评分**，不止航班/酒店）尽量基于公开资料给真实可信信息，但全部为**参考**、可能不准或过时，**必须**展示覆盖全部信息的免责声明（第 5 区块）引导用户核实。
+- 排程应体现**天气/季节逻辑**：把户外项目放在凉爽时段（上午、傍晚），午后高温/雷暴时段安排室内（仅在该目的地确有此类天气特征时）。
+- `escapeHTML` 函数在 `map.js` 与 `reminders.js` 中各自定义一份，属故意重复——两个文件须各自独立（Node require 与浏览器内联均不依赖另一方），维护时请勿合并去重。

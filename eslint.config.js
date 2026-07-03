@@ -62,6 +62,8 @@ module.exports = [
       "node_modules/**",
       "generated/**",
       "docs/**",
+      // 收录的第三方技能包（保持上游原样，不按本仓库规则 lint）
+      ".claude/skills/**",
       // 构建期从 cloudfunctions-shared/ 复制出的副本
       "apps/wechat-miniprogram/cloudfunctions/*/_shared/**",
       // 生成的模板种子

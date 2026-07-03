@@ -22,6 +22,7 @@ VikiSize 是一个微信小程序：以"生活空间"为核心的协作应用（
   - `cloudfunctions/` — 云函数（每目录独立部署）
   - `cloudfunctions-shared/` — 云函数共享源码（构建时复制）
 - `scripts/` — 校验、测试（`scripts/tests/`）、构建、部署脚本
+- `.claude/skills/` — 收录的开源 Claude 技能包（旅行/编码/产品/UI），清单与许可见其 README
 - `docs/` — 规格（specs）、迭代记录（iterations）、版本快照（versions）、ADR（adr）、Agent 约定（agents）
 
 ## 常用命令
