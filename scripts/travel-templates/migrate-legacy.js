@@ -2,7 +2,9 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "../..");
-const htmlPath = path.join(root, "关东东京8天旅行计划.html");
+// 历史来源文件 `关东东京8天旅行计划.html` 与 GitHub Pages 入口 `index.html` 字节相同，
+// 重复副本已在仓库清理中删除，一次性迁移脚本改读 `index.html`。
+const htmlPath = path.join(root, "index.html");
 const outputDir = path.join(root, "apps/wechat-miniprogram/data/travel-templates");
 const outputPath = path.join(outputDir, "tokyo-kanto-8d.v1.json");
 const templatePath = path.join(__dirname, "travel-preview-template.html");

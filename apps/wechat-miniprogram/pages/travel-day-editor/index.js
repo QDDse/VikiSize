@@ -4,6 +4,10 @@ Page({
   data: { instanceId: "", dayId: "", form: { date: "", weekday: "", theme: "" } },
   onLoad(query) {
     const context = store.getCurrentContext();
+    if (!context.space) {
+      wx.redirectTo({ url: "/pages/spaces/index" });
+      return;
+    }
     const instance = store.getTravelInstance(context.space.id);
     const day = query.dayId && instance ? instance.days.find((item) => item.id === query.dayId) : null;
     this.setData({ instanceId: query.instanceId, dayId: query.dayId || "", form: day || this.data.form });

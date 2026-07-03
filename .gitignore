@@ -18,6 +18,8 @@ node_modules/
 dist/
 build/
 out/
+generated/
+apps/wechat-miniprogram/cloudfunctions/*/_shared/
 coverage/
 .next/
 .nuxt/

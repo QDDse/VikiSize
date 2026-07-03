@@ -4,20 +4,26 @@
   "private": true,
   "description": "VikiSize application repository",
   "scripts": {
+    "build:cloudfunctions": "node scripts/build-cloudfunctions.js",
     "build:travel-previews": "node scripts/travel-templates/build-h5.js",
     "build:travel-seed": "node scripts/travel-templates/build-miniprogram-seed.js",
     "deploy:wechat": "node scripts/upload-wechat.js",
+    "lint": "eslint .",
     "migrate:travel-template": "node scripts/travel-templates/migrate-legacy.js",
-    "test:travel-templates": "node scripts/test-travel-templates.js",
+    "pretest": "npm run build:cloudfunctions && npm run build:travel-previews",
+    "test": "node --test scripts/tests/*.test.js",
+    "test:cloudfunctions": "npm run build:cloudfunctions && node --test scripts/tests/cloudfunctions-security.test.js",
+    "test:domain": "node --test scripts/tests/domain.test.js",
+    "test:travel-editor": "node --test scripts/tests/travel-editor.test.js",
+    "test:travel-map-today": "node --test scripts/tests/travel-map-today.test.js",
+    "test:travel-collaboration": "node --test scripts/tests/travel-collaboration.test.js",
+    "test:travel-browse": "node --test scripts/tests/travel-template-browse.test.js",
+    "test:travel-templates": "npm run build:travel-previews && node --test scripts/tests/travel-templates.test.js",
     "validate:travel-templates": "node scripts/travel-templates/validate.js",
-    "validate:wechat": "node scripts/validate-miniprogram.js",
-    "test:domain": "node scripts/test-domain.js",
-    "test:travel-editor": "node scripts/test-travel-editor.js",
-    "test:travel-map-today": "node scripts/test-travel-map-today.js",
-    "test:travel-collaboration": "node scripts/test-travel-collaboration.js",
-    "test:travel-browse": "node scripts/test-travel-template-browse.js"
+    "validate:wechat": "node scripts/validate-miniprogram.js"
   },
   "devDependencies": {
+    "eslint": "9.39.2",
     "miniprogram-ci": "2.1.31"
   }
 }

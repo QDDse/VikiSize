@@ -1,5 +1,6 @@
 const store = require("../../services/localStore");
 const { Modules, RoleLabels } = require("../../domain/constants");
+const { safeRefresh } = require("../../utils/pageGuard");
 
 Page({
   data: {
@@ -9,11 +10,12 @@ Page({
     cards: [],
     budget: {},
     instance: null,
-    activities: []
+    activities: [],
+    loadError: ""
   },
 
   onShow() {
-    this.refresh();
+    safeRefresh(this, () => this.refresh());
   },
 
   refresh() {

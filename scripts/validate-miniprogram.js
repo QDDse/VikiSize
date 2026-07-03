@@ -116,6 +116,45 @@ requiredCollections.forEach((collectionName) => {
   assert(fs.existsSync(path.join(root, "cloudfunctions", name, "index.js")), `missing cloud function: ${name}`);
 });
 
+// 每个 pages/ 子目录都必须注册在 app.json，防止死页面再次堆积。
+fs.readdirSync(path.join(root, "pages"), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .forEach((entry) => {
+    assert(
+      appJson.pages.includes(`pages/${entry.name}/index`),
+      `pages/${entry.name} exists on disk but is not registered in app.json`
+    );
+  });
+
+// 云函数按目录独立部署：禁止越出函数目录的 require，依赖必须锁版本。
+// 共享代码走构建复制，见 docs/adr/0001-cloudfunction-shared-packaging.md。
+const cloudfunctionsDir = path.join(root, "cloudfunctions");
+fs.readdirSync(cloudfunctionsDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .forEach((entry) => {
+    const functionDir = path.join(cloudfunctionsDir, entry.name);
+    assert(fs.existsSync(path.join(functionDir, "index.js")), `cloud function ${entry.name} missing index.js`);
+
+    const pkgPath = path.join(functionDir, "package.json");
+    assert(fs.existsSync(pkgPath), `cloud function ${entry.name} missing package.json`);
+    Object.entries(readJson(pkgPath).dependencies || {}).forEach(([dep, version]) => {
+      assert(
+        version !== "latest" && version !== "*",
+        `cloud function ${entry.name} has unpinned dependency: ${dep}@${version}`
+      );
+    });
+
+    walkFiles(functionDir)
+      .filter((filePath) => filePath.endsWith(".js"))
+      .forEach((filePath) => {
+        const content = fs.readFileSync(filePath, "utf8");
+        assert(
+          !/require\(\s*["']\.\.\//.test(content),
+          `cloud function file escapes its deploy package with require("../"): ${path.relative(root, filePath)}`
+        );
+      });
+  });
+
 appJson.pages.flatMap((page) => [".json", ".wxml", ".js"].map((ext) => path.join(root, `${page}${ext}`))).forEach((filePath) => {
   const content = fs.readFileSync(filePath, "utf8");
   assert(!/AI|智能尺码助手|尺码计算|衣橱档案/.test(content), `old shell or AI entry text remains in ${path.relative(root, filePath)}`);
@@ -130,6 +169,7 @@ appJson.pages.flatMap((page) => [".json", ".wxml", ".js"].map((ext) => path.join
   path.join(root, "data"),
   path.join(root, "services"),
   path.join(root, "cloudfunctions"),
+  path.join(root, "cloudfunctions-shared"),
   path.resolve(__dirname)
 ].flatMap((target) => {
   if (!fs.existsSync(target)) {
