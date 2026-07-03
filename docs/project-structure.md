@@ -45,4 +45,4 @@ docs/iterations/YYYY-MM-DD-short-topic/
 
 ## Current Cleanup Notes
 
-The historical travel-plan HTML files are still tracked today because they were part of the original GitHub Pages version. If VikiSize is now only the app repo, those pages should be moved out of git in a separate cleanup commit after confirming the desired public preview entry point.
+2026-07-03 清理已完成：重复的 `关东东京8天旅行计划.html` 已删除（`index.html` 是唯一的 GitHub Pages 入口），`generated/` 构建产物移出 git。仓库全景与常用命令见根目录 `CONTEXT.md`。
