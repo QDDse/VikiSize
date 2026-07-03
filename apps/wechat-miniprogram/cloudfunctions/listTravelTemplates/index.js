@@ -1,4 +1,4 @@
-const { collection } = require("../_shared/cloud");
+const { collection } = require("./_shared/cloud");
 
 exports.main = async () => {
   const result = await collection("travel_templates").where({ status: "published" }).get();

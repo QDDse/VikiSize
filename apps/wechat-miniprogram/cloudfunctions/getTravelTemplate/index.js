@@ -1,4 +1,4 @@
-const { collection } = require("../_shared/cloud");
+const { collection } = require("./_shared/cloud");
 
 exports.main = async (event) => {
   const query = { id: event.templateId, status: "published" };

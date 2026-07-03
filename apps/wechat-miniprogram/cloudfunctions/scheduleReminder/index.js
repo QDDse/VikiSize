@@ -1,5 +1,5 @@
-const { collection, now } = require("../_shared/cloud");
-const { assertPermission } = require("../_shared/permissions");
+const { collection, now } = require("./_shared/cloud");
+const { assertPermission } = require("./_shared/permissions");
 
 const supportedTypes = ["assigned_to_me", "due_soon", "needs_confirmation"];
 

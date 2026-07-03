@@ -1,5 +1,5 @@
-const { collection, now } = require("../_shared/cloud");
-const { assertPermission } = require("../_shared/permissions");
+const { collection, now } = require("./_shared/cloud");
+const { assertPermission } = require("./_shared/permissions");
 
 exports.main = async (event) => {
   const card = (await collection("cards").doc(event.cardId).get()).data;

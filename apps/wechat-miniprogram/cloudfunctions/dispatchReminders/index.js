@@ -1,4 +1,4 @@
-const { _, cloud, collection, now } = require("../_shared/cloud");
+const { _, cloud, collection, now } = require("./_shared/cloud");
 
 exports.main = async () => {
   const timestamp = now();
