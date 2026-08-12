@@ -1,1 +1,46 @@
-<view class="page"><view class="topbar"><view class="page-title">待安排地点</view></view><view class="card form-card" wx:if="{{canWrite}}"><input class="field-input" value="{{title}}" data-field="title" bindinput="change" placeholder="地点名称"/><input class="field-input" value="{{locationName}}" data-field="locationName" bindinput="change" placeholder="区域或地址"/><button class="pill-button full-button" bindtap="add">收藏地点</button></view><view class="section stack"><view class="list-card" wx:for="{{instance.candidatePlaces}}" wx:key="id"><view class="item-title">{{item.title}}</view><view class="item-subtitle">{{item.locationName}}</view><button class="ghost-button candidate-action" wx:if="{{canWrite && !item.scheduledNodeId}}" data-id="{{item.id}}" bindtap="schedule">安排到日期</button><button class="ghost-button candidate-action" wx:if="{{canWrite && item.scheduledNodeId}}" data-id="{{item.id}}" bindtap="unschedule">移回待安排</button></view><view class="card empty" wx:if="{{!instance.candidatePlaces.length}}">暂无待安排地点</view></view></view>
+<view class="page candidate-page" wx:if="{{instance}}">
+  <view class="topbar">
+    <view><view class="page-title">旅行地点库</view><view class="page-subtitle">先收藏，再安排到具体日期</view></view>
+    <button plain="true" class="top-action add-place-action" wx:if="{{canWrite}}" bindtap="toggleForm">{{formOpen ? '收起' : '添加地点'}}</button>
+  </view>
+  <view class="candidate-form" wx:if="{{canWrite && formOpen}}">
+    <view class="form-title">收藏一个想去的地方</view>
+    <view class="field-label">名称</view>
+    <input class="field-input" value="{{title}}" data-field="title" bindinput="change" placeholder="景点、餐厅、酒店"/>
+    <button plain="true" class="location-picker {{coordinate ? 'selected' : ''}}" bindtap="chooseLocation">
+      <view class="location-pin"></view>
+      <view class="location-picker-main"><view class="location-picker-title">{{locationName || '从地图选择地点'}}</view><view class="location-picker-copy">{{address || '选择后可用于路线整理和地图导航'}}</view></view>
+      <view class="location-picker-arrow">›</view>
+    </button>
+    <view class="field-label">分类</view>
+    <view class="category-row"><view class="category-chip {{category === item.value ? 'active' : ''}}" wx:for="{{categoryOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="selectCategory">{{item.label}}</view></view>
+    <button class="save-place" bindtap="add">收藏到地点库</button>
+  </view>
+  <view class="candidate-toolbar">
+    <view class="candidate-switch">
+      <view class="candidate-filter {{filter === 'unscheduled' ? 'active' : ''}}" data-filter="unscheduled" bindtap="setFilter">待安排 {{counts.unscheduled}}</view>
+      <view class="candidate-filter {{filter === 'scheduled' ? 'active' : ''}}" data-filter="scheduled" bindtap="setFilter">已安排 {{counts.scheduled}}</view>
+    </view>
+    <button plain="true" class="select-action" wx:if="{{canWrite && filter === 'unscheduled' && visibleCandidates.length}}" bindtap="toggleSelecting">{{selecting ? '完成' : '多选'}}</button>
+  </view>
+  <view class="candidate-list" wx:if="{{visibleCandidates.length}}">
+    <view class="candidate-card {{item.selected ? 'selected' : ''}}" wx:for="{{visibleCandidates}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleCandidate">
+      <view class="select-mark" wx:if="{{selecting}}">{{item.selected ? '✓' : ''}}</view>
+      <view class="candidate-index">{{index + 1}}</view>
+      <view class="candidate-main">
+        <view class="candidate-title">{{item.title}}</view>
+        <view class="candidate-location">{{item.locationName || item.address || '地点待补充'}}</view>
+        <view class="candidate-meta"><view class="candidate-tag">{{item.categoryLabel}}</view><view class="candidate-tag arranged" wx:if="{{item.scheduledDayLabel}}">{{item.scheduledDayLabel}}</view><view class="candidate-tag missing" wx:if="{{!item.coordinate}}">未选坐标</view></view>
+      </view>
+      <button plain="true" class="candidate-more" wx:if="{{!selecting && canWrite && !item.scheduledNodeId}}" data-id="{{item.id}}" catchtap="schedule">安排</button>
+      <button plain="true" class="candidate-more muted-action" wx:if="{{!selecting && canWrite && item.scheduledNodeId}}" data-id="{{item.id}}" catchtap="unschedule">移回</button>
+    </view>
+  </view>
+  <view class="candidate-empty" wx:else>
+    <view class="empty-orbit"><view class="empty-orbit-dot"></view></view>
+    <view class="empty-title">{{filter === 'unscheduled' ? '没有待安排地点' : '还没有安排地点'}}</view>
+    <view class="empty-copy">{{filter === 'unscheduled' ? '看到想去的地方先收藏，之后可批量排进同一天。' : '切换到待安排，把收藏的地点加入每天行程。'}}</view>
+    <button class="empty-button" wx:if="{{canWrite && filter === 'unscheduled'}}" bindtap="toggleForm">添加第一个地点</button>
+  </view>
+  <view class="batch-dock" wx:if="{{selecting && selectedIds.length}}"><view class="batch-count">已选 {{selectedIds.length}} 个地点</view><button plain="true" class="batch-button" bindtap="scheduleSelected">安排到同一天</button></view>
+</view>

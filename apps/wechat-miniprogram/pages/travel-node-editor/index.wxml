@@ -1,17 +1,57 @@
-<view class="page form-page">
-  <view class="topbar"><view class="page-title">{{nodeId ? '编辑行程' : '新增行程'}}</view></view>
-  <view class="card form-card">
-    <view class="field-label">名称</view><input class="field-input" value="{{form.title}}" data-field="title" bindinput="change" placeholder="景点、餐厅或交通"/>
-    <view class="two-cols"><view><view class="field-label">开始</view><input class="field-input" value="{{form.startTime}}" data-field="startTime" bindinput="change" placeholder="09:00"/></view><view><view class="field-label">结束</view><input class="field-input" value="{{form.endTime}}" data-field="endTime" bindinput="change" placeholder="11:00"/></view></view>
-    <view class="field-label">地点</view><input class="field-input" value="{{form.locationName}}" data-field="locationName" bindinput="change" placeholder="地点名称"/>
-    <view class="field-label">地址</view><input class="field-input" value="{{form.address}}" data-field="address" bindinput="change" placeholder="详细地址"/>
-    <view class="field-label">交通方式</view><input class="field-input" value="{{form.transport.mode}}" data-field="mode" bindinput="changeTransport" placeholder="地铁、步行、出租车"/>
-    <view class="two-cols"><view><view class="field-label">票价</view><input class="field-input" value="{{form.ticketPrice}}" data-field="ticketPrice" bindinput="change"/></view><view><view class="field-label">预计费用</view><input class="field-input" type="number" value="{{form.estimatedCost}}" data-field="estimatedCost" bindinput="change"/></view></view>
-    <view class="switch-row"><text>需要预约</text><switch checked="{{form.needsBooking}}" bindchange="toggleBooking" color="#2f7dff"/></view>
-    <view class="field-label">备注</view><textarea class="field-textarea" value="{{form.notes}}" data-field="notes" bindinput="change" placeholder="开放时间、注意事项等"/>
-    <view class="field-label">行程图片</view><view class="image-grid"><view class="image-item" wx:for="{{attachments}}" wx:key="id"><image src="{{item.cloudFileId}}" mode="aspectFill" data-url="{{item.cloudFileId}}" bindtap="previewImage"/><button class="image-delete" data-id="{{item.id}}" bindtap="deleteImage">删除</button></view></view>
-    <button class="ghost-button full-button" bindtap="chooseImage">添加图片</button><button class="ghost-button full-button" wx:if="{{nodeId}}" bindtap="createTask">生成关联任务</button>
-    <view class="sensitive-title">敏感信息（访客不可见）</view><view class="field-label">确认号</view><input class="field-input" value="{{form.sensitiveFields.confirmationCode}}" data-field="sensitiveFields.confirmationCode" bindinput="change" password="true"/>
-    <button class="pill-button full-button" bindtap="save">保存行程</button><button class="danger-button" wx:if="{{nodeId}}" bindtap="remove">删除行程</button>
+<view class="page node-editor-page">
+  <view class="topbar">
+    <view><view class="page-title">{{nodeId ? '编辑行程' : '添加行程'}}</view><view class="page-subtitle">把时间、地点和交通放在一起</view></view>
   </view>
+  <view class="editor-section">
+    <view class="section-label">基本信息</view>
+    <view class="editor-card">
+      <view class="field-label">行程类型</view>
+      <view class="type-row"><view class="type-chip {{form.type === item.value ? 'active' : ''}}" wx:for="{{typeOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="selectType">{{item.label}}</view></view>
+      <view class="field-label">名称</view>
+      <input class="field-input title-input" value="{{form.title}}" data-field="title" bindinput="change" placeholder="例如：浅草寺、寿司晚餐"/>
+      <view class="time-grid">
+        <view><view class="field-label">开始</view><picker mode="time" value="{{form.startTime}}" data-field="startTime" bindchange="changeTime"><view class="time-picker">{{form.startTime || '选择时间'}}</view></picker></view>
+        <view><view class="field-label">结束</view><picker mode="time" value="{{form.endTime}}" data-field="endTime" bindchange="changeTime"><view class="time-picker">{{form.endTime || '选择时间'}}</view></picker></view>
+      </view>
+    </view>
+  </view>
+  <view class="editor-section">
+    <view class="section-label">地点与路线</view>
+    <view class="editor-card">
+      <button plain="true" class="map-picker {{form.coordinate ? 'selected' : ''}}" bindtap="chooseLocation">
+        <view class="map-pin"></view>
+        <view class="map-picker-main"><view class="map-picker-title">{{form.locationName || '从地图选择地点'}}</view><view class="map-picker-address">{{form.address || '选点后可参与路线整理和导航'}}</view></view>
+        <view class="map-picker-arrow">›</view>
+      </button>
+      <view class="field-label">交通方式</view>
+      <picker range="{{transportOptions}}" bindchange="chooseTransport"><view class="field-picker">{{form.transport.mode || '选择交通方式'}}<text>›</text></view></picker>
+      <view class="time-grid">
+        <view><view class="field-label">交通耗时</view><input class="field-input" value="{{form.transport.duration}}" data-field="duration" bindinput="changeTransport" placeholder="约 20 分钟"/></view>
+        <view><view class="field-label">交通费用</view><input class="field-input" value="{{form.transport.fare}}" data-field="fare" bindinput="changeTransport" placeholder="例如 ¥80"/></view>
+      </view>
+    </view>
+  </view>
+  <view class="editor-section">
+    <view class="section-label">计划细节</view>
+    <view class="editor-card">
+      <view class="switch-row"><view><view class="switch-title">需要预约</view><view class="switch-copy">在行程中突出显示预约状态</view></view><switch checked="{{form.needsBooking}}" bindchange="toggleBooking" color="#176b4e"/></view>
+      <view class="field-label">预计费用</view><view class="money-field"><text>¥</text><input type="digit" value="{{form.estimatedCost}}" data-field="estimatedCost" bindinput="change" placeholder="0"/></view>
+      <view class="field-label">备注</view><textarea class="field-textarea" value="{{form.notes}}" data-field="notes" bindinput="change" placeholder="开放时间、集合点、注意事项"/>
+    </view>
+  </view>
+  <view class="advanced-toggle" bindtap="toggleAdvanced"><view><view class="advanced-title">附件与确认信息</view><view class="advanced-copy">图片、关联任务和访客不可见的确认号</view></view><view class="advanced-arrow {{advancedOpen ? 'open' : ''}}">›</view></view>
+  <view class="editor-section" wx:if="{{advancedOpen}}">
+    <view class="editor-card">
+      <view class="field-label">行程图片</view>
+      <view class="image-grid"><view class="image-item" wx:for="{{attachments}}" wx:key="id"><image src="{{item.cloudFileId}}" mode="aspectFill" data-url="{{item.cloudFileId}}" bindtap="previewImage"/><button plain="true" class="image-delete" data-id="{{item.id}}" bindtap="deleteImage">删除</button></view></view>
+      <button plain="true" class="secondary-button" loading="{{uploading}}" disabled="{{uploading}}" bindtap="chooseImage">{{uploading ? '正在上传' : '添加图片'}}</button>
+      <button plain="true" class="secondary-button" wx:if="{{nodeId}}" bindtap="createTask">生成关联任务</button>
+      <view class="privacy-divider"></view>
+      <view class="privacy-title">仅成员可见</view>
+      <view class="field-label">预订确认号</view>
+      <input class="field-input" value="{{form.sensitiveFields.confirmationCode}}" data-field="sensitiveFields.confirmationCode" bindinput="change" password="true" placeholder="访客不会看到此内容"/>
+    </view>
+  </view>
+  <button plain="true" class="delete-button" wx:if="{{nodeId}}" bindtap="remove">删除这条行程</button>
+  <view class="save-dock"><button plain="true" class="save-button" bindtap="save">{{nodeId ? '保存修改' : '添加到当天'}}</button></view>
 </view>

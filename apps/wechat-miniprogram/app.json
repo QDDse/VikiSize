@@ -18,13 +18,21 @@
   ],
   "window": {
     "navigationBarTitleText": "VikiSize",
-    "navigationBarBackgroundColor": "#eef2f5",
+    "navigationBarBackgroundColor": "#f4f6f4",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#eef2f5"
+    "backgroundColor": "#f4f6f4"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于选择行程地点并在地图中展示旅行路线"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ],
   "tabBar": {
-    "color": "#8a96a8",
-    "selectedColor": "#2f7dff",
+    "color": "#7a837f",
+    "selectedColor": "#176b4e",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [

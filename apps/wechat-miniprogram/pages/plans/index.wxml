@@ -4,17 +4,22 @@
     <button plain="true" class="top-action" bindtap="openSettings">成员</button>
   </view>
 
-  <view class="space-header">
-    <view class="space-kicker">旅行空间</view>
+  <view class="space-header plan-hero">
+    <view class="space-kicker">正在规划</view>
     <view class="space-title-row">
       <view class="space-title">{{context.space.name}}</view>
       <view class="space-role">{{roleLabel}}</view>
     </view>
-    <view class="hero-copy">旅行计划、任务、预算和活动记录集中在这里，东京模板已复制成当前空间的可编辑实例。</view>
+    <view class="hero-copy">把想去的地方、每天路线和同行任务整理成一份真正能执行的计划。</view>
+    <view class="plan-stats">
+      <view><text>{{planSummary.days}}</text><text>天</text></view>
+      <view><text>{{planSummary.places}}</text><text>行程点</text></view>
+      <view><text>{{planSummary.candidates}}</text><text>待安排</text></view>
+    </view>
     <view class="space-actions">
-      <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
-      <button plain="true" class="link-button" bindtap="openTravelTemplates">浏览模板</button>
-      <button plain="true" class="link-button" bindtap="createPlanCard">新任务</button>
+      <button plain="true" class="link-button primary-link" bindtap="openTravelPlan">打开行程</button>
+      <button plain="true" class="link-button" bindtap="openCandidates">地点库</button>
+      <button plain="true" class="link-button" bindtap="createPlanCard">添加任务</button>
     </view>
   </view>
 
@@ -27,16 +32,17 @@
 
   <view class="section" wx:if="{{tab === 'itinerary'}}">
     <view class="section-head">
-      <view class="section-title">第 1-8 天行程</view>
+      <view class="section-title">每天行程</view>
       <view class="section-note" bindtap="openTravelPlan">查看全部</view>
     </view>
     <view class="stack">
-      <view class="service-card" wx:for="{{instance.days}}" wx:key="id" bindtap="openTravelPlan">
-        <view class="service-icon"></view>
+      <view class="service-card itinerary-day" wx:for="{{instance.days}}" wx:key="id" bindtap="openTravelPlan">
+        <view class="day-number"><text>D{{index + 1}}</text><text>{{item.date}}</text></view>
         <view class="service-main">
-          <view class="item-title">第 {{index + 1}} 天 · {{item.theme}}</view>
-          <view class="item-subtitle">{{item.date}} · {{item.weekday}} · {{item.nodes.length}} 个节点</view>
+          <view class="item-title">{{item.theme}}</view>
+          <view class="item-subtitle">{{item.weekday}}　{{item.nodes.length}} 个地点</view>
         </view>
+        <view class="day-arrow">›</view>
       </view>
     </view>
   </view>
@@ -48,7 +54,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="service-icon"></view>
+        <view class="service-icon small-icon">任</view>
         <view class="service-main">
           <view class="item-title">{{item.title}}</view>
           <view class="item-subtitle">{{item.description}}</view>
@@ -68,7 +74,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{budget.categories}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon small-icon">费</view>
         <view class="service-main">
           <view class="item-title">{{item.name}}</view>
           <view class="item-subtitle">已确认 ¥{{item.confirmedCost}}</view>
@@ -87,7 +93,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{activities}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon small-icon">记</view>
         <view class="service-main">
           <view class="item-title">{{item.summary}}</view>
           <view class="item-subtitle">{{item.createdAt}}</view>

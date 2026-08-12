@@ -1,3 +1,16 @@
 .section-note {
-  color: #2f7dff;
+  color: #176b4e;
 }
+
+.plan-hero { padding-bottom: 30rpx; }
+.plan-stats { border-top: 1rpx solid rgba(255,255,255,.14); display: grid; grid-template-columns: repeat(3,1fr); margin-top: 26rpx; padding-top: 20rpx; position: relative; z-index: 1; }
+.plan-stats view { display: flex; flex-direction: column; gap: 3rpx; }
+.plan-stats text:first-child { color: #fff; font-size: 29rpx; font-weight: 900; }
+.plan-stats text:last-child { color: #acd8c4; font-size: 19rpx; }
+.primary-link { background: #fff; color: #176b4e; }
+.itinerary-day { gap: 20rpx; padding: 22rpx; }
+.day-number { align-items: center; background: #e8f2ed; border-radius: 17rpx; color: #176b4e; display: flex; flex: 0 0 auto; flex-direction: column; height: 78rpx; justify-content: center; width: 82rpx; }
+.day-number text:first-child { font-size: 23rpx; font-weight: 900; }
+.day-number text:last-child { font-size: 15rpx; margin-top: 3rpx; }
+.day-arrow { color: #84908a; font-size: 38rpx; }
+.small-icon { border-radius: 16rpx; height: 64rpx; width: 64rpx; }

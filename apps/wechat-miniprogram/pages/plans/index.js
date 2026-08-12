@@ -10,6 +10,7 @@ Page({
     cards: [],
     budget: {},
     instance: null,
+    planSummary: {},
     activities: [],
     loadError: ""
   },
@@ -21,12 +22,18 @@ Page({
   refresh() {
     const context = store.getCurrentContext();
     const instance = context.space ? store.getTravelInstance(context.space.id) : null;
+    const travelNodes = instance ? instance.days.reduce((all, day) => all.concat(day.nodes || []), []) : [];
     this.setData({
       context,
       roleLabel: context.member ? RoleLabels[context.member.role] : "",
       cards: context.space ? store.getCards(context.space.id, Modules.PLANS) : [],
       budget: context.space ? store.getBudgetSummary(context.space.id) : {},
       instance,
+      planSummary: {
+        days: instance ? instance.days.length : 0,
+        places: travelNodes.length,
+        candidates: instance ? instance.candidatePlaces.filter((item) => !item.scheduledNodeId).length : 0
+      },
       activities: context.space ? context.state.collections.activities.filter((item) => item.spaceId === context.space.id).slice(0, 8) : []
     });
   },
@@ -49,6 +56,11 @@ Page({
 
   openTravelTemplates() {
     wx.navigateTo({ url: "/pages/travel-templates/index" });
+  },
+
+  openCandidates() {
+    if (!this.data.instance) return;
+    wx.navigateTo({ url: `/pages/travel-candidates/index?instanceId=${this.data.instance.id}` });
   },
 
   openCard(event) {

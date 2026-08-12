@@ -1,62 +1,110 @@
-<view class="page" wx:if="{{instance}}">
-  <view class="topbar">
-    <view class="page-title">行程</view>
+<view class="page travel-page" wx:if="{{instance}}">
+  <view class="topbar travel-topbar">
+    <view>
+      <view class="page-title">我的行程</view>
+      <view class="topbar-subtitle">{{instance.startDate}} - {{instance.endDate}}</view>
+    </view>
+    <button plain="true" class="top-action compact-action" bindtap="openCandidates">地点库 {{unscheduledCount}}</button>
   </view>
 
-  <view class="space-header">
-    <view class="space-kicker">旅行计划</view>
-    <view class="space-title-row">
-      <view class="space-title">{{instance.title}}</view>
-      <view class="space-role">{{context.member.role === 'owner' ? '管理员' : context.member.role === 'member' ? '成员' : '访客'}}</view>
-    </view>
-    <view class="hero-copy">{{instance.startDate}} 至 {{instance.endDate}} · {{instance.days.length}} 天 · {{instance.status === 'planning' ? '规划中' : instance.status}}</view>
-    <view class="space-actions">
-      <button class="link-button" bindtap="openCandidates">待安排 {{instance.candidatePlaces.length}}</button>
-      <button class="link-button" wx:if="{{context.canWrite}}" bindtap="openDayEditor">新增日期</button>
+  <view class="trip-hero">
+    <view class="trip-hero-glow"></view>
+    <view class="trip-kicker">{{instance.days.length}} 天旅行计划</view>
+    <view class="trip-title">{{instance.title}}</view>
+    <view class="trip-meta">{{instance.startDate}} 至 {{instance.endDate}}　{{roleLabel}}</view>
+    <view class="trip-stats">
+      <view class="trip-stat"><view class="trip-stat-value">{{tripStats.placeCount}}</view><view class="trip-stat-label">行程点</view></view>
+      <view class="trip-stat"><view class="trip-stat-value">{{tripStats.bookingCount}}</view><view class="trip-stat-label">待预约</view></view>
+      <view class="trip-stat"><view class="trip-stat-value">¥{{tripStats.estimatedCost}}</view><view class="trip-stat-label">预计花费</view></view>
     </view>
   </view>
 
-  <scroll-view scroll-x="true" class="day-tabs">
-    <view class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
-      D{{index + 1}}
+  <scroll-view scroll-x="true" enhanced="{{true}}" show-scrollbar="{{false}}" class="day-tabs" scroll-into-view="day-{{selectedDayId}}">
+    <view id="day-{{item.id}}" class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{dayTabs}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
+      <view class="day-tab-index">D{{item.dayNumber}}</view>
+      <view class="day-tab-date">{{item.shortDate}}</view>
+      <view class="day-tab-count">{{item.nodeCount}} 个地点</view>
     </view>
   </scroll-view>
 
-  <view class="view-switch"><view class="switch-item {{viewMode === 'timeline' ? 'active' : ''}}" data-mode="timeline" bindtap="switchView">时间线</view><view class="switch-item {{viewMode === 'map' ? 'active' : ''}}" data-mode="map" bindtap="switchView">地图</view></view>
-
-  <view class="section map-panel" wx:if="{{viewMode === 'map'}}"><map wx:if="{{mapView.markers.length}}" class="travel-map" latitude="{{mapView.latitude}}" longitude="{{mapView.longitude}}" scale="{{mapView.scale}}" markers="{{mapView.markers}}" polyline="{{mapView.polyline}}" bindmarkertap="markerTap"/><view class="card empty-map" wx:else>当天还没有可显示的坐标，请在节点中补充地点。</view></view>
-
-  <view class="section" wx:if="{{selectedDay && viewMode === 'timeline'}}">
-    <view class="card">
-      <view class="section-head">
-        <view class="card-title">{{selectedDay.theme}}</view>
-        <button class="top-action" wx:if="{{context.canWrite}}" data-id="{{selectedDay.id}}" bindtap="openDayEditor">编辑日期</button>
-      </view>
-      <view class="item-subtitle">{{selectedDay.date}} · {{selectedDay.weekday}}</view>
-      <view class="item-subtitle">{{selectedDay.tip}}</view>
+  <view class="planner-toolbar">
+    <view class="view-switch">
+      <view class="switch-item {{viewMode === 'timeline' ? 'active' : ''}}" data-mode="timeline" bindtap="switchView">日程</view>
+      <view class="switch-item {{viewMode === 'map' ? 'active' : ''}}" data-mode="map" bindtap="switchView">地图</view>
     </view>
+    <button plain="true" class="route-button" wx:if="{{context.canWrite}}" bindtap="optimizeDayRoute">按距离整理</button>
+  </view>
 
-    <view class="stack node-stack">
-      <view class="service-card {{activeNodeId === item.id ? 'active-node' : ''}}" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="activateNode">
-        <view class="service-icon"></view>
-        <view class="service-main">
-          <view class="badge">{{item.period}} · {{item.startTime || item.time}}</view>
-          <view class="item-title node-title" data-id="{{item.id}}" bindtap="openNodeEditor">{{item.title}}</view>
-          <view class="item-subtitle">{{item.locationName || item.location}} · {{item.transport.mode || item.route}}</view>
-          <view class="item-subtitle" wx:if="{{item.needsBooking}}">需要预约</view>
-          <view class="meta-row">
-            <view class="badge soft">预算 ¥{{item.estimatedCost}}</view>
+  <view class="map-panel" wx:if="{{viewMode === 'map'}}">
+    <map wx:if="{{mapView.markers.length}}" class="travel-map" latitude="{{mapView.latitude}}" longitude="{{mapView.longitude}}" scale="{{mapView.scale}}" markers="{{mapView.markers}}" polyline="{{mapView.polyline}}" bindmarkertap="markerTap"/>
+    <view class="map-empty" wx:else>
+      <view class="empty-pin"></view>
+      <view class="empty-title">地图还缺少地点</view>
+      <view class="empty-copy">编辑行程并从地图选点，路线会自动出现在这里。</view>
+      <button class="outline-button" wx:if="{{context.canWrite}}" bindtap="openNodeEditor">添加第一个地点</button>
+    </view>
+    <view class="map-node-preview" wx:if="{{activeNode}}" data-id="{{activeNode.id}}" bindtap="openNodeEditor">
+      <view class="map-node-order">{{activeNode.order}}</view>
+      <view class="map-node-main">
+        <view class="map-node-title">{{activeNode.title}}</view>
+        <view class="map-node-meta">{{activeNode.startTime || '时间待定'}}　{{activeNode.locationName || activeNode.address}}</view>
+      </view>
+      <view class="map-node-arrow">›</view>
+    </view>
+  </view>
+
+  <view class="day-overview" wx:if="{{selectedDay && viewMode === 'timeline'}}">
+    <view class="day-overview-main">
+      <view class="day-overview-date">{{selectedDay.date}}　{{selectedDay.weekday}}</view>
+      <view class="day-overview-title">{{selectedDay.theme}}</view>
+      <view class="day-overview-tip" wx:if="{{selectedDay.tip}}">{{selectedDay.tip}}</view>
+    </view>
+    <button plain="true" class="day-edit" wx:if="{{context.canWrite}}" data-id="{{selectedDay.id}}" bindtap="openDayEditor">编辑</button>
+  </view>
+
+  <view class="day-insights" wx:if="{{selectedDay && viewMode === 'timeline'}}">
+    <view class="insight"><text class="insight-value">{{dayStats.nodeCount}}</text><text class="insight-label">站</text></view>
+    <view class="insight"><text class="insight-value">{{dayStats.timedCount}}</text><text class="insight-label">已排时间</text></view>
+    <view class="insight"><text class="insight-value">¥{{dayStats.estimatedCost}}</text><text class="insight-label">预计</text></view>
+  </view>
+
+  <view class="timeline" wx:if="{{selectedDay && viewMode === 'timeline' && timelineNodes.length}}">
+    <view id="node-{{item.id}}" class="timeline-row {{activeNodeId === item.id ? 'active' : ''}}" wx:for="{{timelineNodes}}" wx:key="id" data-id="{{item.id}}" bindtap="activateNode" bindlongpress="openNodeActions">
+      <view class="time-rail">
+        <view class="node-time">{{item.displayTime}}</view>
+        <view class="rail-dot">{{item.order}}</view>
+        <view class="rail-line" wx:if="{{!item.isLast}}"></view>
+      </view>
+      <view class="timeline-content">
+        <view class="node-card">
+          <view class="node-head">
+            <view class="node-title">{{item.title}}</view>
+            <button plain="true" class="more-button" data-id="{{item.id}}" catchtap="openNodeActions">•••</button>
           </view>
-          <view class="item-subtitle">{{item.notes}}</view>
-          <view class="node-actions" wx:if="{{context.canWrite}}">
-            <button class="mini-action" data-id="{{item.id}}" data-direction="up" bindtap="moveNode">上移</button>
-            <button class="mini-action" data-id="{{item.id}}" data-direction="down" bindtap="moveNode">下移</button>
-            <button class="mini-action primary" data-id="{{item.id}}" bindtap="openNodeEditor">编辑</button>
-            <button class="mini-action" wx:if="{{item.coordinate}}" data-id="{{item.id}}" catchtap="openLocation">地图</button>
+          <view class="node-location" wx:if="{{item.locationName || item.address}}">{{item.locationName || item.address}}</view>
+          <view class="node-tags">
+            <view class="node-tag" wx:if="{{item.period}}">{{item.period}}</view>
+            <view class="node-tag booking" wx:if="{{item.needsBooking}}">需要预约</view>
+            <view class="node-tag cost" wx:if="{{item.estimatedCost}}">¥{{item.estimatedCost}}</view>
           </view>
+          <view class="node-notes" wx:if="{{item.notes}}">{{item.notes}}</view>
+        </view>
+        <view class="travel-leg" wx:if="{{!item.isLast && (item.transportMode || item.transportDuration)}}">
+          <view class="leg-line"></view>
+          <view class="leg-copy">{{item.transportMode || '前往下一站'}}<text wx:if="{{item.transportDuration}}">　{{item.transportDuration}}</text></view>
         </view>
       </view>
-      <button class="pill-button add-node" wx:if="{{context.canWrite}}" bindtap="openNodeEditor">新增行程节点</button>
     </view>
+  </view>
+
+  <view class="timeline-empty" wx:if="{{selectedDay && viewMode === 'timeline' && !timelineNodes.length}}">
+    <view class="empty-title">这一天还没有安排</view>
+    <view class="empty-copy">先从地点库挑选想去的地方，或者直接创建行程。</view>
+    <button class="outline-button" wx:if="{{context.canWrite}}" bindtap="openCandidates">从地点库安排</button>
+  </view>
+
+  <view class="planner-dock" wx:if="{{context.canWrite && selectedDay}}">
+    <button plain="true" class="dock-secondary" bindtap="openCandidates">地点库</button>
+    <button plain="true" class="dock-primary" bindtap="openNodeEditor">添加行程</button>
   </view>
 </view>

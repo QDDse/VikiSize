@@ -13,8 +13,20 @@ function toMiniProgramCoordinate(coordinate) {
   return null;
 }
 function buildMapViewModel(day, activeNodeId) {
-  const markers = (day && day.nodes || []).map((node) => ({ node, coordinate: toMiniProgramCoordinate(node.coordinate) })).filter((item) => item.coordinate).map((item, index) => ({ id: index + 1, nodeId: item.node.id, latitude: item.coordinate.latitude, longitude: item.coordinate.longitude, title: item.node.title, label: { content: String(index + 1), color: "#ffffff", bgColor: "#2f7dff", borderRadius: 10, padding: 4 }, width: 24, height: 24 }));
+  const markers = (day && day.nodes || []).map((node) => ({ node, coordinate: toMiniProgramCoordinate(node.coordinate) })).filter((item) => item.coordinate).map((item, index) => {
+    const active = item.node.id === activeNodeId;
+    return {
+      id: index + 1,
+      nodeId: item.node.id,
+      latitude: item.coordinate.latitude,
+      longitude: item.coordinate.longitude,
+      title: item.node.title,
+      label: { content: String(index + 1), color: "#ffffff", bgColor: active ? "#193d32" : "#2f8a65", borderRadius: 12, padding: active ? 6 : 5 },
+      width: active ? 30 : 25,
+      height: active ? 30 : 25
+    };
+  });
   const first = markers[0];
-  return { latitude: first ? first.latitude : 35.6812, longitude: first ? first.longitude : 139.7671, scale: markers.length ? 11 : 9, markers, polyline: markers.length > 1 ? [{ points: markers.map(({ latitude, longitude }) => ({ latitude, longitude })), color: "#2f7dff", width: 4, dottedLine: true }] : [], activeNodeId: activeNodeId || "" };
+  return { latitude: first ? first.latitude : 35.6812, longitude: first ? first.longitude : 139.7671, scale: markers.length ? 11 : 9, markers, polyline: markers.length > 1 ? [{ points: markers.map(({ latitude, longitude }) => ({ latitude, longitude })), color: "#2f8a65", width: 5, dottedLine: false, arrowLine: true }] : [], activeNodeId: activeNodeId || "" };
 }
 module.exports = { buildMapViewModel, toMiniProgramCoordinate };
