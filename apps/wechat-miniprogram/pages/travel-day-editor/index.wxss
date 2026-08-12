@@ -1,1 +1,3 @@
 @import "../travel-node-editor/index.wxss";
+.day-editor-page { padding-bottom: 180rpx; }
+.day-theme-input { font-size: 28rpx; font-weight: 800; }
