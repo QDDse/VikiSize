@@ -4,13 +4,16 @@ const { secureHashEqual, sha256, tokenHash, validateFitnessDelivery } = require(
 
 function requestPayload(event) {
   if (!event.httpMethod) return event;
-  if (event.httpMethod !== "POST") throw new Error("Fitness Delivery 仅支持 POST");
+  if (event.httpMethod !== "POST") {
+    const error = new Error("Fitness Delivery 仅支持 POST");
+    error.code = "METHOD_NOT_ALLOWED";
+    throw error;
+  }
   const body = event.isBase64Encoded ? Buffer.from(event.body || "", "base64").toString("utf8") : event.body;
   return typeof body === "string" ? JSON.parse(body || "{}") : (body || {});
 }
 
-exports.main = async (event) => {
-  event = requestPayload(event);
+async function ingest(event) {
   const channels = await collection("fitness_channels").where({ id: event.channelId, revokedAt: null }).limit(1).get();
   const channel = channels.data[0];
   if (!channel || !secureHashEqual(channel.publishTokenHash, tokenHash(event.publishToken))) {
@@ -43,5 +46,36 @@ exports.main = async (event) => {
     if (!raced) throw error;
     if (raced.contentHash !== event.delivery.contentHash) throw new Error("Delivery 内容冲突");
     return { delivery: raced, created: false };
+  }
+}
+
+function errorStatus(error) {
+  if (error.code === "PERMISSION_DENIED") return 401;
+  if (error.code === "METHOD_NOT_ALLOWED") return 405;
+  if (/冲突/.test(error.message || "")) return 409;
+  if (error instanceof SyntaxError || /schema|不完整|缺少|哈希|仅支持/.test(error.message || "")) return 400;
+  return 500;
+}
+
+function httpResponse(statusCode, payload) {
+  return {
+    statusCode,
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify(payload)
+  };
+}
+
+exports.main = async (event) => {
+  const isHttp = Boolean(event.httpMethod);
+  try {
+    const result = await ingest(requestPayload(event));
+    return isHttp ? httpResponse(200, result) : result;
+  } catch (error) {
+    if (!isHttp) throw error;
+    const statusCode = errorStatus(error);
+    return httpResponse(statusCode, {
+      error: statusCode === 500 ? "Fitness Delivery 服务暂不可用" : error.message,
+      code: error.code || "INVALID_DELIVERY"
+    });
   }
 };

@@ -44,13 +44,22 @@ test("发布通道密钥只返回一次，Delivery 经哈希校验后幂等入�
     }),
     ingest.main({ channelId: channel.channelId, publishToken: channel.publishToken, delivery })
   ]);
-  assert.strictEqual(first.delivery.id, duplicate.delivery.id);
+  assert.strictEqual(first.statusCode, 200);
+  const firstBody = JSON.parse(first.body);
+  assert.strictEqual(firstBody.delivery.id, duplicate.delivery.id);
   assert.strictEqual(mock.all("fitness_deliveries").length, 1);
 
   await assert.rejects(
     ingest.main({ channelId: channel.channelId, publishToken: "wrong-token", delivery }),
     /发布凭证无效/
   );
+
+  const denied = await ingest.main({
+    httpMethod: "POST",
+    body: JSON.stringify({ channelId: channel.channelId, publishToken: "wrong-token", delivery })
+  });
+  assert.strictEqual(denied.statusCode, 401);
+  assert.ok(!denied.body.includes("wrong-token"));
   await assert.rejects(
     ingest.main({
       channelId: channel.channelId,
