@@ -37,11 +37,19 @@
         </view>
         <view class="item-subtitle">原因：{{item.reason}}</view>
       </view>
+      <view class="writeback-card" wx:if="{{delivery.planPatch.writeback}}">
+        <view class="diff-target">采纳后写回训记训练记录</view>
+        <view class="writeback-note">以下摘要与 Patch 哈希绑定，点击采纳即确认这些变更。</view>
+        <view class="writeback-row" wx:for="{{delivery.planPatch.writeback.summary}}" wx:key="label">
+          <view>{{item.datestr}} · {{item.label}}</view>
+          <view class="writeback-value">{{item.before === null ? '新建' : item.before}} → {{item.after}}{{item.unit || ''}}</view>
+        </view>
+      </view>
       <view class="hash-label">Patch: {{delivery.planPatch.patchHash}}</view>
       <view class="decision-result" wx:if="{{decisionText}}">{{decisionText}}</view>
       <view class="decision-actions" wx:else>
         <button class="reject-button" bindtap="rejectPatch">拒绝</button>
-        <button class="accept-button" bindtap="acceptPatch">采纳计划</button>
+        <button class="accept-button" bindtap="acceptPatch">{{delivery.planPatch.writeback ? '采纳并写回训记' : '采纳计划'}}</button>
       </view>
     </view>
   </block>

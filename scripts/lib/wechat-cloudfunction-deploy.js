@@ -42,6 +42,34 @@ function resolveLogService(environment) {
   };
 }
 
+function mergeEnvironmentVariables(existing, updates) {
+  const merged = new Map((existing || []).map((item) => [item.key, item.value]));
+  Object.entries(updates || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && String(value) !== "") merged.set(key, String(value));
+  });
+  return Array.from(merged, ([key, value]) => ({ key, value }));
+}
+
+async function updateCloudFunctionEnvironment({ project, env, name, variables }) {
+  const updates = Object.fromEntries(Object.entries(variables || {}).filter((entry) => String(entry[1] || "") !== ""));
+  if (!Object.keys(updates).length) return { updated: false, keys: [] };
+  const extAppid = await project.getExtAppid();
+  initCloudAPI(extAppid || project.appid);
+  const transactOptions = {
+    request: boundTransactRequest(project),
+    transactType: cloudAPI.TransactType.IDE
+  };
+  const { envList } = await cloudAPI.tcbGetEnvironments({}, transactOptions);
+  const environment = envList.find((item) => item.envId === env);
+  if (!environment) throw new Error(`CloudBase environment not found: ${env}`);
+  const region = resolveRegion(environment);
+  const codeSecret = await get3rdCloudCodeSecret(project);
+  const info = await cloudAPI.scfGetFunctionInfo({ namespace: env, region, functionName: name, codeSecret }, transactOptions);
+  const merged = mergeEnvironmentVariables(info.environment && info.environment.variables, updates);
+  await cloudAPI.scfUpdateFunctionInfo({ namespace: env, region, functionName: name, environment: { variables: merged } }, transactOptions);
+  return { updated: true, keys: Object.keys(updates) };
+}
+
 /**
  * miniprogram-ci 2.1.31 checks deployment status before its create branch.
  * For a brand-new environment that check throws ResourceNotFound.Function,
@@ -98,6 +126,8 @@ async function createMissingCloudFunction({
 module.exports = {
   createMissingCloudFunction,
   isMissingFunctionError,
+  mergeEnvironmentVariables,
   resolveRegion,
+  updateCloudFunctionEnvironment,
   uploadWithCreateFallback
 };

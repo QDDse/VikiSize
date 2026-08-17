@@ -19,6 +19,7 @@ const ci = require("miniprogram-ci");
 const projectConfig = require("../apps/wechat-miniprogram/project.config.json");
 const {
   createMissingCloudFunction,
+  updateCloudFunctionEnvironment,
   uploadWithCreateFallback
 } = require("./lib/wechat-cloudfunction-deploy");
 
@@ -27,10 +28,29 @@ const functionNames = [
   "ingestFitnessDelivery",
   "listFitnessDeliveries",
   "getFitnessDelivery",
+  "getFitnessNotificationSettings",
   "decideFitnessPlanPatch",
+  "subscribeFitnessWeeklyReport",
   "importBodyMeasurement",
   "listBodyMeasurements"
 ];
+const functionEnvironment = {
+  getFitnessNotificationSettings: {
+    FITNESS_WEEKLY_REPORT_TEMPLATE_ID: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID,
+    FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS
+  },
+  subscribeFitnessWeeklyReport: {
+    FITNESS_WEEKLY_REPORT_TEMPLATE_ID: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID,
+    FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS
+  },
+  ingestFitnessDelivery: {
+    FITNESS_WEEKLY_REPORT_TEMPLATE_ID: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID,
+    FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS
+  },
+  decideFitnessPlanPatch: {
+    XUNJI_TRAINING_API_KEY: process.env.XUNJI_TRAINING_API_KEY
+  }
+};
 const appid = process.env.WECHAT_APPID || projectConfig.appid;
 const env = process.env.WECHAT_CLOUD_ENV_ID;
 const privateKeyFromEnv = process.env.WECHAT_UPLOAD_PRIVATE_KEY;
@@ -72,6 +92,13 @@ async function main() {
       }
     });
     console.log(`Uploaded cloud function: ${name}`);
+    const environmentResult = await updateCloudFunctionEnvironment({
+      project,
+      env,
+      name,
+      variables: functionEnvironment[name]
+    });
+    if (environmentResult.updated) console.log(`Updated cloud function environment keys: ${name} (${environmentResult.keys.join(", ")})`);
   }
 }
 

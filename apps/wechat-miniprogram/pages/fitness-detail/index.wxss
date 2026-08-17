@@ -17,6 +17,10 @@
 .before, .after { border-radius: 16rpx; font-size: 24rpx; font-weight: 800; padding: 16rpx; }
 .before { background: #fee2e2; color: #991b1b; }
 .after { background: #dcfce7; color: #166534; }
+.writeback-card { background: #eef6ff; border: 1rpx solid #bfd7ff; border-radius: 26rpx; margin-top: 18rpx; padding: 24rpx; }
+.writeback-note { color: #58677b; font-size: 21rpx; line-height: 1.5; margin-top: 8rpx; }
+.writeback-row { border-top: 1rpx solid #d8e6fb; font-size: 23rpx; margin-top: 16rpx; padding-top: 16rpx; }
+.writeback-value { color: #173a72; font-weight: 900; margin-top: 6rpx; }
 .decision-actions { display: flex; gap: 18rpx; margin-top: 28rpx; }
 .decision-actions button { border-radius: 999rpx; flex: 1; font-size: 25rpx; font-weight: 900; }
 .reject-button { background: #e2e8f0; color: #334155; }

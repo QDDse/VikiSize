@@ -9,6 +9,10 @@
 .stat-label { color: #9fb0cf; font-size: 20rpx; margin-top: 4rpx; }
 .notice { background: #fff7d6; border-radius: 18rpx; color: #7c5a00; font-size: 23rpx; margin-top: 22rpx; padding: 18rpx 22rpx; }
 .notice.error { background: #fee2e2; color: #991b1b; }
+.reminder-card { align-items: center; background: #eaf7f3; border: 1rpx solid #b9e8dc; border-radius: 28rpx; display: flex; justify-content: space-between; margin-top: 22rpx; padding: 24rpx 26rpx; }
+.reminder-card > view { flex: 1; min-width: 0; }
+.reminder-button { background: #172554; border-radius: 999rpx; color: #fff; flex: 0 0 auto; font-size: 22rpx; font-weight: 900; margin-left: 20rpx; padding: 0 24rpx; }
+.reminder-button.granted { background: #16765f; }
 .report-card, .empty-card, .body-row { background: #fff; border-radius: 28rpx; box-shadow: 0 12rpx 32rpx rgba(20,35,70,.06); margin-bottom: 18rpx; padding: 26rpx; position: relative; }
 .report-top, .body-row { align-items: center; display: flex; justify-content: space-between; }
 .report-date { color: #667386; font-size: 22rpx; font-weight: 800; }

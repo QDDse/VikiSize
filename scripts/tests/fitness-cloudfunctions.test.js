@@ -25,6 +25,24 @@ function unsignedDelivery() {
   };
 }
 
+function withXunjiWriteback(delivery) {
+  delivery.planPatch.writeback = {
+    provider: "xunji",
+    operation: "upsert_training_day_v2",
+    summary: [{ datestr: "2026-08-18", label: "深蹲训练", before: null, after: "3 x 8 @ 60kg", unit: "" }],
+    request: {
+      schema_version: "train_open_api_v2",
+      include_full_data: true,
+      res: [{
+        datestr: "2026-08-18",
+        title: "下肢训练",
+        movements: [{ name: "深蹲", sets: [{ done: false, weight: "60", unit: "kg", reps: "8" }] }]
+      }]
+    }
+  };
+  return delivery;
+}
+
 test("发布通道密钥只返回一次，Delivery 经哈希校验后幂等入库", async () => {
   const mock = installMockCloud();
   const createChannel = loadFunction("createFitnessChannel");
@@ -98,6 +116,97 @@ test("用户只能读取自己的报告，计划确认必须绑定 Patch 哈希"
     decide.main({ deliveryId: delivery.deliveryId, patchHash: delivery.planPatch.patchHash, decision: "rejected" }),
     /已经完成决策/
   );
+});
+
+test("周报订阅只消费一次，通知失败不影响 Delivery 入箱", async () => {
+  const previousTemplate = process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID;
+  const previousBindings = process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS;
+  process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID = "template-weekly";
+  process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS = JSON.stringify({ thing1: "title", time2: "generatedAt", thing3: "summary" });
+  try {
+    const mock = installMockCloud();
+    const createChannel = loadFunction("createFitnessChannel");
+    const settings = loadFunction("getFitnessNotificationSettings");
+    const subscribe = loadFunction("subscribeFitnessWeeklyReport");
+    const ingest = loadFunction("ingestFitnessDelivery");
+    const { withFitnessHashes } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/fitnessSchema");
+
+    assert.strictEqual((await settings.main({})).status, "disabled");
+    await subscribe.main({ templateId: "template-weekly", accepted: true });
+    assert.strictEqual((await settings.main({})).status, "granted");
+    const channel = await createChannel.main({});
+    const delivery = withFitnessHashes(unsignedDelivery());
+    const result = await ingest.main({ channelId: channel.channelId, publishToken: channel.publishToken, delivery });
+    assert.strictEqual(result.delivery.notification.status, "sent");
+    assert.strictEqual(mock.sentMessages.length, 1);
+    assert.strictEqual(mock.sentMessages[0].page, `/pages/fitness-detail/index?id=${delivery.deliveryId}`);
+    assert.strictEqual((await settings.main({})).status, "consumed");
+  } finally {
+    if (previousTemplate === undefined) delete process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID;
+    else process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID = previousTemplate;
+    if (previousBindings === undefined) delete process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS;
+    else process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS = previousBindings;
+  }
+});
+
+test("采纳含训记写回的 Patch 时先完成写回，失败不记录决策", async () => {
+  installMockCloud();
+  const createChannel = loadFunction("createFitnessChannel");
+  const ingest = loadFunction("ingestFitnessDelivery");
+  const decideModule = loadFunction("decideFitnessPlanPatch");
+  const { withFitnessHashes } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/fitnessSchema");
+  const channel = await createChannel.main({});
+  const delivery = withFitnessHashes(withXunjiWriteback(unsignedDelivery()));
+  await ingest.main({ channelId: channel.channelId, publishToken: channel.publishToken, delivery });
+
+  const blockedHandler = decideModule.createHandler({
+    applyTrainingWriteback: async () => { throw new Error("dry-run rejected"); }
+  });
+  await assert.rejects(blockedHandler({
+    deliveryId: delivery.deliveryId,
+    patchHash: delivery.planPatch.patchHash,
+    decision: "accepted"
+  }), /dry-run rejected/);
+
+  let called = 0;
+  const successHandler = decideModule.createHandler({
+    applyTrainingWriteback: async (input) => {
+      called += 1;
+      assert.strictEqual(input.writeback.operation, "upsert_training_day_v2");
+      return { status: "applied_verified", provider: "xunji", readBackVerified: true };
+    }
+  });
+  const result = await successHandler({
+    deliveryId: delivery.deliveryId,
+    patchHash: delivery.planPatch.patchHash,
+    decision: "accepted"
+  });
+  assert.strictEqual(called, 1);
+  assert.strictEqual(result.delivery.decision.writeback.status, "applied_verified");
+});
+
+test("训记客户端严格按 dry-run、正式写入、回读顺序执行", async () => {
+  const { applyTrainingWriteback } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/xunjiClient");
+  const delivery = withXunjiWriteback(unsignedDelivery());
+  const calls = [];
+  const result = await applyTrainingWriteback({
+    writeback: delivery.planPatch.writeback,
+    deliveryId: delivery.deliveryId,
+    patchHash: "sha256:test",
+    env: { XUNJI_TRAINING_API_KEY: "secret-for-test", XUNJI_TRAINING_BASE_URL: "https://example.test" },
+    request: async (url, headers, payload) => {
+      calls.push({ url, headers, payload });
+      if (url.endsWith("api_trains_for_llm_v2")) {
+        return { res: { trains: [{ localid: 1001, datestr: "2026-08-18", title: "下肢训练" }] } };
+      }
+      return { res: [{ localid: 1001, datestr: "2026-08-18", title: "下肢训练" }] };
+    }
+  });
+  assert.deepStrictEqual(calls.map((call) => call.payload.dry_run), [true, false, undefined]);
+  assert.ok(calls[0].headers.Authorization.startsWith("Bearer "));
+  assert.strictEqual(calls[0].payload.client_request_id, calls[1].payload.client_request_id);
+  assert.strictEqual(result.status, "applied_verified");
+  assert.strictEqual(result.readBackVerified, true);
 });
 
 test("体测报告按用户隔离，异常指标拒绝入库", async () => {

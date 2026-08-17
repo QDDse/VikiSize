@@ -32,6 +32,9 @@ jobs:
       WECHAT_VERSION: ${{ github.event.inputs.version || github.ref_name }}
       WECHAT_DESC: ${{ github.event.inputs.desc || github.event.head_commit.message || 'GitHub Actions upload' }}
       WECHAT_ROBOT: ${{ github.event.inputs.robot || '1' }}
+      FITNESS_WEEKLY_REPORT_TEMPLATE_ID: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_ID }}
+      FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS }}
+      XUNJI_TRAINING_API_KEY: ${{ secrets.XUNJI_TRAINING_API_KEY }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

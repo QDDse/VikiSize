@@ -1,6 +1,8 @@
 const { collection, now } = require("./_shared/cloud");
 const { permissionDenied } = require("./_shared/repo");
 const { secureHashEqual, sha256, tokenHash, validateFitnessDelivery } = require("./_shared/fitnessSchema");
+const { sendFitnessWeeklyNotification } = require("./_shared/fitnessNotifications");
+const { _, cloud } = require("./_shared/cloud");
 
 function requestPayload(event) {
   if (!event.httpMethod) return event;
@@ -40,13 +42,28 @@ async function ingest(event) {
   });
   try {
     await collection("fitness_deliveries").add({ data: recordData });
-    return { delivery: recordData, created: true };
   } catch (error) {
     const raced = (await collection("fitness_deliveries").doc(id).get()).data;
     if (!raced) throw error;
     if (raced.contentHash !== event.delivery.contentHash) throw new Error("Delivery 内容冲突");
     return { delivery: raced, created: false };
   }
+  let notification;
+  try {
+    notification = await sendFitnessWeeklyNotification({
+      cloud,
+      collection,
+      _,
+      delivery: recordData,
+      userId: channel.userId,
+      timestamp,
+      env: process.env
+    });
+    await collection("fitness_deliveries").doc(id).update({ data: { notification: _.set(notification), updatedAt: now() } });
+  } catch (error) {
+    notification = { status: "failed", message: String(error.message || "订阅消息发送失败").slice(0, 120) };
+  }
+  return { delivery: Object.assign({}, recordData, { notification }), created: true };
 }
 
 function errorStatus(error) {

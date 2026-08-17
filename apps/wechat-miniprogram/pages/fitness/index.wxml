@@ -18,6 +18,14 @@
   <view class="notice" wx:if="{{cloudWarning}}">{{cloudWarning}}</view>
   <view class="notice error" wx:if="{{loadError}}">{{loadError}}</view>
 
+  <view class="reminder-card">
+    <view>
+      <view class="item-title">周报到达提醒</view>
+      <view class="item-subtitle">微信订阅消息为一次性授权，发送后可再次开启。</view>
+    </view>
+    <button class="reminder-button {{notificationStatus === 'granted' ? 'granted' : ''}}" bindtap="enableWeeklyReminder">{{notificationText}}</button>
+  </view>
+
   <view class="section">
     <view class="section-head">
       <view class="section-title">分析收件箱</view>
