@@ -34,6 +34,7 @@ jobs:
       WECHAT_ROBOT: ${{ github.event.inputs.robot || '1' }}
       FITNESS_WEEKLY_REPORT_TEMPLATE_ID: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_ID }}
       FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS }}
+      FITNESS_MINIPROGRAM_STATE: ${{ vars.FITNESS_MINIPROGRAM_STATE }}
       XUNJI_TRAINING_API_KEY: ${{ secrets.XUNJI_TRAINING_API_KEY }}
     steps:
       - name: Check out repository

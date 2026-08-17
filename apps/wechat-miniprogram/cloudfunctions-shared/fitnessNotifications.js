@@ -6,6 +6,8 @@ function truncate(value, maxLength) {
 function notificationConfig(env) {
   const source = env || process.env;
   const templateId = String(source.FITNESS_WEEKLY_REPORT_TEMPLATE_ID || "").trim();
+  const requestedState = String(source.FITNESS_MINIPROGRAM_STATE || "formal").trim();
+  const miniprogramState = ["developer", "trial", "formal"].includes(requestedState) ? requestedState : "formal";
   let bindings = {};
   try {
     bindings = JSON.parse(source.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS || "{}");
@@ -16,6 +18,7 @@ function notificationConfig(env) {
   return {
     configured,
     templateId,
+    miniprogramState,
     bindings: configured ? bindings : {},
     error: configured ? "" : "周报订阅消息模板尚未配置"
   };
@@ -27,7 +30,7 @@ function bindingValue(delivery, source) {
   const values = {
     title: "健身周报已生成",
     summary: truncate(report.summary, 20),
-    period: truncate(`${period.start || ""} 至 ${period.end || ""}`, 20),
+    period: `${period.start || ""}~${period.end || ""}`.replaceAll("-", "."),
     generatedAt: String(delivery.generatedAt || "").replace("T", " ").slice(0, 16)
   };
   return values[source] || truncate(source, 20);
@@ -56,6 +59,7 @@ async function sendFitnessWeeklyNotification({ cloud, collection, _, delivery, u
       touser: user.openid,
       templateId: config.templateId,
       page: `/pages/fitness-detail/index?id=${encodeURIComponent(delivery.deliveryId)}`,
+      miniprogramState: config.miniprogramState,
       data: buildNotificationData(delivery, config.bindings)
     });
     await collection("users").doc(user._id).update({

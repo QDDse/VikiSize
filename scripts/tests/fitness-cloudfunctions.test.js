@@ -121,8 +121,10 @@ test("用户只能读取自己的报告，计划确认必须绑定 Patch 哈希"
 test("周报订阅只消费一次，通知失败不影响 Delivery 入箱", async () => {
   const previousTemplate = process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID;
   const previousBindings = process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS;
+  const previousState = process.env.FITNESS_MINIPROGRAM_STATE;
   process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID = "template-weekly";
-  process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS = JSON.stringify({ thing1: "title", time2: "generatedAt", thing3: "summary" });
+  process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS = JSON.stringify({ thing2: "周报", time3: "period", thing1: "summary" });
+  process.env.FITNESS_MINIPROGRAM_STATE = "developer";
   try {
     const mock = installMockCloud();
     const createChannel = loadFunction("createFitnessChannel");
@@ -140,12 +142,20 @@ test("周报订阅只消费一次，通知失败不影响 Delivery 入箱", asyn
     assert.strictEqual(result.delivery.notification.status, "sent");
     assert.strictEqual(mock.sentMessages.length, 1);
     assert.strictEqual(mock.sentMessages[0].page, `/pages/fitness-detail/index?id=${delivery.deliveryId}`);
+    assert.strictEqual(mock.sentMessages[0].miniprogramState, "developer");
+    assert.deepStrictEqual(mock.sentMessages[0].data, {
+      thing2: { value: "周报" },
+      time3: { value: "2026.08.10~2026.08.16" },
+      thing1: { value: "训练稳定，恢复尚可。" }
+    });
     assert.strictEqual((await settings.main({})).status, "consumed");
   } finally {
     if (previousTemplate === undefined) delete process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID;
     else process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID = previousTemplate;
     if (previousBindings === undefined) delete process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS;
     else process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS = previousBindings;
+    if (previousState === undefined) delete process.env.FITNESS_MINIPROGRAM_STATE;
+    else process.env.FITNESS_MINIPROGRAM_STATE = previousState;
   }
 });
 
