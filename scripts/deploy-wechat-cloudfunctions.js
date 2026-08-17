@@ -17,6 +17,10 @@ function loadLocalEnv() {
 loadLocalEnv();
 const ci = require("miniprogram-ci");
 const projectConfig = require("../apps/wechat-miniprogram/project.config.json");
+const {
+  createMissingCloudFunction,
+  uploadWithCreateFallback
+} = require("./lib/wechat-cloudfunction-deploy");
 
 const functionNames = [
   "createFitnessChannel",
@@ -47,12 +51,25 @@ const project = new ci.Project({
 
 async function main() {
   for (const name of functionNames) {
-    await ci.cloud.uploadFunction({
+    const uploadOptions = {
       project,
       env,
       name,
       path: path.join(projectPath, "cloudfunctions", name),
       remoteNpmInstall: true
+    };
+    await uploadWithCreateFallback({
+      upload: () => ci.cloud.uploadFunction(uploadOptions),
+      create: async () => {
+        console.log(`Cloud function does not exist; creating it first: ${name}`);
+        await createMissingCloudFunction({
+          project,
+          env,
+          name,
+          functionPath: uploadOptions.path,
+          remoteNpmInstall: uploadOptions.remoteNpmInstall
+        });
+      }
     });
     console.log(`Uploaded cloud function: ${name}`);
   }
