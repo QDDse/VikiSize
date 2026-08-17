@@ -79,23 +79,58 @@ function normalizeNode(node, index) {
 
 function migrateState(saved) {
   const state = clone(saved);
-  if (state.version >= 2) return state;
-  state.version = 2;
-  state.collections.travel_plan_instances = (state.collections.travel_plan_instances || []).map((instance) => Object.assign({
-    title: instance.sourceName || "旅行计划",
-    startDate: instance.days && instance.days[0] ? instance.days[0].date : "",
-    endDate: instance.days && instance.days.length ? instance.days[instance.days.length - 1].date : "",
-    timezone: "Asia/Tokyo",
-    status: instance.archivedAt ? "archived" : "planning",
-    candidatePlaces: [],
-    createdBy: state.currentUserId,
-    revision: 1
-  }, instance, {
-    days: (instance.days || []).map((day, dayIndex) => Object.assign({ order: dayIndex + 1 }, day, {
-      order: dayIndex + 1,
-      nodes: (day.nodes || []).map(normalizeNode)
-    }))
-  }));
+  if (state.version < 2) {
+    state.version = 2;
+    state.collections.travel_plan_instances = (state.collections.travel_plan_instances || []).map((instance) => Object.assign({
+      title: instance.sourceName || "旅行计划",
+      startDate: instance.days && instance.days[0] ? instance.days[0].date : "",
+      endDate: instance.days && instance.days.length ? instance.days[instance.days.length - 1].date : "",
+      timezone: "Asia/Tokyo",
+      status: instance.archivedAt ? "archived" : "planning",
+      candidatePlaces: [],
+      createdBy: state.currentUserId,
+      revision: 1
+    }, instance, {
+      days: (instance.days || []).map((day, dayIndex) => Object.assign({ order: dayIndex + 1 }, day, {
+        order: dayIndex + 1,
+        nodes: (day.nodes || []).map(normalizeNode)
+      }))
+    }));
+  }
+  if (state.version < 3) {
+    const collections = state.collections;
+    const travelSpaces = (collections.spaces || []).filter((space) => space.templateType === TemplateTypes.TRAVEL_TEAM);
+    const travelSpaceIds = new Set(travelSpaces.map((space) => space.id));
+    const travelCards = (collections.cards || []).filter((card) => travelSpaceIds.has(card.spaceId));
+    const travelCardIds = new Set(travelCards.map((card) => card.id));
+    collections.spaces = travelSpaces;
+    collections.space_members = (collections.space_members || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.cards = travelCards;
+    collections.comments = (collections.comments || []).filter((item) => travelSpaceIds.has(item.spaceId) || travelCardIds.has(item.cardId));
+    collections.activities = (collections.activities || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.reminders = (collections.reminders || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.attachments = (collections.attachments || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.member_opinions = (collections.member_opinions || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.travel_plan_instances = (collections.travel_plan_instances || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.invitations = (collections.invitations || []).filter((item) => travelSpaceIds.has(item.spaceId));
+    collections.fitness_deliveries = collections.fitness_deliveries || [];
+    collections.body_measurement_imports = collections.body_measurement_imports || [];
+    if (!collections.spaces.length) {
+      if (!collections.travel_templates || !collections.travel_templates.length) {
+        collections.travel_templates = [clone(tokyoTravelTemplate)];
+      }
+      const replacement = createSpaceRecord(state, {
+        name: "关东东京 8 天旅行小队",
+        templateType: TemplateTypes.TRAVEL_TEAM,
+        ownerUserId: state.currentUserId
+      });
+      state.currentSpaceId = replacement.id;
+    }
+    state.currentSpaceId = travelSpaceIds.has(state.currentSpaceId)
+      ? state.currentSpaceId
+      : (collections.spaces[0] ? collections.spaces[0].id : "");
+    state.version = 3;
+  }
   return state;
 }
 
@@ -119,13 +154,18 @@ function readRawState() {
   }
 
   const saved = storage.getStorageSync(STORAGE_KEY);
-  if (saved && (saved.version === 1 || saved.version === 2)) {
+  if (saved && (saved.version === 1 || saved.version === 2 || saved.version === 3)) {
     try {
+      if (saved.version < 3 && !storage.getStorageSync(`${STORAGE_KEY}_backup_v${saved.version}`)) {
+        storage.setStorageSync(`${STORAGE_KEY}_backup_v${saved.version}`, saved);
+      }
       memoryState = migrateState(saved);
       storage.setStorageSync(STORAGE_KEY, memoryState);
       return clone(memoryState);
     } catch (error) {
-      storage.setStorageSync(`${STORAGE_KEY}_backup_v1`, saved);
+      if (!storage.getStorageSync(`${STORAGE_KEY}_backup_v${saved.version}`)) {
+        storage.setStorageSync(`${STORAGE_KEY}_backup_v${saved.version}`, saved);
+      }
       throw new Error("本地旅行数据升级失败，原始数据已备份，请重试或联系支持");
     }
   }
@@ -161,7 +201,7 @@ function createInitialState() {
   };
 
   const state = {
-    version: 2,
+    version: 3,
     currentUserId: user.id,
     currentSpaceId: "",
     collections: {
@@ -176,7 +216,9 @@ function createInitialState() {
       member_opinions: [],
       travel_templates: [clone(tokyoTravelTemplate)],
       travel_plan_instances: [],
-      invitations: []
+      invitations: [],
+      fitness_deliveries: [],
+      body_measurement_imports: []
     }
   };
 
@@ -216,31 +258,6 @@ function createSpaceRecord(state, input) {
 
   if (input.templateType === TemplateTypes.TRAVEL_TEAM) {
     createTravelInstanceFromTemplateRecord(state, space.id, input.ownerUserId, input.sourceTemplateId, input.sourceTemplateVersion);
-  }
-
-  if (input.templateType === TemplateTypes.FAMILY_LIFE) {
-    createCardRecord(state, {
-      spaceId: space.id,
-      module: Modules.LIFE,
-      title: "本周采购清单",
-      description: "牛奶、鸡蛋、蔬菜、水果，按需补充。",
-      ownerUserId: input.ownerUserId,
-      createdBy: input.ownerUserId,
-      details: { checklist: ["牛奶", "鸡蛋", "蔬菜", "水果"], quantity: "按需" }
-    });
-  }
-
-  if (input.templateType === TemplateTypes.PURCHASE_DECISION) {
-    createCardRecord(state, {
-      spaceId: space.id,
-      module: Modules.DECISIONS,
-      title: "新行李箱购买决策",
-      description: "比较 24 寸和 26 寸，等待目标价。",
-      ownerUserId: input.ownerUserId,
-      createdBy: input.ownerUserId,
-      status: CardStatuses.PENDING_CONFIRMATION,
-      details: { targetPrice: 699, currentPrice: 899, candidates: ["24 寸", "26 寸"] }
-    });
   }
 
   return space;
@@ -466,7 +483,10 @@ function switchSpace(spaceId) {
 function createSpace(input) {
   const state = readRawState();
   const userId = state.currentUserId;
-  const template = TemplateOptions.find((item) => item.type === input.templateType) || TemplateOptions[3];
+  const template = TemplateOptions.find((item) => item.type === input.templateType);
+  if (!template || template.type !== TemplateTypes.TRAVEL_TEAM) {
+    throw new Error("当前版本只支持旅行空间");
+  }
   const space = createSpaceRecord(state, {
     name: input.name || template.name,
     templateType: template.type,
@@ -477,6 +497,109 @@ function createSpace(input) {
   state.currentSpaceId = space.id;
   saveRawState(state);
   return space;
+}
+
+function validateFitnessDelivery(delivery) {
+  if (!delivery || delivery.schemaVersion !== "fitness_delivery_v1") {
+    throw new Error("不支持的 Fitness Delivery schema");
+  }
+  if (!delivery.deliveryId || !delivery.contentHash || !delivery.generatedAt) {
+    throw new Error("Fitness Delivery 缺少标识或内容哈希");
+  }
+  if (!delivery.report || delivery.report.schemaVersion !== "fitness_review_v2" || !delivery.report.reportId) {
+    throw new Error("Fitness Delivery 报告不完整");
+  }
+  if (delivery.planPatch) {
+    if (delivery.planPatch.schemaVersion !== "plan_patch_v1" || !delivery.planPatch.patchId || !delivery.planPatch.patchHash) {
+      throw new Error("Fitness Delivery 计划变更不完整");
+    }
+    if (!Array.isArray(delivery.planPatch.changes)) {
+      throw new Error("Fitness Delivery 计划变更必须为列表");
+    }
+  }
+}
+
+function ingestFitnessDelivery(delivery) {
+  validateFitnessDelivery(delivery);
+  const state = readRawState();
+  const existing = state.collections.fitness_deliveries.find((item) => item.deliveryId === delivery.deliveryId);
+  if (existing) {
+    if (existing.contentHash !== delivery.contentHash) {
+      throw new Error("Delivery 内容冲突：相同 deliveryId 对应不同内容");
+    }
+    return clone(existing);
+  }
+  const record = Object.assign({}, clone(delivery), {
+    id: delivery.deliveryId,
+    readAt: null,
+    receivedAt: now(),
+    decision: null
+  });
+  state.collections.fitness_deliveries.unshift(record);
+  saveRawState(state);
+  return clone(record);
+}
+
+function listFitnessDeliveries() {
+  return readRawState().collections.fitness_deliveries
+    .slice()
+    .sort((left, right) => right.generatedAt.localeCompare(left.generatedAt))
+    .map(clone);
+}
+
+function getFitnessDelivery(deliveryId, markRead) {
+  const state = readRawState();
+  const record = state.collections.fitness_deliveries.find((item) => item.deliveryId === deliveryId);
+  if (!record) return null;
+  if (markRead && !record.readAt) {
+    record.readAt = now();
+    saveRawState(state);
+  }
+  return clone(record);
+}
+
+function decideFitnessPlanPatch(deliveryId, patchHash, status) {
+  if (status !== "accepted" && status !== "rejected") {
+    throw new Error("不支持的计划决策");
+  }
+  const state = readRawState();
+  const record = state.collections.fitness_deliveries.find((item) => item.deliveryId === deliveryId);
+  if (!record || !record.planPatch) throw new Error("计划变更不存在");
+  if (record.planPatch.patchHash !== patchHash) throw new Error("Patch 已变化，请刷新后重新确认");
+  if (record.decision) throw new Error("该计划已经完成决策");
+  record.decision = { status, patchHash, decidedAt: now() };
+  saveRawState(state);
+  return clone(record);
+}
+
+function createBodyMeasurementImport(input) {
+  const weight = Number(input && input.metrics && input.metrics.weightKg);
+  const bodyFat = Number(input && input.metrics && input.metrics.bodyFatPct);
+  if (!input || !input.measurementId || !input.measuredAt) throw new Error("体测记录缺少标识或测量时间");
+  if (!Number.isFinite(weight) || weight < 20 || weight > 300 || !Number.isFinite(bodyFat) || bodyFat < 1 || bodyFat > 80) {
+    throw new Error("体重或体脂率超出合理范围，请检查报告");
+  }
+  const state = readRawState();
+  const existing = state.collections.body_measurement_imports.find((item) => item.measurementId === input.measurementId);
+  if (existing) return clone(existing);
+  const record = {
+    id: input.measurementId,
+    measurementId: input.measurementId,
+    schemaVersion: "body_measurement_v1",
+    source: "wechat_miniprogram_report",
+    measuredAt: input.measuredAt,
+    imageFileId: input.imageFileId || "",
+    metrics: Object.assign({}, input.metrics, { weightKg: weight, bodyFatPct: bodyFat }),
+    reviewStatus: "confirmed",
+    createdAt: now()
+  };
+  state.collections.body_measurement_imports.unshift(record);
+  saveRawState(state);
+  return clone(record);
+}
+
+function listBodyMeasurementImports() {
+  return readRawState().collections.body_measurement_imports.map(clone);
 }
 
 function getCards(spaceId, moduleName, includeArchived) {
@@ -1201,6 +1324,7 @@ module.exports = {
   archiveCard,
   archiveTravelInstance,
   createAttachmentRecord,
+  createBodyMeasurementImport,
   createTravelDay,
   createTravelInstanceFromTemplate,
   createTravelNode,
@@ -1211,15 +1335,20 @@ module.exports = {
   deleteTravelNode,
   deleteTravelModule,
   deleteAttachment,
+  decideFitnessPlanPatch,
   duplicateTravelNode,
   getBudgetSummary,
   getCardDetail,
   getCards,
   getCurrentContext,
+  getFitnessDelivery,
   getState,
   getTodaySummary,
   getTravelInstance,
+  ingestFitnessDelivery,
   listSpaces,
+  listBodyMeasurementImports,
+  listFitnessDeliveries,
   listAttachmentsForScope,
   projectTravelInstanceForRole,
   resetLocalState,

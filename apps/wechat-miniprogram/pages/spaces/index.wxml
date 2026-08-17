@@ -1,15 +1,15 @@
 <view class="page">
   <view class="topbar">
-    <view class="page-title">生活空间</view>
+    <view class="page-title">旅行空间</view>
   </view>
 
   <view class="space-header">
     <view class="space-kicker">切换空间</view>
     <view class="space-title-row">
-      <view class="space-title">选择生活空间</view>
+      <view class="space-title">选择旅行空间</view>
       <view class="space-role">{{spaces.length}} 个</view>
     </view>
-    <view class="hero-copy">像原型中的模块入口一样，把不同家庭、旅行和购买决策分成独立空间。</view>
+    <view class="hero-copy">为不同旅程创建独立空间，集中管理行程、预算、任务与同行成员。</view>
   </view>
 
   <view class="section">

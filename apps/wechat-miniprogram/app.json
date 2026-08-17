@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/today/index",
     "pages/plans/index",
-    "pages/life/index",
-    "pages/decisions/index",
+    "pages/fitness/index",
+    "pages/fitness-detail/index",
+    "pages/body-import/index",
     "pages/spaces/index",
     "pages/space-settings/index",
     "pages/card-detail/index",
@@ -29,20 +29,12 @@
     "borderStyle": "white",
     "list": [
       {
-        "pagePath": "pages/today/index",
-        "text": "今日"
-      },
-      {
         "pagePath": "pages/plans/index",
-        "text": "计划"
+        "text": "旅行"
       },
       {
-        "pagePath": "pages/life/index",
-        "text": "生活"
-      },
-      {
-        "pagePath": "pages/decisions/index",
-        "text": "决策"
+        "pagePath": "pages/fitness/index",
+        "text": "健身"
       }
     ]
   },

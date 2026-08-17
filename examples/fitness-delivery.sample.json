@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "fitness_delivery_v1",
+  "deliveryId": "delivery-2026-w33",
+  "generatedAt": "2026-08-17T08:00:00.000Z",
+  "report": {
+    "schemaVersion": "fitness_review_v2",
+    "reportId": "review-2026-w33",
+    "period": { "start": "2026-08-10", "end": "2026-08-16" },
+    "summary": "本周训练频率稳定，建议小幅下调下肢训练量以保证恢复。",
+    "metrics": [
+      { "key": "training_sessions", "label": "训练次数", "value": 4, "unit": "次" },
+      { "key": "body_weight", "label": "最新体重", "value": 79.3, "unit": "kg" }
+    ],
+    "insights": ["连续两周完成四次训练", "下肢训练后的恢复时间有所延长"],
+    "recommendations": ["下周维持四练", "深蹲总量降低两组"]
+  },
+  "planPatch": {
+    "schemaVersion": "plan_patch_v1",
+    "patchId": "patch-2026-w34",
+    "basePlanVersion": "plan-v7",
+    "changes": [
+      {
+        "operation": "replace",
+        "target": "day-2.squat.volume",
+        "title": "深蹲总组数",
+        "before": "12 组",
+        "after": "10 组",
+        "reason": "恢复时间延长"
+      }
+    ]
+  }
+}

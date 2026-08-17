@@ -1,0 +1,15 @@
+.import-page { padding-bottom: 90rpx; }
+.import-hero { background: #172554; border-radius: 38rpx; color: #fff; padding: 36rpx; }
+.fitness-kicker { color: #79e7cc; font-size: 22rpx; font-weight: 900; }
+.import-title { font-size: 38rpx; font-weight: 950; line-height: 1.25; margin-top: 14rpx; }
+.import-copy { color: #cfdaef; font-size: 24rpx; line-height: 1.6; margin-top: 16rpx; }
+.upload-box { align-items: center; background: #fff; border: 2rpx dashed #b8c4d6; border-radius: 28rpx; display: flex; flex-direction: column; height: 320rpx; justify-content: center; margin-top: 18rpx; overflow: hidden; }
+.upload-box image { height: 100%; width: 100%; }
+.upload-plus { color: #2f7dff; font-size: 58rpx; font-weight: 300; }
+.form-card { background: #fff; border-radius: 28rpx; padding: 28rpx; }
+.form-row { align-items: center; border-bottom: 1rpx solid #e8edf3; display: flex; justify-content: space-between; min-height: 100rpx; }
+.form-label { font-size: 26rpx; font-weight: 800; }
+.form-input, .input-wrap { color: #172554; font-size: 26rpx; font-weight: 800; }
+.input-wrap { align-items: center; display: flex; gap: 10rpx; }
+.input-wrap input { text-align: right; width: 190rpx; }
+.submit-button { background: #172554; border-radius: 999rpx; color: #fff; font-size: 27rpx; font-weight: 900; margin-top: 32rpx; }

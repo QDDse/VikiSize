@@ -1,9 +1,0 @@
-input.search-box {
-  border: 0;
-  width: 100%;
-}
-
-.card .list-card {
-  margin-top: 18rpx;
-}
-.execution-card { border: 2rpx solid #2f7dff; margin-top: 20rpx; }.execution-card.next { border-color: #cbd4df; }

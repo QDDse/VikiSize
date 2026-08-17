@@ -1,3 +1,12 @@
 .section-note {
   color: #2f7dff;
 }
+.today-strip { background: #fff; border-radius: 30rpx; box-shadow: 0 12rpx 32rpx rgba(20,35,70,.06); margin-top: 24rpx; padding: 26rpx; }
+.today-head { align-items: flex-start; display: flex; justify-content: space-between; }
+.today-kicker { color: #2f7dff; font-size: 20rpx; font-weight: 900; }
+.today-title { font-size: 30rpx; font-weight: 950; margin-top: 6rpx; }
+.today-date { color: #667386; font-size: 21rpx; }
+.execution-row { align-items: center; border: 2rpx solid #2f7dff; border-radius: 22rpx; display: flex; gap: 16rpx; margin-top: 18rpx; padding: 18rpx; }
+.execution-row.muted { border-color: #dbe3ee; }
+.execution-badge { background: #dbeafe; border-radius: 999rpx; color: #1d4ed8; flex: 0 0 auto; font-size: 19rpx; font-weight: 900; padding: 8rpx 12rpx; }
+.execution-badge.next { background: #eef2f5; color: #526071; }

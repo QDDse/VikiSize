@@ -1,0 +1,37 @@
+<view class="page import-page">
+  <view class="import-hero">
+    <view class="fitness-kicker">体脂秤 · 微信小程序报告</view>
+    <view class="import-title">把报告图变成可追踪的数据点</view>
+    <view class="import-copy">当前版本保存原始报告图，并由你核对体重、体脂率后入库；尚未启用 OCR 自动识别。</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">1. 选择报告图</view>
+    <view class="upload-box" bindtap="chooseReport">
+      <image wx:if="{{tempFilePath}}" src="{{tempFilePath}}" mode="aspectFill" bindtap="previewReport"></image>
+      <block wx:else>
+        <view class="upload-plus">＋</view>
+        <view class="item-title">从相册选择或拍照</view>
+        <view class="item-subtitle">保留原始证据，方便后续校验</view>
+      </block>
+    </view>
+  </view>
+
+  <view class="section form-card">
+    <view class="section-title">2. 人工核对关键指标</view>
+    <view class="form-row">
+      <view class="form-label">测量日期</view>
+      <picker mode="date" value="{{reportDate}}" bindchange="onDateChange"><view class="form-input">{{reportDate}}</view></picker>
+    </view>
+    <view class="form-row">
+      <view class="form-label">体重</view>
+      <view class="input-wrap"><input type="digit" value="{{weightKg}}" placeholder="如 79.3" bindinput="onWeightInput" /><text>kg</text></view>
+    </view>
+    <view class="form-row">
+      <view class="form-label">体脂率</view>
+      <view class="input-wrap"><input type="digit" value="{{bodyFatPct}}" placeholder="如 14.7" bindinput="onBodyFatInput" /><text>%</text></view>
+    </view>
+  </view>
+
+  <button class="submit-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">确认并导入</button>
+</view>

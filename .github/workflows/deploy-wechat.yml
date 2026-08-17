@@ -28,6 +28,7 @@ jobs:
     env:
       WECHAT_APPID: wxa6892dd697cb738a
       WECHAT_UPLOAD_PRIVATE_KEY: ${{ secrets.WECHAT_UPLOAD_PRIVATE_KEY }}
+      WECHAT_CLOUD_ENV_ID: ${{ secrets.WECHAT_CLOUD_ENV_ID }}
       WECHAT_VERSION: ${{ github.event.inputs.version || github.ref_name }}
       WECHAT_DESC: ${{ github.event.inputs.desc || github.event.head_commit.message || 'GitHub Actions upload' }}
       WECHAT_ROBOT: ${{ github.event.inputs.robot || '1' }}
@@ -50,5 +51,8 @@ jobs:
           npm run validate:travel-templates
           npm test
 
-      - name: Upload to WeChat
+      - name: Deploy Fitness cloud functions
+        run: npm run deploy:wechat:cloud
+
+      - name: Upload Mini Program development version
         run: npm run deploy:wechat

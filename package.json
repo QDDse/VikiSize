@@ -8,6 +8,8 @@
     "build:travel-previews": "node scripts/travel-templates/build-h5.js",
     "build:travel-seed": "node scripts/travel-templates/build-miniprogram-seed.js",
     "deploy:wechat": "node scripts/upload-wechat.js",
+    "deploy:wechat:cloud": "npm run build:cloudfunctions && node scripts/deploy-wechat-cloudfunctions.js",
+    "fitness:publish": "node scripts/publish-fitness-delivery.js",
     "lint": "eslint .",
     "migrate:travel-template": "node scripts/travel-templates/migrate-legacy.js",
     "pretest": "npm run build:cloudfunctions && npm run build:travel-previews",

@@ -69,6 +69,46 @@ test("F2 已知版本正常迁移不受影响", () => {
   assert.ok(context.space, "全新初始化仍然可用");
 });
 
+test("v2 到 v3：先备份，再只保留旅行空间并初始化 Fitness 集合", () => {
+  const saved = {
+    version: 2,
+    currentUserId: "user-1",
+    currentSpaceId: "legacy-family",
+    collections: {
+      users: [{ id: "user-1" }],
+      spaces: [
+        { id: "travel-1", templateType: "travel_team", archivedAt: null },
+        { id: "legacy-family", templateType: "family_life", archivedAt: null }
+      ],
+      space_members: [
+        { id: "member-travel", spaceId: "travel-1", userId: "user-1", role: "owner" },
+        { id: "member-family", spaceId: "legacy-family", userId: "user-1", role: "owner" }
+      ],
+      cards: [
+        { id: "travel-card", spaceId: "travel-1", module: "plans" },
+        { id: "family-card", spaceId: "legacy-family", module: "life" }
+      ],
+      comments: [], activities: [], reminders: [], attachments: [], member_opinions: [],
+      travel_templates: [], travel_plan_instances: [], invitations: []
+    }
+  };
+  const storage = installFakeWxStorage({ [STORAGE_KEY]: saved });
+  const store = freshStore();
+  const context = store.getCurrentContext();
+
+  assert.deepStrictEqual(storage[`${STORAGE_KEY}_backup_v2`], saved);
+  assert.strictEqual(context.state.version, 3);
+  assert.deepStrictEqual(context.state.collections.spaces.map((item) => item.id), ["travel-1"]);
+  assert.deepStrictEqual(context.state.collections.cards.map((item) => item.id), ["travel-card"]);
+  assert.strictEqual(context.state.currentSpaceId, "travel-1");
+  assert.deepStrictEqual(context.state.collections.fitness_deliveries, []);
+  assert.deepStrictEqual(context.state.collections.body_measurement_imports, []);
+
+  const storeAgain = freshStore();
+  assert.strictEqual(storeAgain.getCurrentContext().state.version, 3, "迁移结果可重复读取");
+  assert.deepStrictEqual(storage[`${STORAGE_KEY}_backup_v2`], saved, "备份不得被二次覆盖");
+});
+
 test("S2 本地邀请 token 无时间戳前缀且带过期时间", () => {
   const storage = installFakeWxStorage({});
   let store = freshStore();

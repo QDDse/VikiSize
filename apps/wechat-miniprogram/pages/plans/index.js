@@ -1,5 +1,6 @@
 const store = require("../../services/localStore");
 const { Modules, RoleLabels } = require("../../domain/constants");
+const { toMiniProgramCoordinate } = require("../../services/mapAdapter");
 const { safeRefresh } = require("../../utils/pageGuard");
 
 Page({
@@ -11,6 +12,7 @@ Page({
     budget: {},
     instance: null,
     activities: [],
+    summary: {},
     loadError: ""
   },
 
@@ -27,6 +29,7 @@ Page({
       cards: context.space ? store.getCards(context.space.id, Modules.PLANS) : [],
       budget: context.space ? store.getBudgetSummary(context.space.id) : {},
       instance,
+      summary: context.space ? store.getTodaySummary(context.space.id) : {},
       activities: context.space ? context.state.collections.activities.filter((item) => item.spaceId === context.space.id).slice(0, 8) : []
     });
   },
@@ -49,6 +52,24 @@ Page({
 
   openTravelTemplates() {
     wx.navigateTo({ url: "/pages/travel-templates/index" });
+  },
+
+  openTravelLocation(event) {
+    const node = event.currentTarget.dataset.kind === "current"
+      ? this.data.summary.currentTravelNode
+      : this.data.summary.nextTravelNode;
+    const coordinate = node && toMiniProgramCoordinate(node.coordinate);
+    if (!coordinate) {
+      wx.showToast({ title: "该行程暂无坐标", icon: "none" });
+      return;
+    }
+    wx.openLocation({
+      latitude: coordinate.latitude,
+      longitude: coordinate.longitude,
+      name: node.title,
+      address: node.address || node.locationName || "",
+      fail: () => wx.setClipboardData({ data: node.address || node.locationName || node.title })
+    });
   },
 
   openCard(event) {

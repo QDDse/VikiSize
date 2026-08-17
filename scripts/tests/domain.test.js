@@ -27,13 +27,10 @@ test("编辑实例不污染模板源数据", () => {
   assert.strictEqual(context.state.collections.travel_templates[0].days[0].nodes[0].notes, originalTemplateNote);
 });
 
-test("各空间模板生成对应的种子卡片", () => {
-  const familySpace = store.createSpace({ templateType: TemplateTypes.FAMILY_LIFE });
-  assert.ok(store.getCards(familySpace.id, Modules.LIFE).length >= 1);
-  const decisionSpace = store.createSpace({ templateType: TemplateTypes.PURCHASE_DECISION });
-  assert.ok(store.getCards(decisionSpace.id, Modules.DECISIONS).length >= 1);
-  const blankSpace = store.createSpace({ templateType: TemplateTypes.BLANK });
-  assert.strictEqual(store.getCards(blankSpace.id).length, 0);
+test("空间入口只允许创建旅行实例", () => {
+  const travelSpace = store.createSpace({ templateType: TemplateTypes.TRAVEL_TEAM, name: "周末旅行" });
+  assert.ok(store.getTravelInstance(travelSpace.id));
+  assert.throws(() => store.createSpace({ templateType: "family_life" }), /只支持旅行空间/);
 });
 
 test("评论、归档与提醒", () => {
@@ -60,7 +57,7 @@ test("角色写权限：访客只读，成员可写", () => {
   store.setCurrentUserRoleForPreview(Roles.GUEST);
   assert.throws(() => store.upsertCard({
     spaceId: context.space.id,
-    module: Modules.LIFE,
+    module: Modules.PLANS,
     title: "访客写入",
     description: ""
   }), /访客只能查看/);
@@ -68,11 +65,11 @@ test("角色写权限：访客只读，成员可写", () => {
   store.setCurrentUserRoleForPreview(Roles.MEMBER);
   store.upsertCard({
     spaceId: context.space.id,
-    module: Modules.LIFE,
+    module: Modules.PLANS,
     title: "成员可写",
-    description: "成员可以创建生活卡片"
+    description: "成员可以创建旅行任务"
   });
-  assert.ok(store.getCards(context.space.id, Modules.LIFE).some((item) => item.title === "成员可写"));
+  assert.ok(store.getCards(context.space.id, Modules.PLANS).some((item) => item.title === "成员可写"));
 });
 
 test("邀请创建与无效 token 拒绝", () => {

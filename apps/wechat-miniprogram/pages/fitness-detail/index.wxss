@@ -1,0 +1,25 @@
+.detail-page { padding-bottom: 100rpx; }
+.report-hero { background: #172554; border-radius: 38rpx; color: #fff; padding: 36rpx; }
+.fitness-kicker { color: #79e7cc; font-size: 22rpx; font-weight: 900; }
+.report-title { font-size: 38rpx; font-weight: 950; line-height: 1.35; margin-top: 16rpx; }
+.hash-label { color: #8a96a8; font-size: 19rpx; margin-top: 18rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.metric-grid { display: grid; gap: 16rpx; grid-template-columns: 1fr 1fr; margin-top: 22rpx; }
+.metric-card { background: #fff; border-radius: 26rpx; padding: 24rpx; }
+.metric-label { color: #667386; font-size: 22rpx; font-weight: 800; }
+.metric-value { font-size: 40rpx; font-weight: 950; }
+.metric-unit { color: #667386; font-size: 20rpx; margin-left: 6rpx; }
+.insight { align-items: flex-start; background: #fff; border-radius: 24rpx; display: flex; font-size: 26rpx; gap: 16rpx; line-height: 1.55; margin-top: 14rpx; padding: 22rpx; }
+.insight-dot { background: #2f7dff; border-radius: 50%; flex: 0 0 auto; height: 12rpx; margin-top: 14rpx; width: 12rpx; }
+.insight-index { align-items: center; background: #dcfce7; border-radius: 50%; color: #166534; display: flex; flex: 0 0 auto; font-size: 20rpx; font-weight: 900; height: 38rpx; justify-content: center; width: 38rpx; }
+.diff-card { background: #fff; border-radius: 26rpx; margin-top: 16rpx; padding: 24rpx; }
+.diff-target { font-size: 27rpx; font-weight: 900; }
+.diff-values { display: grid; gap: 12rpx; grid-template-columns: 1fr 1fr; margin: 18rpx 0 12rpx; }
+.before, .after { border-radius: 16rpx; font-size: 24rpx; font-weight: 800; padding: 16rpx; }
+.before { background: #fee2e2; color: #991b1b; }
+.after { background: #dcfce7; color: #166534; }
+.decision-actions { display: flex; gap: 18rpx; margin-top: 28rpx; }
+.decision-actions button { border-radius: 999rpx; flex: 1; font-size: 25rpx; font-weight: 900; }
+.reject-button { background: #e2e8f0; color: #334155; }
+.accept-button { background: #172554; color: #fff; }
+.decision-result { background: #dcfce7; border-radius: 20rpx; color: #166534; font-size: 26rpx; font-weight: 900; margin-top: 24rpx; padding: 22rpx; text-align: center; }
+.notice.error { background: #fee2e2; border-radius: 18rpx; color: #991b1b; padding: 18rpx; }

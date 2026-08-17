@@ -5,9 +5,7 @@ const Roles = {
 };
 
 const Modules = {
-  PLANS: "plans",
-  LIFE: "life",
-  DECISIONS: "decisions"
+  PLANS: "plans"
 };
 
 const CardStatuses = {
@@ -18,17 +16,11 @@ const CardStatuses = {
 };
 
 const TemplateTypes = {
-  FAMILY_LIFE: "family_life",
-  TRAVEL_TEAM: "travel_team",
-  PURCHASE_DECISION: "purchase_decision",
-  BLANK: "blank"
+  TRAVEL_TEAM: "travel_team"
 };
 
 const TemplateTypeLabels = {
-  family_life: "家庭生活",
-  travel_team: "旅行空间",
-  purchase_decision: "购买决策",
-  blank: "空白空间"
+  travel_team: "旅行空间"
 };
 
 const ReminderTypes = {
@@ -51,9 +43,7 @@ const ReminderStatusLabels = {
 };
 
 const OpinionValues = {
-  travel: ["agree", "unavailable", "undecided"],
-  life: ["want", "do_not_want", "neutral"],
-  decisions: ["support", "oppose", "watching"]
+  travel: ["agree", "unavailable", "undecided"]
 };
 
 const StatusLabels = {
@@ -70,9 +60,7 @@ const RoleLabels = {
 };
 
 const ModuleLabels = {
-  plans: "计划",
-  life: "生活",
-  decisions: "决策"
+  plans: "旅行"
 };
 
 const TemplateOptions = [
@@ -80,21 +68,6 @@ const TemplateOptions = [
     type: TemplateTypes.TRAVEL_TEAM,
     name: "关东东京 8 天旅行小队",
     description: "行程、任务、预算、提醒一体化协作"
-  },
-  {
-    type: TemplateTypes.FAMILY_LIFE,
-    name: "家庭生活",
-    description: "共享家务、购物清单和日常待办"
-  },
-  {
-    type: TemplateTypes.PURCHASE_DECISION,
-    name: "购买决策",
-    description: "跟踪候选商品、目标价和成员意见"
-  },
-  {
-    type: TemplateTypes.BLANK,
-    name: "空白空间",
-    description: "从空白生活空间开始"
   }
 ];
 

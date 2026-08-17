@@ -1,0 +1,57 @@
+<view class="page fitness-page">
+  <view class="topbar">
+    <view class="page-title">Fitness PlanOps</view>
+    <button plain="true" class="top-action" bindtap="createPipelineChannel">接入 Pipeline</button>
+  </view>
+
+  <view class="fitness-hero">
+    <view class="fitness-kicker">训练 × 身体 × 恢复</view>
+    <view class="fitness-title">让计划跟着身体反馈迭代</view>
+    <view class="fitness-copy">Pipeline 汇总训记、Apple 健康与体测数据，GPT 生成周报和计划 Diff；最终变更由你确认。</view>
+    <view class="fitness-stats">
+      <view><text class="stat-number">{{deliveries.length}}</text><text class="stat-label">份报告</text></view>
+      <view><text class="stat-number">{{unreadCount}}</text><text class="stat-label">待阅读</text></view>
+      <view><text class="stat-number">{{bodyMeasurements.length}}</text><text class="stat-label">条体测</text></view>
+    </view>
+  </view>
+
+  <view class="notice" wx:if="{{cloudWarning}}">{{cloudWarning}}</view>
+  <view class="notice error" wx:if="{{loadError}}">{{loadError}}</view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">分析收件箱</view>
+      <view class="section-note">报告与计划变更</view>
+    </view>
+    <view class="stack" wx:if="{{deliveries.length}}">
+      <view class="report-card" wx:for="{{deliveries}}" wx:key="deliveryId" data-id="{{item.deliveryId}}" bindtap="openDelivery">
+        <view class="report-top">
+          <view class="report-date">{{item.generatedDate}}</view>
+          <view class="decision-badge {{item.decision ? 'done' : ''}}">{{item.decisionText}}</view>
+        </view>
+        <view class="item-title">{{item.report.summary}}</view>
+        <view class="item-subtitle">{{item.periodText}}</view>
+        <view class="unread-dot" wx:if="{{!item.readAt}}"></view>
+      </view>
+    </view>
+    <view class="empty-card" wx:else>
+      <view class="empty-title">还没有 Pipeline 报告</view>
+      <view class="item-subtitle">创建发布通道后，周报和训练计划会推送到这里。</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">体脂秤报告</view>
+      <view class="section-note" bindtap="openBodyImport">导入一份</view>
+    </view>
+    <view class="body-row" wx:for="{{bodyMeasurements}}" wx:key="measurementId">
+      <view>
+        <view class="item-title">{{item.measuredDate}}</view>
+        <view class="item-subtitle">微信小程序报告 · 已人工确认</view>
+      </view>
+      <view class="body-metric">{{item.metrics.weightKg}} kg · {{item.metrics.bodyFatPct}}%</view>
+    </view>
+    <button class="import-button" bindtap="openBodyImport">上传体测报告图</button>
+  </view>
+</view>

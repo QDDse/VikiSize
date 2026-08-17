@@ -31,10 +31,10 @@ function walkFiles(dir, result = []) {
 const appJson = readJson(appJsonPath);
 const projectConfig = readJson(projectConfigPath);
 const requiredPages = [
-  "pages/today/index",
   "pages/plans/index",
-  "pages/life/index",
-  "pages/decisions/index",
+  "pages/fitness/index",
+  "pages/fitness-detail/index",
+  "pages/body-import/index",
   "pages/spaces/index",
   "pages/space-settings/index",
   "pages/card-detail/index",
@@ -59,7 +59,9 @@ const requiredCollections = [
   "member_opinions",
   "travel_templates",
   "travel_plan_instances",
-  "invitations"
+  "invitations",
+  "fitness_deliveries",
+  "body_measurement_imports"
 ];
 
 requiredPages.forEach((page) => {
@@ -70,8 +72,8 @@ requiredPages.forEach((page) => {
 });
 
 const tabPages = appJson.tabBar.list.map((item) => item.pagePath);
-assert(tabPages.length === 4, "tabBar must have exactly four tabs");
-assert(tabPages.join(",") === "pages/today/index,pages/plans/index,pages/life/index,pages/decisions/index", "tabBar must be 今日 / 计划 / 生活 / 决策");
+assert(tabPages.length === 2, "tabBar must have exactly two tabs");
+assert(tabPages.join(",") === "pages/plans/index,pages/fitness/index", "tabBar must be 旅行 / 健身");
 assert(projectConfig.cloudfunctionRoot === "cloudfunctions/", "project.config.json must set cloudfunctionRoot");
 
 requiredCollections.forEach((collectionName) => {
@@ -111,7 +113,14 @@ requiredCollections.forEach((collectionName) => {
   "addComment",
   "setMemberOpinion",
   "scheduleReminder",
-  "dispatchReminders"
+  "dispatchReminders",
+  "createFitnessChannel",
+  "ingestFitnessDelivery",
+  "listFitnessDeliveries",
+  "getFitnessDelivery",
+  "decideFitnessPlanPatch",
+  "importBodyMeasurement",
+  "listBodyMeasurements"
 ].forEach((name) => {
   assert(fs.existsSync(path.join(root, "cloudfunctions", name, "index.js")), `missing cloud function: ${name}`);
 });

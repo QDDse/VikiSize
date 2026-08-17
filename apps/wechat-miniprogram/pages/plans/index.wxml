@@ -1,7 +1,25 @@
 <view class="page">
   <view class="topbar">
-    <view class="page-title">计划</view>
+    <view class="page-title">旅行</view>
     <button plain="true" class="top-action" bindtap="openSettings">成员</button>
+  </view>
+
+  <view class="today-strip" wx:if="{{summary.todayItinerary}}">
+    <view class="today-head">
+      <view>
+        <view class="today-kicker">今日执行</view>
+        <view class="today-title">{{summary.travelState === 'before' ? '行程预告' : summary.travelState === 'after' ? '旅行已结束' : summary.todayItinerary.theme}}</view>
+      </view>
+      <view class="today-date">{{summary.todayItinerary.date}}</view>
+    </view>
+    <view class="execution-row" wx:if="{{summary.currentTravelNode}}" data-kind="current" bindtap="openTravelLocation">
+      <view class="execution-badge">当前</view>
+      <view><view class="item-title">{{summary.currentTravelNode.startTime}} · {{summary.currentTravelNode.title}}</view><view class="item-subtitle">{{summary.currentTravelNode.locationName}}</view></view>
+    </view>
+    <view class="execution-row muted" wx:if="{{summary.nextTravelNode}}" data-kind="next" bindtap="openTravelLocation">
+      <view class="execution-badge next">下一站</view>
+      <view><view class="item-title">{{summary.nextTravelNode.startTime}} · {{summary.nextTravelNode.title}}</view><view class="item-subtitle">{{summary.nextTravelNode.locationName}}</view></view>
+    </view>
   </view>
 
   <view class="space-header">
