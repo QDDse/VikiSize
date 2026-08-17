@@ -11,6 +11,24 @@ function isCommand(value) {
   return value && typeof value === "object" && value.__mockCommand;
 }
 
+function applyUpdate(doc, key, value) {
+  if (isCommand(value)) {
+    if (value.op === "set") {
+      doc[key] = clone(value.value);
+      return;
+    }
+    throw new Error(`mock 不支持的更新指令: ${value.op}`);
+  }
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    if (doc[key] === null || (doc[key] !== undefined && (typeof doc[key] !== "object" || Array.isArray(doc[key])))) {
+      throw new Error(`Cannot create nested field in element {${key}: ${doc[key]}}`);
+    }
+    doc[key] = Object.assign({}, clone(doc[key] || {}), clone(value));
+    return;
+  }
+  doc[key] = clone(value);
+}
+
 function matches(doc, filter) {
   return Object.entries(filter).every(([key, expected]) => {
     if (isCommand(expected)) {
@@ -49,7 +67,7 @@ function createMockCloud() {
         const found = rows(name).filter((doc) => matches(doc, filter));
         found.forEach((doc) => {
           Object.entries(data).forEach(([key, value]) => {
-            if (key !== "_id") doc[key] = clone(value);
+            if (key !== "_id") applyUpdate(doc, key, value);
           });
         });
         return { stats: { updated: found.length } };
@@ -60,7 +78,8 @@ function createMockCloud() {
   const db = {
     command: {
       lte(value) { return { __mockCommand: true, op: "lte", value }; },
-      gte(value) { return { __mockCommand: true, op: "gte", value }; }
+      gte(value) { return { __mockCommand: true, op: "gte", value }; },
+      set(value) { return { __mockCommand: true, op: "set", value }; }
     },
     collection(name) {
       return Object.assign(makeQuery(name, {}, null), {
@@ -85,7 +104,7 @@ function createMockCloud() {
               const doc = rows(name).find((item) => item._id === id);
               if (!doc) throw new Error(`document not found: ${name}/${id}`);
               Object.entries(data).forEach(([key, value]) => {
-                if (key !== "_id") doc[key] = clone(value);
+                if (key !== "_id") applyUpdate(doc, key, value);
               });
               return { stats: { updated: 1 } };
             },
