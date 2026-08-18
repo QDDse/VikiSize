@@ -38,7 +38,7 @@
 
     <view class="stack node-stack">
       <view class="service-card {{activeNodeId === item.id ? 'active-node' : ''}}" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="activateNode">
-        <view class="service-icon"></view>
+        <view class="service-icon time-icon">{{item.startTime || item.time}}</view>
         <view class="service-main">
           <view class="badge">{{item.period}} · {{item.startTime || item.time}}</view>
           <view class="item-title node-title" data-id="{{item.id}}" bindtap="openNodeEditor">{{item.title}}</view>

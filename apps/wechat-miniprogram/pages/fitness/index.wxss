@@ -1,26 +1,26 @@
-.fitness-page { padding-bottom: 110rpx; }
-.fitness-hero { background: linear-gradient(145deg, #101d3f, #243a75); border-radius: 40rpx; color: #fff; padding: 38rpx; }
-.fitness-kicker { color: #79e7cc; font-size: 22rpx; font-weight: 900; letter-spacing: 2rpx; }
-.fitness-title { font-size: 42rpx; font-weight: 950; line-height: 1.2; margin-top: 16rpx; }
-.fitness-copy { color: #cfdaef; font-size: 25rpx; line-height: 1.6; margin-top: 18rpx; }
-.fitness-stats { display: flex; gap: 46rpx; margin-top: 32rpx; }
+.fitness-page { padding-bottom: 118rpx; }
+.fitness-hero { background: linear-gradient(145deg, #153b32 0%, #275348 100%); border-radius: 40rpx; box-shadow: 0 18rpx 36rpx rgba(21,65,55,.14); color: #fff; padding: 40rpx; }
+.fitness-kicker { color: #a9e4d2; font-size: 22rpx; font-weight: 800; letter-spacing: 2rpx; }
+.fitness-title { font-size: 44rpx; font-weight: 800; line-height: 1.18; margin-top: 16rpx; }
+.fitness-copy { color: #c6e6dc; font-size: 25rpx; line-height: 1.62; margin-top: 18rpx; }
+.fitness-stats { display: flex; gap: 44rpx; margin-top: 34rpx; }
 .fitness-stats view { display: flex; flex-direction: column; }
-.stat-number { font-size: 38rpx; font-weight: 950; }
-.stat-label { color: #9fb0cf; font-size: 20rpx; margin-top: 4rpx; }
-.notice { background: #fff7d6; border-radius: 18rpx; color: #7c5a00; font-size: 23rpx; margin-top: 22rpx; padding: 18rpx 22rpx; }
+.stat-number { font-size: 40rpx; font-variant-numeric: tabular-nums; font-weight: 800; }
+.stat-label { color: #b9d8ce; font-size: 20rpx; margin-top: 4rpx; }
+.notice { background: #fff7d6; border-radius: 22rpx; color: #7c5a00; font-size: 23rpx; margin-top: 22rpx; padding: 18rpx 22rpx; }
 .notice.error { background: #fee2e2; color: #991b1b; }
-.reminder-card { align-items: center; background: #eaf7f3; border: 1rpx solid #b9e8dc; border-radius: 28rpx; display: flex; justify-content: space-between; margin-top: 22rpx; padding: 24rpx 26rpx; }
+.reminder-card { align-items: center; background: #eaf6f1; border-radius: 30rpx; box-shadow: inset 0 0 0 1rpx #d3eade; display: flex; justify-content: space-between; margin-top: 22rpx; padding: 26rpx 28rpx; }
 .reminder-card > view { flex: 1; min-width: 0; }
-.reminder-button { background: #172554; border-radius: 999rpx; color: #fff; flex: 0 0 auto; font-size: 22rpx; font-weight: 900; margin-left: 20rpx; padding: 0 24rpx; }
-.reminder-button.granted { background: #16765f; }
-.report-card, .empty-card, .body-row { background: #fff; border-radius: 28rpx; box-shadow: 0 12rpx 32rpx rgba(20,35,70,.06); margin-bottom: 18rpx; padding: 26rpx; position: relative; }
+.reminder-button { background: #1f705f; border-radius: 999rpx; color: #fff; flex: 0 0 auto; font-size: 22rpx; font-weight: 800; margin-left: 20rpx; padding: 0 24rpx; }
+.reminder-button.granted { background: #267d69; }
+.report-card, .empty-card, .body-row { background: #fff; border-radius: 30rpx; box-shadow: 0 14rpx 32rpx rgba(21,65,55,.06); margin-bottom: 20rpx; padding: 28rpx; position: relative; }
 .report-top, .body-row { align-items: center; display: flex; justify-content: space-between; }
-.report-date { color: #667386; font-size: 22rpx; font-weight: 800; }
+.report-date { color: #64746e; font-size: 22rpx; font-weight: 700; }
 .decision-badge { background: #fff1c2; border-radius: 999rpx; color: #8a5b00; font-size: 20rpx; font-weight: 900; padding: 8rpx 14rpx; }
-.decision-badge.done { background: #dcfce7; color: #166534; }
+.decision-badge.done { background: #dff2ea; color: #246e5d; }
 .report-card .item-title { margin-top: 18rpx; }
-.unread-dot { background: #2f7dff; border-radius: 50%; height: 14rpx; position: absolute; right: 24rpx; top: 72rpx; width: 14rpx; }
-.empty-title { font-size: 28rpx; font-weight: 900; margin-bottom: 8rpx; }
+.unread-dot { background: #2b8a75; border-radius: 50%; height: 14rpx; position: absolute; right: 26rpx; top: 76rpx; width: 14rpx; }
+.empty-title { color: #16342d; font-size: 28rpx; font-weight: 800; margin-bottom: 8rpx; }
 .body-row { margin-bottom: 14rpx; }
-.body-metric { color: #172554; font-size: 25rpx; font-weight: 900; }
-.import-button { background: #172554; border-radius: 999rpx; color: #fff; font-size: 25rpx; font-weight: 900; margin-top: 18rpx; }
+.body-metric { color: #1f705f; font-size: 25rpx; font-weight: 800; }
+.import-button { background: #1f705f; border-radius: 999rpx; color: #fff; font-size: 25rpx; font-weight: 800; margin-top: 18rpx; }

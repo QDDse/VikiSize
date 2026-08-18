@@ -19,7 +19,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{spaces}}" wx:key="id" data-id="{{item.id}}" bindtap="switchSpace">
-        <view class="service-icon"></view>
+        <view class="service-icon">旅</view>
         <view class="service-main">
           <view class="item-title">{{item.name}}</view>
           <view class="item-subtitle">{{item.templateTypeLabel}}</view>
@@ -35,7 +35,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{templates}}" wx:key="type" data-type="{{item.type}}" bindtap="createSpace">
-        <view class="service-icon"></view>
+        <view class="service-icon">新</view>
         <view class="service-main">
           <view class="item-title">{{item.name}}</view>
           <view class="item-subtitle">{{item.description}}</view>

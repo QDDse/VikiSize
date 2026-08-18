@@ -50,7 +50,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{instance.days}}" wx:key="id" bindtap="openTravelPlan">
-        <view class="service-icon"></view>
+        <view class="service-icon itinerary-icon">D{{index + 1}}</view>
         <view class="service-main">
           <view class="item-title">第 {{index + 1}} 天 · {{item.theme}}</view>
           <view class="item-subtitle">{{item.date}} · {{item.weekday}} · {{item.nodes.length}} 个节点</view>
@@ -66,7 +66,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="service-icon"></view>
+        <view class="service-icon task-icon">任</view>
         <view class="service-main">
           <view class="item-title">{{item.title}}</view>
           <view class="item-subtitle">{{item.description}}</view>
@@ -86,7 +86,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{budget.categories}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon budget-icon">¥</view>
         <view class="service-main">
           <view class="item-title">{{item.name}}</view>
           <view class="item-subtitle">已确认 ¥{{item.confirmedCost}}</view>
@@ -105,7 +105,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{activities}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon activity-icon">动</view>
         <view class="service-main">
           <view class="item-title">{{item.summary}}</view>
           <view class="item-subtitle">{{item.createdAt}}</view>

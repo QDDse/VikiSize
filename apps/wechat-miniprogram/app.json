@@ -18,13 +18,13 @@
   ],
   "window": {
     "navigationBarTitleText": "VikiSize",
-    "navigationBarBackgroundColor": "#eef2f5",
+    "navigationBarBackgroundColor": "#f3f8f6",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#eef2f5"
+    "backgroundColor": "#f3f8f6"
   },
   "tabBar": {
-    "color": "#8a96a8",
-    "selectedColor": "#2f7dff",
+    "color": "#74837e",
+    "selectedColor": "#267d69",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
