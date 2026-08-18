@@ -35,7 +35,6 @@ jobs:
       FITNESS_WEEKLY_REPORT_TEMPLATE_ID: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_ID }}
       FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS }}
       FITNESS_MINIPROGRAM_STATE: ${{ vars.FITNESS_MINIPROGRAM_STATE }}
-      SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
       XUNJI_TRAINING_API_KEY: ${{ secrets.XUNJI_TRAINING_API_KEY }}
     steps:
       - name: Check out repository
@@ -58,6 +57,8 @@ jobs:
 
       - name: Deploy Fitness cloud functions
         run: npm run deploy:wechat:cloud
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
 
       - name: Upload Mini Program development version
         run: npm run deploy:wechat
