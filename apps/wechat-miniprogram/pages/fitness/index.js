@@ -10,6 +10,8 @@ Page({
     bodyMeasurements: [],
     unreadCount: 0,
     notificationConfigured: false,
+    notificationTemplateId: "",
+    notificationMessage: "",
     notificationStatus: "disabled",
     notificationText: "开启周报提醒",
     cloudWarning: "",
@@ -36,6 +38,8 @@ Page({
         bodyMeasurements: bodyMeasurements.slice(0, 3).map((item) => Object.assign({}, item, { measuredDate: dateText(item.measuredAt) })),
         unreadCount: deliveries.filter((item) => !item.readAt).length,
         notificationConfigured: notification.configured,
+        notificationTemplateId: notification.templateId || "",
+        notificationMessage: notification.message || "",
         notificationStatus: notification.status,
         notificationText: notification.status === "granted" ? "下次周报将提醒" : "开启周报提醒",
         cloudWarning: deliveryResult.warning,
@@ -73,25 +77,31 @@ Page({
 
   async enableWeeklyReminder() {
     try {
-      const settings = await fitnessRepository.getNotificationSettings();
-      if (!settings.configured || !settings.templateId) {
+      const templateId = this.data.notificationTemplateId;
+      if (!this.data.notificationConfigured || !templateId) {
         wx.showModal({
           title: "周报提醒尚未配置",
-          content: settings.message || "请先在云函数环境配置微信订阅消息模板。",
+          content: this.data.notificationMessage || "请先在云函数环境配置微信订阅消息模板。",
           showCancel: false
         });
         return;
       }
-      const result = await wx.requestSubscribeMessage({ tmplIds: [settings.templateId] });
-      if (result[settings.templateId] !== "accept") {
+      const result = await wx.requestSubscribeMessage({ tmplIds: [templateId] });
+      if (result[templateId] !== "accept") {
         wx.showToast({ title: "未获得本次提醒授权", icon: "none" });
         return;
       }
-      await fitnessRepository.subscribeWeeklyReport(settings.templateId);
+      await fitnessRepository.subscribeWeeklyReport(templateId);
       this.setData({ notificationStatus: "granted", notificationText: "下次周报将提醒" });
       wx.showToast({ title: "已开启一次提醒", icon: "success" });
     } catch (error) {
-      wx.showToast({ title: error.message || "开启提醒失败", icon: "none" });
+      const errCode = error && error.errCode !== undefined ? `错误码：${error.errCode}\n` : "";
+      const errMsg = (error && (error.errMsg || error.message)) || "微信订阅接口调用失败";
+      wx.showModal({
+        title: "开启提醒失败",
+        content: `${errCode}${errMsg}`,
+        showCancel: false
+      });
     }
   }
 });
