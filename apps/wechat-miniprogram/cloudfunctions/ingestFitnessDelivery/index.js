@@ -1,7 +1,8 @@
 const { collection, now } = require("./_shared/cloud");
 const { permissionDenied } = require("./_shared/repo");
 const { secureHashEqual, sha256, tokenHash, validateFitnessDelivery } = require("./_shared/fitnessSchema");
-const { sendFitnessWeeklyNotification } = require("./_shared/fitnessNotifications");
+const { sendFitnessDeliveryNotifications, sendFitnessWeeklyNotification } = require("./_shared/fitnessNotifications");
+const { sendServerChanNotification } = require("./_shared/serverChanClient");
 const { _, cloud } = require("./_shared/cloud");
 
 function requestPayload(event) {
@@ -15,7 +16,7 @@ function requestPayload(event) {
   return typeof body === "string" ? JSON.parse(body || "{}") : (body || {});
 }
 
-async function ingest(event) {
+async function ingest(event, dependencies) {
   const channels = await collection("fitness_channels").where({ id: event.channelId, revokedAt: null }).limit(1).get();
   const channel = channels.data[0];
   if (!channel || !secureHashEqual(channel.publishTokenHash, tokenHash(event.publishToken))) {
@@ -50,14 +51,16 @@ async function ingest(event) {
   }
   let notification;
   try {
-    notification = await sendFitnessWeeklyNotification({
+    notification = await sendFitnessDeliveryNotifications({
       cloud,
       collection,
       _,
       delivery: recordData,
       userId: channel.userId,
       timestamp,
-      env: process.env
+      env: process.env,
+      sendWechat: dependencies.sendFitnessWeeklyNotification,
+      sendServerChan: dependencies.sendServerChanNotification
     });
     await collection("fitness_deliveries").doc(id).update({ data: { notification: _.set(notification), updatedAt: now() } });
   } catch (error) {
@@ -82,17 +85,23 @@ function httpResponse(statusCode, payload) {
   };
 }
 
-exports.main = async (event) => {
-  const isHttp = Boolean(event.httpMethod);
-  try {
-    const result = await ingest(requestPayload(event));
-    return isHttp ? httpResponse(200, result) : result;
-  } catch (error) {
-    if (!isHttp) throw error;
-    const statusCode = errorStatus(error);
-    return httpResponse(statusCode, {
-      error: statusCode === 500 ? "Fitness Delivery 服务暂不可用" : error.message,
-      code: error.code || "INVALID_DELIVERY"
-    });
-  }
-};
+function createHandler(overrides) {
+  const dependencies = Object.assign({ sendFitnessWeeklyNotification, sendServerChanNotification }, overrides);
+  return async (event) => {
+    const isHttp = Boolean(event.httpMethod);
+    try {
+      const result = await ingest(requestPayload(event), dependencies);
+      return isHttp ? httpResponse(200, result) : result;
+    } catch (error) {
+      if (!isHttp) throw error;
+      const statusCode = errorStatus(error);
+      return httpResponse(statusCode, {
+        error: statusCode === 500 ? "Fitness Delivery 服务暂不可用" : error.message,
+        code: error.code || "INVALID_DELIVERY"
+      });
+    }
+  };
+}
+
+exports.createHandler = createHandler;
+exports.main = createHandler();

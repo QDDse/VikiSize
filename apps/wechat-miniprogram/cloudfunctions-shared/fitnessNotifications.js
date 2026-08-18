@@ -3,6 +3,33 @@ function truncate(value, maxLength) {
   return text.length > maxLength ? `${text.slice(0, Math.max(0, maxLength - 1))}…` : text;
 }
 
+function overallNotificationStatus(channels) {
+  const statuses = Object.values(channels).map((channel) => channel.status);
+  if (statuses.includes("sent")) return "sent";
+  if (statuses.includes("failed")) return "failed";
+  if (statuses.includes("not_subscribed")) return "not_subscribed";
+  return "not_configured";
+}
+
+async function sendFitnessDeliveryNotifications({
+  cloud,
+  collection,
+  _,
+  delivery,
+  userId,
+  timestamp,
+  env,
+  sendWechat,
+  sendServerChan
+}) {
+  const [wechat, serverChan] = await Promise.all([
+    (sendWechat || sendFitnessWeeklyNotification)({ cloud, collection, _, delivery, userId, timestamp, env }),
+    (sendServerChan || require("./serverChanClient").sendServerChanNotification)({ delivery, timestamp, env })
+  ]);
+  const channels = { wechat, serverChan };
+  return { status: overallNotificationStatus(channels), channels };
+}
+
 function notificationConfig(env) {
   const source = env || process.env;
   const templateId = String(source.FITNESS_WEEKLY_REPORT_TEMPLATE_ID || "").trim();
@@ -81,5 +108,7 @@ async function sendFitnessWeeklyNotification({ cloud, collection, _, delivery, u
 module.exports = {
   buildNotificationData,
   notificationConfig,
+  overallNotificationStatus,
+  sendFitnessDeliveryNotifications,
   sendFitnessWeeklyNotification
 };

@@ -1,5 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
+const { URLSearchParams } = require("node:url");
 const { installMockCloud, loadFunction } = require("./lib/cloudHarness");
 
 function unsignedDelivery() {
@@ -157,6 +158,76 @@ test("周报订阅只消费一次，通知失败不影响 Delivery 入箱", asyn
     if (previousState === undefined) delete process.env.FITNESS_MINIPROGRAM_STATE;
     else process.env.FITNESS_MINIPROGRAM_STATE = previousState;
   }
+});
+
+test("每个新 Delivery 只触发一次 Server酱通知，重复投递不重复提醒", async () => {
+  installMockCloud();
+  const createChannel = loadFunction("createFitnessChannel");
+  const ingestModule = loadFunction("ingestFitnessDelivery");
+  const { withFitnessHashes } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/fitnessSchema");
+  const serverChanCalls = [];
+  const ingest = ingestModule.createHandler({
+    sendFitnessWeeklyNotification: async () => ({ status: "not_subscribed" }),
+    sendServerChanNotification: async ({ delivery }) => {
+      serverChanCalls.push(delivery.deliveryId);
+      return { status: "sent", sentAt: "2026-08-18T01:00:00.000Z" };
+    }
+  });
+
+  const channel = await createChannel.main({});
+  const delivery = withFitnessHashes(unsignedDelivery());
+  const first = await ingest({ channelId: channel.channelId, publishToken: channel.publishToken, delivery });
+  const duplicate = await ingest({ channelId: channel.channelId, publishToken: channel.publishToken, delivery });
+
+  assert.strictEqual(first.created, true);
+  assert.strictEqual(duplicate.created, false);
+  assert.deepStrictEqual(serverChanCalls, [delivery.deliveryId]);
+  assert.strictEqual(first.delivery.notification.status, "sent");
+  assert.strictEqual(first.delivery.notification.channels.serverChan.status, "sent");
+  assert.strictEqual(first.delivery.notification.channels.wechat.status, "not_subscribed");
+});
+
+test("Server酱通知失败只记录旁路状态，不回滚 Delivery", async () => {
+  const mock = installMockCloud();
+  const createChannel = loadFunction("createFitnessChannel");
+  const ingestModule = loadFunction("ingestFitnessDelivery");
+  const { withFitnessHashes } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/fitnessSchema");
+  const ingest = ingestModule.createHandler({
+    sendFitnessWeeklyNotification: async () => ({ status: "not_subscribed" }),
+    sendServerChanNotification: async () => ({ status: "failed", message: "Server酱暂不可用" })
+  });
+
+  const channel = await createChannel.main({});
+  const delivery = withFitnessHashes(unsignedDelivery());
+  const result = await ingest({ channelId: channel.channelId, publishToken: channel.publishToken, delivery });
+
+  assert.strictEqual(result.created, true);
+  assert.strictEqual(mock.all("fitness_deliveries").length, 1);
+  assert.strictEqual(result.delivery.notification.status, "failed");
+  assert.strictEqual(result.delivery.notification.channels.serverChan.status, "failed");
+});
+
+test("Server酱客户端按 SendKey 类型构造接口并只发送报告到达摘要", async () => {
+  const { sendServerChanNotification } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/serverChanClient");
+  const calls = [];
+  const result = await sendServerChanNotification({
+    delivery: unsignedDelivery(),
+    timestamp: "2026-08-18T01:00:00.000Z",
+    env: { SERVERCHAN_SENDKEY: "SCT-test-send-key" },
+    request: async (url, headers, body) => {
+      calls.push({ url, headers, body });
+      return { code: 0, message: "SUCCESS" };
+    }
+  });
+
+  assert.strictEqual(result.status, "sent");
+  assert.strictEqual(calls.length, 1);
+  assert.strictEqual(calls[0].url, "https://sctapi.ftqq.com/SCT-test-send-key.send");
+  assert.strictEqual(calls[0].headers["Content-Type"], "application/x-www-form-urlencoded; charset=utf-8");
+  const form = new URLSearchParams(calls[0].body);
+  assert.strictEqual(form.get("title"), "健身周报已生成");
+  assert.match(form.get("desp"), /2026\.08\.10~2026\.08\.16/);
+  assert.ok(!form.get("desp").includes("训练稳定，恢复尚可"), "通知正文不应泄露健康分析内容");
 });
 
 test("采纳含训记写回的 Patch 时先完成写回，失败不记录决策", async () => {
