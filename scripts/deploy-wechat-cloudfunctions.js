@@ -23,7 +23,7 @@ const {
   uploadWithCreateFallback
 } = require("./lib/wechat-cloudfunction-deploy");
 
-const functionNames = [
+const allFunctionNames = [
   "createFitnessChannel",
   "ingestFitnessDelivery",
   "listFitnessDeliveries",
@@ -34,6 +34,13 @@ const functionNames = [
   "importBodyMeasurement",
   "listBodyMeasurements"
 ];
+const requestedFunctionNames = String(process.env.WECHAT_CLOUD_FUNCTIONS || "")
+  .split(",")
+  .map((name) => name.trim())
+  .filter(Boolean);
+const unknownFunctionNames = requestedFunctionNames.filter((name) => !allFunctionNames.includes(name));
+if (unknownFunctionNames.length) throw new Error(`Unknown cloud functions: ${unknownFunctionNames.join(", ")}`);
+const functionNames = requestedFunctionNames.length ? requestedFunctionNames : allFunctionNames;
 const functionEnvironment = {
   getFitnessNotificationSettings: {
     FITNESS_WEEKLY_REPORT_TEMPLATE_ID: process.env.FITNESS_WEEKLY_REPORT_TEMPLATE_ID,
