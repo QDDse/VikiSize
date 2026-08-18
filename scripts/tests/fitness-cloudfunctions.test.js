@@ -230,6 +230,58 @@ test("Server酱客户端按 SendKey 类型构造接口并只发送报告到达�
   assert.ok(!form.get("desp").includes("训练稳定，恢复尚可"), "通知正文不应泄露健康分析内容");
 });
 
+test("Server酱报告模式发送周报摘要、指标、洞察、建议和无后端数据 H5 链接", async () => {
+  const { sendServerChanNotification } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/serverChanClient");
+  const calls = [];
+  const delivery = unsignedDelivery();
+  delivery.report.metrics = [
+    { key: "active_days", label: "训练活跃日", value: 4, unit: "天" },
+    { key: "duration", label: "训练时长", value: 69.2, unit: "分钟" }
+  ];
+  delivery.report.insights = ["训练活跃日频率总体稳定"];
+  delivery.report.recommendations = ["下周保持约 4 个训练活跃日"];
+
+  const result = await sendServerChanNotification({
+    delivery,
+    timestamp: "2026-08-18T01:00:00.000Z",
+    env: {
+      SERVERCHAN_SENDKEY: "SCT-test-send-key",
+      FITNESS_SERVERCHAN_DETAIL_LEVEL: "report",
+      FITNESS_REPORT_H5_URL: "https://fitness.example.test/fitness/deliveries?view=report"
+    },
+    request: async (url, headers, body) => {
+      calls.push({ url, headers, body });
+      return { code: 0, message: "SUCCESS" };
+    }
+  });
+
+  assert.strictEqual(result.status, "sent");
+  const form = new URLSearchParams(calls[0].body);
+  assert.strictEqual(form.get("title"), "健身周报｜4 天训练");
+  assert.match(form.get("desp"), /训练稳定，恢复尚可/);
+  assert.match(form.get("desp"), /\| 训练活跃日 \| 4 天 \|/);
+  assert.match(form.get("desp"), /训练活跃日频率总体稳定/);
+  assert.match(form.get("desp"), /下周保持约 4 个训练活跃日/);
+  assert.match(form.get("desp"), /\[打开完整 H5 报告\]\(https:\/\/fitness\.example\.test\/fitness\/deliveries\?view=report#report=/);
+});
+
+test("Fitness HTTP 路由以 GET 返回只解析 Fragment 的 H5 报告壳", async () => {
+  installMockCloud();
+  const ingest = loadFunction("ingestFitnessDelivery");
+  const response = await ingest.main({
+    httpMethod: "GET",
+    queryStringParameters: { view: "report" }
+  });
+
+  assert.strictEqual(response.statusCode, 200);
+  assert.strictEqual(response.headers["Content-Type"], "text/html; charset=utf-8");
+  assert.match(response.headers["Content-Security-Policy"], /default-src 'none'/);
+  assert.match(response.body, /location\.hash/);
+  assert.match(response.body, /fitness_report_view_v1/);
+  assert.ok(!response.body.includes("fetch("), "H5 不应从后台读取健康报告");
+  assert.ok(!response.body.includes("训练稳定，恢复尚可"), "H5 壳不得内嵌某份个人报告");
+});
+
 test("采纳含训记写回的 Patch 时先完成写回，失败不记录决策", async () => {
   installMockCloud();
   const createChannel = loadFunction("createFitnessChannel");

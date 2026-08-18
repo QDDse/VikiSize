@@ -3,6 +3,7 @@ const { permissionDenied } = require("./_shared/repo");
 const { secureHashEqual, sha256, tokenHash, validateFitnessDelivery } = require("./_shared/fitnessSchema");
 const { sendFitnessDeliveryNotifications, sendFitnessWeeklyNotification } = require("./_shared/fitnessNotifications");
 const { sendServerChanNotification } = require("./_shared/serverChanClient");
+const { renderFitnessReportPage } = require("./_shared/fitnessReportPage");
 const { _, cloud } = require("./_shared/cloud");
 
 function requestPayload(event) {
@@ -85,11 +86,27 @@ function httpResponse(statusCode, payload) {
   };
 }
 
+function reportPageResponse() {
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "Referrer-Policy": "no-referrer",
+      "X-Content-Type-Options": "nosniff"
+    },
+    body: renderFitnessReportPage()
+  };
+}
+
 function createHandler(overrides) {
   const dependencies = Object.assign({ sendFitnessWeeklyNotification, sendServerChanNotification }, overrides);
   return async (event) => {
     const isHttp = Boolean(event.httpMethod);
     try {
+      if (event.httpMethod === "GET" && event.queryStringParameters && event.queryStringParameters.view === "report") {
+        return reportPageResponse();
+      }
       const result = await ingest(requestPayload(event), dependencies);
       return isHttp ? httpResponse(200, result) : result;
     } catch (error) {
