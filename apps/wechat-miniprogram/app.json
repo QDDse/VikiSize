@@ -23,18 +23,22 @@
     "backgroundColor": "#f3f8f6"
   },
   "tabBar": {
-    "color": "#74837e",
+    "color": "#6b7771",
     "selectedColor": "#267d69",
-    "backgroundColor": "#ffffff",
+    "backgroundColor": "#fffdf9",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/plans/index",
-        "text": "旅行"
+        "text": "旅行",
+        "iconPath": "assets/icons/travel.png",
+        "selectedIconPath": "assets/icons/travel.png"
       },
       {
         "pagePath": "pages/fitness/index",
-        "text": "健身"
+        "text": "健身",
+        "iconPath": "assets/icons/fitness.png",
+        "selectedIconPath": "assets/icons/fitness.png"
       }
     ]
   },

@@ -1,7 +1,38 @@
 const fitnessRepository = require("../../services/fitnessRepository");
 
+const WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
 function dateText(value) {
   return value ? String(value).slice(0, 10) : "";
+}
+
+function localDate(value) {
+  const text = dateText(value);
+  return text ? new Date(`${text}T12:00:00`) : null;
+}
+
+function monthDay(value) {
+  const date = localDate(value);
+  return date && !Number.isNaN(date.getTime()) ? `${date.getMonth() + 1}月${date.getDate()}日` : "";
+}
+
+function weekday(value) {
+  const date = localDate(value);
+  return date && !Number.isNaN(date.getTime()) ? WEEKDAYS[date.getDay()] : "";
+}
+
+function currentWeekRange(now) {
+  const current = new Date(now || Date.now());
+  current.setHours(12, 0, 0, 0);
+  const offset = (current.getDay() + 6) % 7;
+  const start = new Date(current);
+  start.setDate(current.getDate() - offset);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const endText = start.getMonth() === end.getMonth()
+    ? `${end.getDate()}日`
+    : `${end.getMonth() + 1}月${end.getDate()}日`;
+  return `${start.getMonth() + 1}月${start.getDate()}日–${endText}`;
 }
 
 function decisionState(item) {
@@ -17,33 +48,14 @@ function decisionState(item) {
   return { text: "可阅读", tone: "read" };
 }
 
-function reportInsights(delivery) {
-  const insights = delivery && delivery.report && Array.isArray(delivery.report.insights)
-    ? delivery.report.insights
-    : [];
-  return insights.slice(0, 3).map((text, index) => ({
-    key: String(delivery.deliveryId || "report") + "-" + index,
-    number: index + 1,
-    text
-  }));
-}
-
-function reportMetrics(delivery) {
-  const metrics = delivery && delivery.report && Array.isArray(delivery.report.metrics)
-    ? delivery.report.metrics
-    : [];
-  return metrics.slice(0, 3).map((item, index) => ({
-    key: String(item.key || index),
-    label: item.label || item.key || "指标",
-    value: item.value === undefined || item.value === null || item.value === "" ? "—" : item.value,
-    unit: item.unit || ""
-  }));
-}
-
-function formatDelivery(item) {
+function formatDelivery(item, index) {
   const state = decisionState(item);
+  const generatedDate = dateText(item.generatedAt);
   return Object.assign({}, item, {
-    generatedDate: dateText(item.generatedAt),
+    generatedDate,
+    archiveDate: monthDay(generatedDate),
+    archiveWeekday: weekday(generatedDate),
+    archiveTitle: index === 0 ? "本周训练周报" : index === 1 ? "上周训练周报" : "训练周报",
     periodText: item.report && item.report.period ? item.report.period.start + " — " + item.report.period.end : "",
     reportTitle: item.report && item.report.summary ? item.report.summary : "本周训练回顾",
     decisionText: state.text,
@@ -64,15 +76,18 @@ Page({
     bodyMeasurements: [],
     unreadCount: 0,
     pendingCount: 0,
+    weekRangeText: "",
+    weeklyStatusTitle: "本周无需处理",
+    weeklyStatusCopy: "暂无待确认项目",
+    latestMeasurement: null,
+    measurementCount: 0,
     activeDeliveryId: "",
-    activeDelivery: null,
-    activeInsights: [],
-    activeMetrics: [],
     notificationConfigured: false,
     notificationTemplateId: "",
     notificationMessage: "",
     notificationStatus: "disabled",
     notificationText: "开启提醒",
+    reminderNote: "订阅消息仅授权一次",
     cloudWarning: "",
     loadError: ""
   },
@@ -88,38 +103,34 @@ Page({
       const notification = await fitnessRepository.getNotificationSettings();
       const deliveries = deliveryResult.items.map(formatDelivery);
       const activeDelivery = selectedDelivery(deliveries, this.data.activeDeliveryId);
+      const formattedMeasurements = bodyMeasurements.slice(0, 3).map((item) => Object.assign({}, item, {
+        measuredDate: dateText(item.measuredAt),
+        measuredDisplayDate: monthDay(item.measuredAt)
+      }));
+      const pendingCount = deliveries.filter((item) => item.planPatch && !item.decision).length;
       this.setData({
         deliveries,
-        bodyMeasurements: bodyMeasurements.slice(0, 3).map((item) => Object.assign({}, item, { measuredDate: dateText(item.measuredAt) })),
+        bodyMeasurements: formattedMeasurements,
+        latestMeasurement: formattedMeasurements[0] || null,
+        measurementCount: bodyMeasurements.length,
         unreadCount: deliveries.filter((item) => !item.readAt).length,
-        pendingCount: deliveries.filter((item) => item.planPatch && !item.decision).length,
+        pendingCount,
+        weekRangeText: currentWeekRange(new Date()),
+        weeklyStatusTitle: pendingCount ? `${pendingCount} 项待你确认` : "本周无需处理",
+        weeklyStatusCopy: `${deliveries.length} 份周报已归档，${pendingCount ? `${pendingCount} 项待确认` : "暂无待确认项目"}`,
         activeDeliveryId: activeDelivery ? activeDelivery.deliveryId : "",
-        activeDelivery,
-        activeInsights: reportInsights(activeDelivery),
-        activeMetrics: reportMetrics(activeDelivery),
         notificationConfigured: notification.configured,
         notificationTemplateId: notification.templateId || "",
         notificationMessage: notification.message || "",
         notificationStatus: notification.status,
         notificationText: notification.status === "granted" ? "提醒已就绪" : "开启提醒",
+        reminderNote: notification.status === "granted" ? "一次提醒已就绪，发送后可再次开启" : "订阅消息仅授权一次",
         cloudWarning: deliveryResult.warning,
         loadError: ""
       });
     } catch (error) {
       this.setData({ loadError: error.message || "健身数据加载失败" });
     }
-  },
-
-  selectDelivery(event) {
-    const deliveryId = event.currentTarget.dataset.id;
-    const activeDelivery = this.data.deliveries.find((item) => item.deliveryId === deliveryId);
-    if (!activeDelivery) return;
-    this.setData({
-      activeDeliveryId: deliveryId,
-      activeDelivery,
-      activeInsights: reportInsights(activeDelivery),
-      activeMetrics: reportMetrics(activeDelivery)
-    });
   },
 
   openDelivery(event) {
@@ -129,6 +140,11 @@ Page({
   openActiveDelivery() {
     if (!this.data.activeDeliveryId) return;
     wx.navigateTo({ url: "/pages/fitness-detail/index?id=" + this.data.activeDeliveryId });
+  },
+
+  async toggleWeeklyReminder(event) {
+    if (!event.detail.value || this.data.notificationStatus === "granted") return;
+    await this.enableWeeklyReminder();
   },
 
   openBodyImport() {
@@ -169,7 +185,11 @@ Page({
         return;
       }
       await fitnessRepository.subscribeWeeklyReport(templateId);
-      this.setData({ notificationStatus: "granted", notificationText: "提醒已就绪" });
+      this.setData({
+        notificationStatus: "granted",
+        notificationText: "提醒已就绪",
+        reminderNote: "一次提醒已就绪，发送后可再次开启"
+      });
       wx.showToast({ title: "已开启一次提醒", icon: "success" });
     } catch (error) {
       const errCode = error && error.errCode !== undefined ? "错误码：" + error.errCode + "\n" : "";
