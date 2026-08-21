@@ -1,37 +1,68 @@
 <view class="page import-page">
-  <view class="import-hero">
-    <view class="fitness-kicker">体脂秤 · 微信小程序报告</view>
-    <view class="import-title">把报告图变成可追踪的数据点</view>
-    <view class="import-copy">当前版本保存原始报告图，并由你核对体重、体脂率后入库；尚未启用 OCR 自动识别。</view>
+  <view class="topbar import-topbar">
+    <view class="title-cluster">
+      <view class="page-title">体测</view>
+      <view class="page-subtitle">手动留档</view>
+    </view>
   </view>
 
-  <view class="section">
-    <view class="section-title">1. 选择报告图</view>
+  <view class="import-hero">
+    <view class="import-hero-copy">
+      <view class="fitness-kicker">一份报告，一次确认</view>
+      <view class="import-title">把身体变化，留成自己看得懂的记录</view>
+      <view class="import-copy">保存原始报告图，并由你核对关键数值后再入库。当前不做自动识别，也不替你推断。</view>
+    </view>
+    <view class="import-mark">
+      <view class="mark-ring mark-ring-one"></view>
+      <view class="mark-ring mark-ring-two"></view>
+      <view class="mark-bar mark-bar-one"></view>
+      <view class="mark-bar mark-bar-two"></view>
+    </view>
+  </view>
+
+  <view class="section import-section">
+    <view class="section-head">
+      <view>
+        <view class="section-title">选择报告图</view>
+        <view class="section-caption">相册或相机都可以，原图会作为核对依据</view>
+      </view>
+    </view>
     <view class="upload-box" bindtap="chooseReport">
       <image wx:if="{{tempFilePath}}" src="{{tempFilePath}}" mode="aspectFill" bindtap="previewReport"></image>
       <block wx:else>
-        <view class="upload-plus">＋</view>
-        <view class="item-title">从相册选择或拍照</view>
-        <view class="item-subtitle">保留原始证据，方便后续校验</view>
+        <view class="upload-frame">
+          <view class="upload-line upload-line-one"></view>
+          <view class="upload-line upload-line-two"></view>
+        </view>
+        <view class="upload-title">选择一张报告图</view>
+        <view class="upload-copy">稍后再填写确认过的数值</view>
       </block>
     </view>
   </view>
 
-  <view class="section form-card">
-    <view class="section-title">2. 人工核对关键指标</view>
-    <view class="form-row">
-      <view class="form-label">测量日期</view>
-      <picker mode="date" value="{{reportDate}}" bindchange="onDateChange"><view class="form-input">{{reportDate}}</view></picker>
+  <view class="section data-section">
+    <view class="section-head">
+      <view>
+        <view class="section-title">核对关键数值</view>
+        <view class="section-caption">只填写你确认无误的数据</view>
+      </view>
     </view>
-    <view class="form-row">
-      <view class="form-label">体重</view>
-      <view class="input-wrap"><input type="digit" value="{{weightKg}}" placeholder="如 79.3" bindinput="onWeightInput" /><text>kg</text></view>
-    </view>
-    <view class="form-row">
-      <view class="form-label">体脂率</view>
-      <view class="input-wrap"><input type="digit" value="{{bodyFatPct}}" placeholder="如 14.7" bindinput="onBodyFatInput" /><text>%</text></view>
+    <view class="form-card">
+      <view class="form-row">
+        <view class="form-label">测量日期</view>
+        <picker mode="date" value="{{reportDate}}" bindchange="onDateChange"><view class="form-input">{{reportDate}}</view></picker>
+      </view>
+      <view class="form-row">
+        <view class="form-label">体重</view>
+        <view class="input-wrap"><input type="digit" value="{{weightKg}}" placeholder="如 79.3" bindinput="onWeightInput" /><text>kg</text></view>
+      </view>
+      <view class="form-row">
+        <view class="form-label">体脂率</view>
+        <view class="input-wrap"><input type="digit" value="{{bodyFatPct}}" placeholder="如 14.7" bindinput="onBodyFatInput" /><text>%</text></view>
+      </view>
     </view>
   </view>
 
-  <button class="submit-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">确认并导入</button>
+  <view class="import-boundary">记录仅在确认后入库，后续训练回顾会使用这些已核对的信息。</view>
+  <button class="submit-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">确认并保存记录</button>
 </view>

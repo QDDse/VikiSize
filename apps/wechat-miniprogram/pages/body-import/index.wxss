@@ -1,15 +1,273 @@
-.import-page { padding-bottom: 100rpx; }
-.import-hero { background: linear-gradient(145deg, #153b32 0%, #275348 100%); border-radius: 40rpx; box-shadow: 0 18rpx 36rpx rgba(21,65,55,.14); color: #fff; padding: 40rpx; }
-.fitness-kicker { color: #a9e4d2; font-size: 22rpx; font-weight: 800; }
-.import-title { font-size: 40rpx; font-weight: 800; line-height: 1.22; margin-top: 14rpx; }
-.import-copy { color: #c6e6dc; font-size: 24rpx; line-height: 1.62; margin-top: 16rpx; }
-.upload-box { align-items: center; background: #fff; border: 2rpx dashed #afd8c9; border-radius: 30rpx; display: flex; flex-direction: column; height: 320rpx; justify-content: center; margin-top: 20rpx; overflow: hidden; }
-.upload-box image { height: 100%; width: 100%; }
-.upload-plus { color: #2b8a75; font-size: 58rpx; font-weight: 300; }
-.form-card { background: #fff; border-radius: 30rpx; box-shadow: 0 14rpx 32rpx rgba(21,65,55,.05); padding: 30rpx; }
-.form-row { align-items: center; border-bottom: 1rpx solid #e3ece7; display: flex; justify-content: space-between; min-height: 100rpx; }
-.form-label { color: #16342d; font-size: 26rpx; font-weight: 800; }
-.form-input, .input-wrap { color: #1f705f; font-size: 26rpx; font-weight: 800; }
-.input-wrap { align-items: center; display: flex; gap: 10rpx; }
-.input-wrap input { text-align: right; width: 190rpx; }
-.submit-button { background: #1f705f; border-radius: 999rpx; color: #fff; font-size: 27rpx; font-weight: 800; margin-top: 32rpx; }
+.import-page {
+  font-family: "Outfit", "PingFang SC", "Helvetica Neue", sans-serif;
+  padding-bottom: 116rpx;
+}
+
+.import-topbar {
+  height: 108rpx;
+}
+
+.title-cluster {
+  align-items: baseline;
+  display: flex;
+  gap: 16rpx;
+}
+
+.page-subtitle {
+  color: #789087;
+  font-size: 21rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.import-hero {
+  background:
+    radial-gradient(circle at 86% 20%, rgba(190, 229, 199, 0.2), transparent 29%),
+    radial-gradient(circle at 15% 110%, rgba(93, 163, 132, 0.18), transparent 42%),
+    #193d33;
+  border-radius: 38rpx;
+  box-shadow: 0 22rpx 52rpx rgba(18, 54, 44, 0.15);
+  box-sizing: border-box;
+  color: #ffffff;
+  min-height: 334rpx;
+  overflow: hidden;
+  padding: 40rpx 38rpx;
+  position: relative;
+}
+
+.import-hero-copy {
+  position: relative;
+  width: 72%;
+  z-index: 1;
+}
+
+.fitness-kicker {
+  color: #b3ddc0;
+  font-size: 20rpx;
+  font-weight: 800;
+  letter-spacing: 1.6rpx;
+}
+
+.import-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  letter-spacing: -0.8rpx;
+  line-height: 1.25;
+  margin-top: 16rpx;
+  max-width: 620rpx;
+}
+
+.import-copy {
+  color: #c8ded0;
+  font-size: 23rpx;
+  line-height: 1.6;
+  margin-top: 16rpx;
+}
+
+.import-mark {
+  height: 196rpx;
+  position: absolute;
+  right: -2rpx;
+  top: 60rpx;
+  transform: scale(0.88);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  width: 200rpx;
+}
+
+.import-hero:active .import-mark {
+  transform: scale(1);
+}
+
+.mark-ring {
+  border: 2rpx solid rgba(218, 240, 210, 0.3);
+  border-radius: 50%;
+  position: absolute;
+}
+
+.mark-ring-one {
+  height: 98rpx;
+  right: 36rpx;
+  top: 10rpx;
+  width: 98rpx;
+}
+
+.mark-ring-two {
+  border-color: rgba(218, 240, 210, 0.16);
+  height: 166rpx;
+  right: 0;
+  top: -22rpx;
+  width: 166rpx;
+}
+
+.mark-bar {
+  background: #d9efcf;
+  border-radius: 999rpx;
+  height: 3rpx;
+  position: absolute;
+  transform-origin: left center;
+}
+
+.mark-bar-one {
+  right: 37rpx;
+  top: 104rpx;
+  transform: rotate(42deg);
+  width: 98rpx;
+}
+
+.mark-bar-two {
+  background: rgba(217, 239, 207, 0.66);
+  right: 76rpx;
+  top: 148rpx;
+  transform: rotate(-32deg);
+  width: 84rpx;
+}
+
+.section {
+  margin-top: 46rpx;
+}
+
+.section-head {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  color: #1b4035;
+  font-size: 34rpx;
+  font-weight: 800;
+  letter-spacing: -0.6rpx;
+}
+
+.section-caption {
+  color: #80958c;
+  font-size: 20rpx;
+  line-height: 1.45;
+  margin-top: 8rpx;
+}
+
+.upload-box {
+  align-items: center;
+  background: #ffffff;
+  border: 1rpx solid #dbe8e0;
+  border-radius: 32rpx;
+  box-shadow: 0 16rpx 38rpx rgba(25, 68, 56, 0.06);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 346rpx;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.upload-box:active {
+  transform: scale(0.987);
+}
+
+.upload-box image {
+  height: 100%;
+  width: 100%;
+}
+
+.upload-frame {
+  border: 2rpx solid #82b8a3;
+  border-radius: 20rpx;
+  height: 72rpx;
+  overflow: hidden;
+  position: relative;
+  width: 92rpx;
+}
+
+.upload-line {
+  background: #82b8a3;
+  border-radius: 99rpx;
+  height: 3rpx;
+  position: absolute;
+}
+
+.upload-line-one {
+  left: 14rpx;
+  top: 42rpx;
+  transform: rotate(-25deg);
+  width: 34rpx;
+}
+
+.upload-line-two {
+  left: 36rpx;
+  top: 34rpx;
+  transform: rotate(31deg);
+  width: 44rpx;
+}
+
+.upload-title {
+  color: #2b5044;
+  font-size: 27rpx;
+  font-weight: 800;
+  margin-top: 22rpx;
+}
+
+.upload-copy {
+  color: #82978e;
+  font-size: 21rpx;
+  margin-top: 9rpx;
+}
+
+.form-card {
+  background: #ffffff;
+  border: 1rpx solid #e2ece5;
+  border-radius: 30rpx;
+  box-shadow: 0 14rpx 34rpx rgba(25, 68, 56, 0.05);
+  padding: 0 28rpx;
+}
+
+.form-row {
+  align-items: center;
+  border-bottom: 1rpx solid #e1ebe4;
+  display: flex;
+  justify-content: space-between;
+  min-height: 112rpx;
+}
+
+.form-row:last-child {
+  border-bottom: 0;
+}
+
+.form-label {
+  color: #24473c;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.form-input,
+.input-wrap {
+  color: #256752;
+  font-size: 25rpx;
+  font-weight: 800;
+}
+
+.input-wrap {
+  align-items: center;
+  display: flex;
+  gap: 10rpx;
+}
+
+.input-wrap input {
+  color: #256752;
+  text-align: right;
+  width: 200rpx;
+}
+
+.import-boundary {
+  color: #789087;
+  font-size: 20rpx;
+  line-height: 1.55;
+  margin: 28rpx 4rpx 0;
+}
+
+.submit-button {
+  background: #1d6353;
+  border-radius: 999rpx;
+  color: #ffffff;
+  font-size: 27rpx;
+  font-weight: 800;
+  margin-top: 26rpx;
+}

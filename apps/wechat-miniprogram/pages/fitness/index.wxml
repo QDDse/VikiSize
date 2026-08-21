@@ -1,65 +1,145 @@
 <view class="page fitness-page">
-  <view class="topbar">
-    <view class="page-title">Fitness PlanOps</view>
-    <button plain="true" class="top-action" bindtap="createPipelineChannel">接入 Pipeline</button>
+  <view class="topbar fitness-topbar">
+    <view class="title-cluster">
+      <view class="page-title">健身</view>
+      <view class="page-subtitle">训练回顾</view>
+    </view>
+    <button plain="true" class="top-action" bindtap="createPipelineChannel">接入数据</button>
   </view>
 
   <view class="fitness-hero">
-    <view class="fitness-kicker">训练 × 身体 × 恢复</view>
-    <view class="fitness-title">让计划跟着身体反馈迭代</view>
-    <view class="fitness-copy">Pipeline 汇总训记、Apple 健康与体测数据，GPT 生成周报和计划 Diff；最终变更由你确认。</view>
-    <view class="fitness-stats">
-      <view><text class="stat-number">{{deliveries.length}}</text><text class="stat-label">份报告</text></view>
-      <view><text class="stat-number">{{unreadCount}}</text><text class="stat-label">待阅读</text></view>
-      <view><text class="stat-number">{{bodyMeasurements.length}}</text><text class="stat-label">条体测</text></view>
+    <view class="hero-copy-column">
+      <view class="fitness-kicker">本周回顾</view>
+      <view class="fitness-hero-title">让训练，按身体的节奏前进</view>
+      <view class="fitness-copy">把训练、体测和恢复信息放到同一段时间里看。任何计划变更，都先由你确认。</view>
+    </view>
+    <view class="hero-signal" aria-label="训练节律示意">
+      <view class="signal-orbit orbit-one"></view>
+      <view class="signal-orbit orbit-two"></view>
+      <view class="signal-orbit orbit-three"></view>
+      <view class="signal-line line-one"></view>
+      <view class="signal-line line-two"></view>
+      <view class="signal-point point-one"></view>
+      <view class="signal-point point-two"></view>
+    </view>
+  </view>
+
+  <view class="source-ribbon">
+    <view class="source-ribbon-track">
+      <text>训练记录</text><text>体测数据</text><text>恢复感受</text><text>你的确认</text>
+      <text>训练记录</text><text>体测数据</text><text>恢复感受</text><text>你的确认</text>
     </view>
   </view>
 
   <view class="notice" wx:if="{{cloudWarning}}">{{cloudWarning}}</view>
   <view class="notice error" wx:if="{{loadError}}">{{loadError}}</view>
 
-  <view class="reminder-card">
-    <view>
-      <view class="item-title">周报到达提醒</view>
-      <view class="item-subtitle">微信订阅消息为一次性授权，发送后可再次开启。</view>
+  <view class="overview-bento">
+    <view class="bento-card">
+      <view class="bento-label">已收周报</view>
+      <view class="bento-value">{{deliveries.length}}<text> 份</text></view>
+      <view class="bento-foot">按周留档</view>
+    </view>
+    <view class="bento-card bento-card-warm">
+      <view class="bento-label">待你确认</view>
+      <view class="bento-value">{{pendingCount}}<text> 项</text></view>
+      <view class="bento-foot">不自动写入</view>
+    </view>
+    <view class="bento-card bento-card-wide" bindtap="openBodyImport">
+      <view>
+        <view class="bento-label">最近体测</view>
+        <view class="bento-wide-copy">从一张报告图开始，保留原始证据，也保留你的判断。</view>
+      </view>
+      <view class="bento-wide-action">{{bodyMeasurements.length}} 份 · 导入</view>
+    </view>
+  </view>
+
+  <view class="reminder-strip">
+    <view class="reminder-copy">
+      <view class="reminder-title">下一份周报，提醒我</view>
+      <view class="reminder-note">订阅消息每次只征求一次授权，发送后可随时再次开启。</view>
     </view>
     <button class="reminder-button {{notificationStatus === 'granted' ? 'granted' : ''}}" bindtap="enableWeeklyReminder">{{notificationText}}</button>
   </view>
 
-  <view class="section">
+  <view class="section report-section">
     <view class="section-head">
-      <view class="section-title">分析收件箱</view>
-      <view class="section-note">报告与计划变更</view>
-    </view>
-    <view class="stack" wx:if="{{deliveries.length}}">
-      <view class="report-card" wx:for="{{deliveries}}" wx:key="deliveryId" data-id="{{item.deliveryId}}" bindtap="openDelivery">
-        <view class="report-top">
-          <view class="report-date">{{item.generatedDate}}</view>
-          <view class="decision-badge {{item.decision ? 'done' : ''}}">{{item.decisionText}}</view>
-        </view>
-        <view class="item-title">{{item.report.summary}}</view>
-        <view class="item-subtitle">{{item.periodText}}</view>
-        <view class="unread-dot" wx:if="{{!item.readAt}}"></view>
+      <view>
+        <view class="section-title">周报归档</view>
+        <view class="section-caption">点选一份，先读摘要再进入完整记录</view>
       </view>
+      <view class="section-note">{{unreadCount ? unreadCount + ' 份未读' : '已读完'}}</view>
     </view>
-    <view class="empty-card" wx:else>
-      <view class="empty-title">还没有 Pipeline 报告</view>
-      <view class="item-subtitle">创建发布通道后，周报和训练计划会推送到这里。</view>
+
+    <block wx:if="{{deliveries.length}}">
+      <scroll-view class="report-rail" scroll-x="true" enable-flex="true" show-scrollbar="{{false}}">
+        <view class="report-rail-track">
+          <view class="report-rail-card {{activeDeliveryId === item.deliveryId ? 'is-active' : ''}}" wx:for="{{deliveries}}" wx:key="deliveryId" data-id="{{item.deliveryId}}" bindtap="selectDelivery">
+            <view class="rail-top">
+              <view class="report-date">{{item.generatedDate}}</view>
+              <view class="decision-badge {{item.decisionTone}}">{{item.decisionText}}</view>
+            </view>
+            <view class="rail-title">{{item.reportTitle}}</view>
+            <view class="rail-period">{{item.periodText}}</view>
+            <view class="unread-dot" wx:if="{{!item.readAt}}"></view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="report-preview" wx:if="{{activeDelivery}}">
+        <view class="preview-top">
+          <view>
+            <view class="preview-kicker">已选周报</view>
+            <view class="preview-period">{{activeDelivery.periodText}}</view>
+          </view>
+          <view class="preview-status {{activeDelivery.decisionTone}}">{{activeDelivery.decisionText}}</view>
+        </view>
+        <view class="preview-title">{{activeDelivery.reportTitle}}</view>
+
+        <view class="preview-metrics" wx:if="{{activeMetrics.length}}">
+          <view class="mini-metric" wx:for="{{activeMetrics}}" wx:key="key">
+            <view class="mini-metric-label">{{item.label}}</view>
+            <view><text class="mini-metric-value">{{item.value}}</text><text class="mini-metric-unit">{{item.unit}}</text></view>
+          </view>
+        </view>
+
+        <scroll-view class="insight-rail" scroll-x="true" enable-flex="true" show-scrollbar="{{false}}" wx:if="{{activeInsights.length}}">
+          <view class="insight-rail-track">
+            <view class="insight-quote" wx:for="{{activeInsights}}" wx:key="key">
+              <view class="quote-number">{{item.number}}</view>
+              <view class="quote-copy">{{item.text}}</view>
+            </view>
+          </view>
+        </scroll-view>
+
+        <button class="preview-action" bindtap="openActiveDelivery">查看完整周报</button>
+      </view>
+    </block>
+
+    <view class="empty-report" wx:else>
+      <view class="empty-title">这里会保存你的周报</view>
+      <view class="empty-copy">接入数据后，训练回顾和需要你确认的变更会按时间留在这里。</view>
+      <button class="empty-action" bindtap="createPipelineChannel">开始接入</button>
     </view>
   </view>
 
-  <view class="section">
+  <view class="section measurement-section">
     <view class="section-head">
-      <view class="section-title">体脂秤报告</view>
-      <view class="section-note" bindtap="openBodyImport">导入一份</view>
-    </view>
-    <view class="body-row" wx:for="{{bodyMeasurements}}" wx:key="measurementId">
       <view>
-        <view class="item-title">{{item.measuredDate}}</view>
-        <view class="item-subtitle">微信小程序报告 · 已人工确认</view>
+        <view class="section-title">最近体测</view>
+        <view class="section-caption">数据来自你手动核对的报告</view>
       </view>
-      <view class="body-metric">{{item.metrics.weightKg}} kg · {{item.metrics.bodyFatPct}}%</view>
+      <view class="section-note" bindtap="openBodyImport">导入报告</view>
     </view>
-    <button class="import-button" bindtap="openBodyImport">上传体测报告图</button>
+    <view class="measurement-ledger" wx:if="{{bodyMeasurements.length}}">
+      <view class="measurement-row" wx:for="{{bodyMeasurements}}" wx:key="measurementId">
+        <view>
+          <view class="measurement-date">{{item.measuredDate}}</view>
+          <view class="measurement-source">已人工确认</view>
+        </view>
+        <view class="measurement-value">{{item.metrics.weightKg}} kg · {{item.metrics.bodyFatPct}}%</view>
+      </view>
+    </view>
+    <view class="measurement-empty" wx:else bindtap="openBodyImport">还没有体测记录，导入第一份报告图</view>
   </view>
 </view>
