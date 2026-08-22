@@ -93,7 +93,7 @@ function activeDaysTitle(report) {
   return metric && metric.value !== undefined ? `健身周报｜${metric.value} 天训练` : "健身周报已生成";
 }
 
-function detailedDescription(delivery, h5Url) {
+function detailedDescription(delivery) {
   const report = delivery && delivery.report || {};
   const lines = [
     `# 训练周报 · ${reportPeriod(delivery)}`,
@@ -115,8 +115,7 @@ function detailedDescription(delivery, h5Url) {
     lines.push("", "## 下周建议", "");
     recommendations.forEach((item, index) => lines.push(`${index + 1}. ${truncate(item, 240)}`));
   }
-  if (h5Url) lines.push("", `[打开完整 H5 报告](${h5Url})`);
-  lines.push("", "完整记录仍保存在 VikiSize 小程序收件箱。");
+  lines.push("", "完整报告与计划操作：打开微信小程序「VikiSize」→「健身」→「周报归档」。");
   return lines.join("\n");
 }
 
@@ -128,12 +127,11 @@ async function sendServerChanNotification({ delivery, timestamp, env, request })
   try {
     const endpoint = serverChanEndpoint(sendKey);
     const detailed = String(source.FITNESS_SERVERCHAN_DETAIL_LEVEL || "minimal").trim() === "report";
-    const h5Url = detailed ? reportUrl(delivery, source.FITNESS_REPORT_H5_URL) : "";
     const report = delivery && delivery.report || {};
     const body = new URLSearchParams({
       title: detailed ? activeDaysTitle(report) : "健身周报已生成",
       desp: detailed
-        ? detailedDescription(delivery, h5Url)
+        ? detailedDescription(delivery)
         : `VikiSize 已收到 ${reportPeriod(delivery)} 的健身周报。\n\n打开微信小程序「VikiSize」查看报告与计划变更。`
     }).toString();
     const response = await (request || defaultRequest)(endpoint, {

@@ -230,7 +230,7 @@ test("Server酱客户端按 SendKey 类型构造接口并只发送报告到达�
   assert.ok(!form.get("desp").includes("训练稳定，恢复尚可"), "通知正文不应泄露健康分析内容");
 });
 
-test("Server酱报告模式发送周报摘要、指标、洞察、建议和无后端数据 H5 链接", async () => {
+test("Server酱报告模式内联周报内容并引导用户回到原生小程序", async () => {
   const { sendServerChanNotification } = require("../../apps/wechat-miniprogram/cloudfunctions-shared/serverChanClient");
   const calls = [];
   const delivery = unsignedDelivery();
@@ -262,7 +262,9 @@ test("Server酱报告模式发送周报摘要、指标、洞察、建议和无�
   assert.match(form.get("desp"), /\| 训练活跃日 \| 4 天 \|/);
   assert.match(form.get("desp"), /训练活跃日频率总体稳定/);
   assert.match(form.get("desp"), /下周保持约 4 个训练活跃日/);
-  assert.match(form.get("desp"), /\[打开完整 H5 报告\]\(https:\/\/fitness\.example\.test\/fitness\/deliveries\?view=report#report=/);
+  assert.match(form.get("desp"), /打开微信小程序「VikiSize」→「健身」→「周报归档」/);
+  assert.ok(!form.get("desp").includes("fitness.example.test"), "报告通知不应再生成 H5 链接");
+  assert.ok(!form.get("desp").includes("#report="), "报告通知不应再携带 Fragment 报告数据");
 });
 
 test("Fitness HTTP 路由以 GET 返回只解析 Fragment 的 H5 报告壳", async () => {

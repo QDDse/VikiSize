@@ -1,6 +1,6 @@
 # ADR 0003：Fitness 报告通知与训记写回边界
 
-- 状态：Accepted
+- 状态：Accepted（Server酱正文边界由 ADR 0004 补充并取代）
 - 日期：2026-08-18
 
 ## 决策
