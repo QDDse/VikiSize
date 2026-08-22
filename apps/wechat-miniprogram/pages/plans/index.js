@@ -3,6 +3,59 @@ const { Modules, RoleLabels } = require("../../domain/constants");
 const { toMiniProgramCoordinate } = require("../../services/mapAdapter");
 const { safeRefresh } = require("../../utils/pageGuard");
 
+function shortDate(value) {
+  const parts = String(value || "").split("-").map(Number);
+  if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) return "";
+  return `${parts[1]}月${parts[2]}日`;
+}
+
+function dateRange(instance) {
+  const days = instance && Array.isArray(instance.days) ? instance.days : [];
+  if (!days.length) return "";
+  const first = days[0].date;
+  const last = days[days.length - 1].date;
+  const firstParts = String(first || "").split("-").map(Number);
+  const lastParts = String(last || "").split("-").map(Number);
+  if (firstParts.length !== 3 || lastParts.length !== 3) return `${shortDate(first)}–${shortDate(last)}`;
+  const lastText = firstParts[1] === lastParts[1] ? `${lastParts[2]}日` : `${lastParts[1]}月${lastParts[2]}日`;
+  return `${firstParts[1]}月${firstParts[2]}日–${lastText}`;
+}
+
+function numberText(value) {
+  return String(Math.round(Number(value || 0))).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function primaryAction(summary, instance) {
+  if (summary.travelState === "during") {
+    const node = summary.nextTravelNode || summary.currentTravelNode;
+    return {
+      label: summary.nextTravelNode ? "下一站" : "当前行程",
+      title: node ? `${node.startTime || ""}${node.startTime ? " · " : ""}${node.title}` : "查看今日行程",
+      meta: node && (node.locationName || node.address) || "打开行程查看详情",
+      text: node ? "查看位置" : "查看行程",
+      kind: node ? "location" : "plan"
+    };
+  }
+  if (summary.travelState === "after") {
+    return {
+      label: "旅行已结束",
+      title: "回看这次行程",
+      meta: `${instance && instance.days ? instance.days.length : 0} 天行程已完成`,
+      text: "查看行程",
+      kind: "plan"
+    };
+  }
+  const firstDay = instance && instance.days && instance.days[0];
+  const isTokyo = firstDay && String(firstDay.theme || "").includes("东京");
+  return {
+    label: "下一步",
+    title: "确认第一天交通",
+    meta: isTokyo ? "成田/羽田 → 新宿" : firstDay && firstDay.theme || "补充第一天交通安排",
+    text: "去确认",
+    kind: "plan"
+  };
+}
+
 Page({
   data: {
     context: {},
@@ -11,6 +64,10 @@ Page({
     cards: [],
     budget: {},
     instance: null,
+    previewDays: [],
+    tripDateRange: "",
+    budgetDisplay: "0",
+    primaryAction: {},
     activities: [],
     summary: {},
     loadError: ""
@@ -23,13 +80,22 @@ Page({
   refresh() {
     const context = store.getCurrentContext();
     const instance = context.space ? store.getTravelInstance(context.space.id) : null;
+    const cards = context.space ? store.getCards(context.space.id, Modules.PLANS) : [];
+    const budget = context.space ? store.getBudgetSummary(context.space.id) : {};
+    const summary = context.space ? store.getTodaySummary(context.space.id) : {};
     this.setData({
       context,
       roleLabel: context.member ? RoleLabels[context.member.role] : "",
-      cards: context.space ? store.getCards(context.space.id, Modules.PLANS) : [],
-      budget: context.space ? store.getBudgetSummary(context.space.id) : {},
+      cards,
+      budget,
       instance,
-      summary: context.space ? store.getTodaySummary(context.space.id) : {},
+      previewDays: instance && instance.days ? instance.days.slice(0, 2).map((day) => Object.assign({}, day, {
+        displayDate: shortDate(day.date)
+      })) : [],
+      tripDateRange: dateRange(instance),
+      budgetDisplay: numberText(budget.estimatedTotal),
+      primaryAction: primaryAction(summary, instance),
+      summary,
       activities: context.space ? context.state.collections.activities.filter((item) => item.spaceId === context.space.id).slice(0, 8) : []
     });
   },
@@ -58,6 +124,18 @@ Page({
     const node = event.currentTarget.dataset.kind === "current"
       ? this.data.summary.currentTravelNode
       : this.data.summary.nextTravelNode;
+    this.openNodeLocation(node);
+  },
+
+  openPrimaryAction() {
+    if (this.data.primaryAction.kind !== "location") {
+      this.openTravelPlan();
+      return;
+    }
+    this.openNodeLocation(this.data.summary.nextTravelNode || this.data.summary.currentTravelNode);
+  },
+
+  openNodeLocation(node) {
     const coordinate = node && toMiniProgramCoordinate(node.coordinate);
     if (!coordinate) {
       wx.showToast({ title: "该行程暂无坐标", icon: "none" });

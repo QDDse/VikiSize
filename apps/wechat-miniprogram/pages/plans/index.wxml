@@ -1,116 +1,133 @@
-<view class="page">
-  <view class="topbar">
+<view class="page plans-page">
+  <view class="topbar plans-topbar">
     <view class="page-title">旅行</view>
-    <button plain="true" class="top-action" bindtap="openSettings">成员</button>
+    <view class="top-action" role="button" bindtap="openSettings">
+      <image class="top-action-icon" src="/assets/icons/members.png" mode="aspectFit" />
+      <text>成员</text>
+    </view>
   </view>
 
-  <view class="today-strip" wx:if="{{summary.todayItinerary}}">
-    <view class="today-head">
-      <view>
-        <view class="today-kicker">今日执行</view>
-        <view class="today-title">{{summary.travelState === 'before' ? '行程预告' : summary.travelState === 'after' ? '旅行已结束' : summary.todayItinerary.theme}}</view>
+  <view class="trip-summary" wx:if="{{instance}}" role="button" bindtap="openSpaces">
+    <view class="trip-kicker" wx:if="{{summary.travelState === 'before'}}"><image class="trip-kicker-icon" src="/assets/icons/calendar.png" mode="aspectFit" />距离出发 <text>{{summary.daysUntilStart}}</text> 天</view>
+    <view class="trip-kicker" wx:elif="{{summary.travelState === 'during'}}">旅行进行中</view>
+    <view class="trip-kicker" wx:else>旅行已结束</view>
+    <view class="trip-title">{{context.space.name}}</view>
+    <view class="trip-date">{{tripDateRange}}</view>
+    <view class="trip-summary-foot">
+      <view class="trip-role">{{roleLabel}}</view>
+    </view>
+  </view>
+
+  <view class="trip-summary trip-summary-empty" wx:else>
+    <view class="trip-kicker">旅行空间</view>
+    <view class="trip-title">从一段真实行程开始</view>
+    <view class="trip-date">创建空间或从模板复制行程</view>
+    <view class="summary-link summary-link-empty" bindtap="openSpaces">选择旅行空间</view>
+  </view>
+
+  <view class="next-action" wx:if="{{instance}}">
+    <view class="next-action-main">
+      <view class="next-label">{{primaryAction.label}}</view>
+      <view class="next-title">{{primaryAction.title}}</view>
+      <view class="next-meta">{{primaryAction.meta}}</view>
+    </view>
+    <view class="next-button" role="button" bindtap="openPrimaryAction">
+      <text>{{primaryAction.text}}</text>
+      <image class="chevron-icon" src="/assets/icons/chevron.png" mode="aspectFit" />
+    </view>
+  </view>
+
+    <view class="trip-ledger" wx:if="{{instance}}">
+    <view class="ledger-item" role="button" data-tab="tasks" bindtap="setTab">
+      <image class="ledger-icon" src="/assets/icons/tasks.png" mode="aspectFit" />
+      <view class="ledger-label">任务</view>
+      <view class="ledger-value">{{cards.length}}</view>
+    </view>
+    <view class="ledger-divider"></view>
+    <view class="ledger-item" role="button" data-tab="budget" bindtap="setTab">
+      <image class="ledger-icon" src="/assets/icons/wallet.png" mode="aspectFit" />
+      <view class="ledger-label">预算</view>
+      <view class="ledger-value">¥{{budgetDisplay}}</view>
+    </view>
+  </view>
+
+  <view class="travel-section" wx:if="{{instance && tab === 'itinerary'}}">
+    <view class="travel-section-head">
+      <view class="travel-section-title">行程</view>
+      <view class="travel-section-action" bindtap="openTravelPlan"><text>查看全部</text><image class="section-chevron" src="/assets/icons/chevron.png" mode="aspectFit" /></view>
+    </view>
+    <view class="grouped-list itinerary-list">
+      <view class="itinerary-row" wx:for="{{previewDays}}" wx:key="id" bindtap="openTravelPlan">
+        <view class="day-marker">D{{index + 1}}</view>
+        <view class="row-main">
+          <view class="row-meta">{{item.displayDate}} · {{item.weekday}}</view>
+          <view class="row-title">{{item.theme}}</view>
+          <view class="row-meta row-meta-bottom">{{item.nodes.length}} 个节点</view>
+        </view>
+        <image class="row-chevron" src="/assets/icons/chevron.png" mode="aspectFit" />
       </view>
-      <view class="today-date">{{summary.todayItinerary.date}}</view>
     </view>
-    <view class="execution-row" wx:if="{{summary.currentTravelNode}}" data-kind="current" bindtap="openTravelLocation">
-      <view class="execution-badge">当前</view>
-      <view><view class="item-title">{{summary.currentTravelNode.startTime}} · {{summary.currentTravelNode.title}}</view><view class="item-subtitle">{{summary.currentTravelNode.locationName}}</view></view>
-    </view>
-    <view class="execution-row muted" wx:if="{{summary.nextTravelNode}}" data-kind="next" bindtap="openTravelLocation">
-      <view class="execution-badge next">下一站</view>
-      <view><view class="item-title">{{summary.nextTravelNode.startTime}} · {{summary.nextTravelNode.title}}</view><view class="item-subtitle">{{summary.nextTravelNode.locationName}}</view></view>
+    <view class="travel-utility-links">
+      <view data-tab="activity" bindtap="setTab">旅行动态</view>
+      <view bindtap="openTravelTemplates">浏览模板</view>
     </view>
   </view>
 
-  <view class="space-header">
-    <view class="space-kicker">旅行空间</view>
-    <view class="space-title-row">
-      <view class="space-title">{{context.space.name}}</view>
-      <view class="space-role">{{roleLabel}}</view>
+  <view class="travel-section" wx:if="{{instance && tab === 'tasks'}}">
+    <view class="travel-section-head">
+      <view class="travel-section-title">任务</view>
+      <view class="travel-section-actions">
+        <view class="travel-section-back" data-tab="itinerary" bindtap="setTab">行程</view>
+        <view class="travel-section-action" bindtap="createPlanCard">新任务</view>
+      </view>
     </view>
-    <view class="hero-copy">旅行计划、任务、预算和活动记录集中在这里，东京模板已复制成当前空间的可编辑实例。</view>
-    <view class="space-actions">
-      <button plain="true" class="link-button" bindtap="openSpaces">切换空间</button>
-      <button plain="true" class="link-button" bindtap="openTravelTemplates">浏览模板</button>
-      <button plain="true" class="link-button" bindtap="createPlanCard">新任务</button>
+    <view class="grouped-list" wx:if="{{cards.length}}">
+      <view class="plain-row" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
+        <view class="row-main">
+          <view class="row-title">{{item.title}}</view>
+          <view class="row-meta row-meta-bottom">{{item.description}}</view>
+        </view>
+        <view class="row-status">{{item.statusLabel}}</view>
+      </view>
+    </view>
+    <view class="quiet-empty" wx:else bindtap="createPlanCard">还没有任务，创建第一项</view>
+  </view>
+
+  <view class="travel-section" wx:if="{{instance && tab === 'budget'}}">
+    <view class="travel-section-head">
+      <view class="travel-section-title">预算</view>
+      <view class="travel-section-actions">
+        <view class="travel-section-back" data-tab="itinerary" bindtap="setTab">行程</view>
+        <view class="travel-section-note">已确认 ¥{{budget.confirmedTotal}}</view>
+      </view>
+    </view>
+    <view class="grouped-list">
+      <view class="plain-row" wx:for="{{budget.categories}}" wx:key="id">
+        <view class="row-main">
+          <view class="row-title">{{item.name}}</view>
+          <view class="row-meta row-meta-bottom">已确认 ¥{{item.confirmedCost}}</view>
+        </view>
+        <view class="row-status">预估 ¥{{item.estimatedCost}}</view>
+      </view>
     </view>
   </view>
 
-  <view class="segmented">
-    <view class="segment {{tab === 'itinerary' ? 'active' : ''}}" data-tab="itinerary" bindtap="setTab">行程</view>
-    <view class="segment {{tab === 'tasks' ? 'active' : ''}}" data-tab="tasks" bindtap="setTab">任务</view>
-    <view class="segment {{tab === 'budget' ? 'active' : ''}}" data-tab="budget" bindtap="setTab">预算</view>
-    <view class="segment {{tab === 'activity' ? 'active' : ''}}" data-tab="activity" bindtap="setTab">动态</view>
-  </view>
-
-  <view class="section" wx:if="{{tab === 'itinerary'}}">
-    <view class="section-head">
-      <view class="section-title">第 1-8 天行程</view>
-      <view class="section-note" bindtap="openTravelPlan">查看全部</view>
+  <view class="travel-section" wx:if="{{instance && tab === 'activity'}}">
+    <view class="travel-section-head">
+      <view class="travel-section-title">动态</view>
+      <view class="travel-section-actions">
+        <view class="travel-section-back" data-tab="itinerary" bindtap="setTab">行程</view>
+        <view class="travel-section-note">最近更新</view>
+      </view>
     </view>
-    <view class="stack">
-      <view class="service-card" wx:for="{{instance.days}}" wx:key="id" bindtap="openTravelPlan">
-        <view class="service-icon"></view>
-        <view class="service-main">
-          <view class="item-title">第 {{index + 1}} 天 · {{item.theme}}</view>
-          <view class="item-subtitle">{{item.date}} · {{item.weekday}} · {{item.nodes.length}} 个节点</view>
+    <view class="grouped-list" wx:if="{{activities.length}}">
+      <view class="plain-row" wx:for="{{activities}}" wx:key="id">
+        <view class="row-main">
+          <view class="row-title">{{item.summary}}</view>
+          <view class="row-meta row-meta-bottom">{{item.createdAt}}</view>
         </view>
       </view>
     </view>
-  </view>
-
-  <view class="section" wx:if="{{tab === 'tasks'}}">
-    <view class="section-head">
-      <view class="section-title">任务卡片</view>
-      <view class="section-note">{{cards.length}} 张</view>
-    </view>
-    <view class="stack">
-      <view class="service-card" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" bindtap="openCard">
-        <view class="service-icon"></view>
-        <view class="service-main">
-          <view class="item-title">{{item.title}}</view>
-          <view class="item-subtitle">{{item.description}}</view>
-          <view class="meta-row">
-            <view class="badge">{{item.statusLabel}}</view>
-            <view class="badge soft" wx:if="{{item.estimateText}}">{{item.estimateText}}</view>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <view class="section" wx:if="{{tab === 'budget'}}">
-    <view class="section-head">
-      <view class="section-title">预算</view>
-      <view class="section-note">预估 ¥{{budget.estimatedTotal}} / 已确认 ¥{{budget.confirmedTotal}}</view>
-    </view>
-    <view class="stack">
-      <view class="service-card" wx:for="{{budget.categories}}" wx:key="id">
-        <view class="service-icon"></view>
-        <view class="service-main">
-          <view class="item-title">{{item.name}}</view>
-          <view class="item-subtitle">已确认 ¥{{item.confirmedCost}}</view>
-          <view class="meta-row">
-            <view class="badge">预估 ¥{{item.estimatedCost}}</view>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <view class="section" wx:if="{{tab === 'activity'}}">
-    <view class="section-head">
-      <view class="section-title">活动</view>
-      <view class="section-note">最近更新</view>
-    </view>
-    <view class="stack">
-      <view class="service-card" wx:for="{{activities}}" wx:key="id">
-        <view class="service-icon"></view>
-        <view class="service-main">
-          <view class="item-title">{{item.summary}}</view>
-          <view class="item-subtitle">{{item.createdAt}}</view>
-        </view>
-      </view>
-    </view>
+    <view class="quiet-empty" wx:else>还没有旅行动态</view>
   </view>
 </view>

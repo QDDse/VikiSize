@@ -40,10 +40,33 @@ function validateFitnessDelivery(delivery) {
   if (delivery.planPatch) {
     if (delivery.planPatch.schemaVersion !== "plan_patch_v1" || !delivery.planPatch.patchId || !delivery.planPatch.patchHash) throw new Error("计划变更不完整");
     if (!Array.isArray(delivery.planPatch.changes)) throw new Error("计划变更必须为列表");
+    validateWriteback(delivery.planPatch.writeback);
     if (delivery.planPatch.patchHash !== sha256(patchPayload(delivery.planPatch))) throw new Error("Patch 内容哈希不匹配");
   }
   if (delivery.contentHash !== sha256(deliveryPayload(delivery))) throw new Error("Delivery 内容哈希不匹配");
   return delivery;
+}
+
+function validateWriteback(writeback) {
+  if (!writeback) return;
+  if (writeback.provider !== "xunji" || writeback.operation !== "upsert_training_day_v2") {
+    throw new Error("不支持的训记写回操作");
+  }
+  if (!Array.isArray(writeback.summary) || !writeback.summary.length) throw new Error("训记写回缺少确认摘要");
+  if (!writeback.request || !Array.isArray(writeback.request.res) || !writeback.request.res.length || writeback.request.res.length > 4) {
+    throw new Error("训记写回训练记录数量必须为 1 到 4 条");
+  }
+  if (writeback.request.client_request_id || writeback.request.dry_run !== undefined || writeback.request.confirmed !== undefined) {
+    throw new Error("训记写回请求包含服务端保留字段");
+  }
+  const dates = new Set(writeback.request.res.map((item) => item && item.datestr));
+  if (dates.size !== 1 || dates.has(undefined) || dates.has("")) throw new Error("训记单次写回必须属于同一天");
+  writeback.summary.forEach((item) => {
+    if (!item || !item.datestr || !item.label || item.after === undefined) throw new Error("训记写回确认摘要不完整");
+    if (!dates.has(item.datestr)) throw new Error("训记写回摘要日期与请求不一致");
+  });
+  const serialized = JSON.stringify(writeback.request).toLowerCase();
+  if (/authorization|api[_-]?key|bearer|publish[_-]?token/.test(serialized)) throw new Error("训记写回请求不得包含凭证");
 }
 
 function tokenHash(token) {
@@ -56,4 +79,4 @@ function secureHashEqual(left, right) {
   return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-module.exports = { secureHashEqual, sha256, tokenHash, validateFitnessDelivery, withFitnessHashes };
+module.exports = { patchPayload, secureHashEqual, sha256, tokenHash, validateFitnessDelivery, validateWriteback, withFitnessHashes };

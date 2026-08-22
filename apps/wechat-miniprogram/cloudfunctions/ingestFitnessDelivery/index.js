@@ -1,6 +1,10 @@
 const { collection, now } = require("./_shared/cloud");
 const { permissionDenied } = require("./_shared/repo");
 const { secureHashEqual, sha256, tokenHash, validateFitnessDelivery } = require("./_shared/fitnessSchema");
+const { sendFitnessDeliveryNotifications, sendFitnessWeeklyNotification } = require("./_shared/fitnessNotifications");
+const { sendServerChanNotification } = require("./_shared/serverChanClient");
+const { renderFitnessReportPage } = require("./_shared/fitnessReportPage");
+const { _, cloud } = require("./_shared/cloud");
 
 function requestPayload(event) {
   if (!event.httpMethod) return event;
@@ -13,7 +17,7 @@ function requestPayload(event) {
   return typeof body === "string" ? JSON.parse(body || "{}") : (body || {});
 }
 
-async function ingest(event) {
+async function ingest(event, dependencies) {
   const channels = await collection("fitness_channels").where({ id: event.channelId, revokedAt: null }).limit(1).get();
   const channel = channels.data[0];
   if (!channel || !secureHashEqual(channel.publishTokenHash, tokenHash(event.publishToken))) {
@@ -40,13 +44,30 @@ async function ingest(event) {
   });
   try {
     await collection("fitness_deliveries").add({ data: recordData });
-    return { delivery: recordData, created: true };
   } catch (error) {
     const raced = (await collection("fitness_deliveries").doc(id).get()).data;
     if (!raced) throw error;
     if (raced.contentHash !== event.delivery.contentHash) throw new Error("Delivery 内容冲突");
     return { delivery: raced, created: false };
   }
+  let notification;
+  try {
+    notification = await sendFitnessDeliveryNotifications({
+      cloud,
+      collection,
+      _,
+      delivery: recordData,
+      userId: channel.userId,
+      timestamp,
+      env: process.env,
+      sendWechat: dependencies.sendFitnessWeeklyNotification,
+      sendServerChan: dependencies.sendServerChanNotification
+    });
+    await collection("fitness_deliveries").doc(id).update({ data: { notification: _.set(notification), updatedAt: now() } });
+  } catch (error) {
+    notification = { status: "failed", message: String(error.message || "订阅消息发送失败").slice(0, 120) };
+  }
+  return { delivery: Object.assign({}, recordData, { notification }), created: true };
 }
 
 function errorStatus(error) {
@@ -65,17 +86,39 @@ function httpResponse(statusCode, payload) {
   };
 }
 
-exports.main = async (event) => {
-  const isHttp = Boolean(event.httpMethod);
-  try {
-    const result = await ingest(requestPayload(event));
-    return isHttp ? httpResponse(200, result) : result;
-  } catch (error) {
-    if (!isHttp) throw error;
-    const statusCode = errorStatus(error);
-    return httpResponse(statusCode, {
-      error: statusCode === 500 ? "Fitness Delivery 服务暂不可用" : error.message,
-      code: error.code || "INVALID_DELIVERY"
-    });
-  }
-};
+function reportPageResponse() {
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "Referrer-Policy": "no-referrer",
+      "X-Content-Type-Options": "nosniff"
+    },
+    body: renderFitnessReportPage()
+  };
+}
+
+function createHandler(overrides) {
+  const dependencies = Object.assign({ sendFitnessWeeklyNotification, sendServerChanNotification }, overrides);
+  return async (event) => {
+    const isHttp = Boolean(event.httpMethod);
+    try {
+      if (event.httpMethod === "GET" && event.queryStringParameters && event.queryStringParameters.view === "report") {
+        return reportPageResponse();
+      }
+      const result = await ingest(requestPayload(event), dependencies);
+      return isHttp ? httpResponse(200, result) : result;
+    } catch (error) {
+      if (!isHttp) throw error;
+      const statusCode = errorStatus(error);
+      return httpResponse(statusCode, {
+        error: statusCode === 500 ? "Fitness Delivery 服务暂不可用" : error.message,
+        code: error.code || "INVALID_DELIVERY"
+      });
+    }
+  };
+}
+
+exports.createHandler = createHandler;
+exports.main = createHandler();

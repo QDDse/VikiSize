@@ -18,6 +18,7 @@ function assert(condition, message) {
 
 function walkFiles(dir, result = []) {
   fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+    if (entry.isDirectory() && entry.name === "node_modules") return;
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       walkFiles(fullPath, result);
@@ -118,7 +119,9 @@ requiredCollections.forEach((collectionName) => {
   "ingestFitnessDelivery",
   "listFitnessDeliveries",
   "getFitnessDelivery",
+  "getFitnessNotificationSettings",
   "decideFitnessPlanPatch",
+  "subscribeFitnessWeeklyReport",
   "importBodyMeasurement",
   "listBodyMeasurements"
 ].forEach((name) => {

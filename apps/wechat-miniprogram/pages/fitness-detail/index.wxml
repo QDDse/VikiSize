@@ -1,47 +1,101 @@
 <view class="page detail-page">
   <view class="notice error" wx:if="{{loadError}}">{{loadError}}</view>
+
   <block wx:if="{{delivery}}">
-    <view class="report-hero">
-      <view class="fitness-kicker">{{delivery.report.period.start}} — {{delivery.report.period.end}}</view>
-      <view class="report-title">{{delivery.report.summary}}</view>
-      <view class="hash-label">报告 {{delivery.report.reportId}}</view>
-    </view>
-
-    <view class="metric-grid">
-      <view class="metric-card" wx:for="{{delivery.report.metrics}}" wx:key="key">
-        <view class="metric-label">{{item.label}}</view>
-        <view><text class="metric-value">{{item.value}}</text><text class="metric-unit">{{item.unit}}</text></view>
+    <view class="detail-hero">
+      <view class="detail-hero-copy">
+        <view class="detail-kicker">训练回顾</view>
+        <view class="report-title">{{delivery.report.summary}}</view>
+        <view class="detail-period">{{delivery.report.period.start}} — {{delivery.report.period.end}}</view>
+        <view class="detail-id">报告记录 · {{delivery.report.reportId}}</view>
+      </view>
+      <view class="detail-art">
+        <view class="art-ring ring-one"></view>
+        <view class="art-ring ring-two"></view>
+        <view class="art-ring ring-three"></view>
+        <view class="art-line art-line-one"></view>
+        <view class="art-line art-line-two"></view>
+        <view class="art-dot art-dot-one"></view>
+        <view class="art-dot art-dot-two"></view>
       </view>
     </view>
 
-    <view class="section">
-      <view class="section-title">关键洞察</view>
-      <view class="insight" wx:for="{{delivery.report.insights}}" wx:key="*this"><view class="insight-dot"></view>{{item}}</view>
+    <view class="reading-route">
+      <view>先看事实</view>
+      <view>再读建议</view>
+      <view>最后决定</view>
     </view>
 
-    <view class="section">
-      <view class="section-title">行动建议</view>
-      <view class="insight recommendation" wx:for="{{delivery.report.recommendations}}" wx:key="*this"><view class="insight-index">{{index + 1}}</view>{{item}}</view>
-    </view>
-
-    <view class="section patch-section" wx:if="{{delivery.planPatch}}">
-      <view class="section-head">
-        <view class="section-title">下周计划 Diff</view>
-        <view class="section-note">基于 {{delivery.planPatch.basePlanVersion}}</view>
-      </view>
-      <view class="diff-card" wx:for="{{delivery.planPatch.changes}}" wx:key="target">
-        <view class="diff-target">{{item.title || item.target}}</view>
-        <view class="diff-values">
-          <view class="before">− {{item.before}}</view>
-          <view class="after">＋ {{item.after}}</view>
+    <scroll-view class="metric-rail" scroll-x="true" enable-flex="true" show-scrollbar="{{false}}">
+      <view class="metric-rail-track">
+        <view class="metric-card" wx:for="{{delivery.report.metrics}}" wx:key="key">
+          <view class="metric-label">{{item.label}}</view>
+          <view><text class="metric-value">{{item.value}}</text><text class="metric-unit">{{item.unit}}</text></view>
         </view>
-        <view class="item-subtitle">原因：{{item.reason}}</view>
       </view>
-      <view class="hash-label">Patch: {{delivery.planPatch.patchHash}}</view>
+    </scroll-view>
+
+    <view class="section insight-section">
+      <view class="section-head">
+        <view>
+          <view class="section-title">本期观察</view>
+          <view class="section-caption">基于已记录的数据，不替代你的感受</view>
+        </view>
+      </view>
+      <view class="insight-stack">
+        <view class="insight" wx:for="{{delivery.report.insights}}" wx:key="*this">
+          <view class="insight-number">{{index + 1}}</view>
+          <view class="insight-copy">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section recommendation-section">
+      <view class="section-head">
+        <view>
+          <view class="section-title">下周可以这样做</view>
+          <view class="section-caption">每条建议都是可选项，不会自行执行</view>
+        </view>
+      </view>
+      <view class="recommendation-list">
+        <view class="recommendation-row" wx:for="{{delivery.report.recommendations}}" wx:key="*this">
+          <view class="recommendation-index">{{index + 1}}</view>
+          <view>{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section decision-section" wx:if="{{delivery.planPatch}}">
+      <view class="section-head">
+        <view>
+          <view class="section-title">准备变更的训练安排</view>
+          <view class="section-caption">基于 {{delivery.planPatch.basePlanVersion}}，采纳前可逐项核对</view>
+        </view>
+      </view>
+
+      <view class="change-card" wx:for="{{delivery.planPatch.changes}}" wx:key="target">
+        <view class="change-target">{{item.title || item.target}}</view>
+        <view class="change-values">
+          <view class="before"><view class="change-label">原安排</view><view>{{item.before}}</view></view>
+          <view class="after"><view class="change-label">建议调整为</view><view>{{item.after}}</view></view>
+        </view>
+        <view class="change-reason">调整原因：{{item.reason}}</view>
+      </view>
+
+      <view class="writeback-card" wx:if="{{delivery.planPatch.writeback}}">
+        <view class="writeback-title">确认后写入训练记录</view>
+        <view class="writeback-note">写入前会校验；成功后会回读核对。以下内容与本次确认绑定。</view>
+        <view class="writeback-row" wx:for="{{delivery.planPatch.writeback.summary}}" wx:key="label">
+          <view>{{item.datestr}} · {{item.label}}</view>
+          <view class="writeback-value">{{item.before === null ? '新建' : item.before}} → {{item.after}}{{item.unit || ''}}</view>
+        </view>
+      </view>
+
+      <view class="version-boundary">本次确认绑定版本：{{delivery.planPatch.patchHash}}</view>
       <view class="decision-result" wx:if="{{decisionText}}">{{decisionText}}</view>
       <view class="decision-actions" wx:else>
-        <button class="reject-button" bindtap="rejectPatch">拒绝</button>
-        <button class="accept-button" bindtap="acceptPatch">采纳计划</button>
+        <button class="reject-button" bindtap="rejectPatch">暂不采纳</button>
+        <button class="accept-button" bindtap="acceptPatch">{{delivery.planPatch.writeback ? '确认并写入记录' : '采纳这份建议'}}</button>
       </view>
     </view>
   </block>

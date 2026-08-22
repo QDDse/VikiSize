@@ -1,22 +1,318 @@
-.fitness-page { padding-bottom: 110rpx; }
-.fitness-hero { background: linear-gradient(145deg, #101d3f, #243a75); border-radius: 40rpx; color: #fff; padding: 38rpx; }
-.fitness-kicker { color: #79e7cc; font-size: 22rpx; font-weight: 900; letter-spacing: 2rpx; }
-.fitness-title { font-size: 42rpx; font-weight: 950; line-height: 1.2; margin-top: 16rpx; }
-.fitness-copy { color: #cfdaef; font-size: 25rpx; line-height: 1.6; margin-top: 18rpx; }
-.fitness-stats { display: flex; gap: 46rpx; margin-top: 32rpx; }
-.fitness-stats view { display: flex; flex-direction: column; }
-.stat-number { font-size: 38rpx; font-weight: 950; }
-.stat-label { color: #9fb0cf; font-size: 20rpx; margin-top: 4rpx; }
-.notice { background: #fff7d6; border-radius: 18rpx; color: #7c5a00; font-size: 23rpx; margin-top: 22rpx; padding: 18rpx 22rpx; }
-.notice.error { background: #fee2e2; color: #991b1b; }
-.report-card, .empty-card, .body-row { background: #fff; border-radius: 28rpx; box-shadow: 0 12rpx 32rpx rgba(20,35,70,.06); margin-bottom: 18rpx; padding: 26rpx; position: relative; }
-.report-top, .body-row { align-items: center; display: flex; justify-content: space-between; }
-.report-date { color: #667386; font-size: 22rpx; font-weight: 800; }
-.decision-badge { background: #fff1c2; border-radius: 999rpx; color: #8a5b00; font-size: 20rpx; font-weight: 900; padding: 8rpx 14rpx; }
-.decision-badge.done { background: #dcfce7; color: #166534; }
-.report-card .item-title { margin-top: 18rpx; }
-.unread-dot { background: #2f7dff; border-radius: 50%; height: 14rpx; position: absolute; right: 24rpx; top: 72rpx; width: 14rpx; }
-.empty-title { font-size: 28rpx; font-weight: 900; margin-bottom: 8rpx; }
-.body-row { margin-bottom: 14rpx; }
-.body-metric { color: #172554; font-size: 25rpx; font-weight: 900; }
-.import-button { background: #172554; border-radius: 999rpx; color: #fff; font-size: 25rpx; font-weight: 900; margin-top: 18rpx; }
+page {
+  background: #f7f6f2;
+  color: #18231f;
+}
+
+.fitness-page {
+  font-family: "PingFang SC", "Helvetica Neue", sans-serif;
+  min-height: 100vh;
+  padding: 0 40rpx 152rpx;
+}
+
+.fitness-topbar {
+  height: 154rpx;
+}
+
+.title-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.fitness-page .page-title {
+  color: #18231f;
+  font-size: 60rpx;
+  font-weight: 700;
+  letter-spacing: -2rpx;
+  line-height: 1.15;
+}
+
+.page-subtitle {
+  color: #6b7771;
+  font-size: 27rpx;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.fitness-page .top-action {
+  align-items: center;
+  color: #267d69;
+  display: flex;
+  font-size: 29rpx;
+  font-weight: 600;
+  gap: 10rpx;
+  line-height: 76rpx;
+  min-height: 76rpx;
+  padding-left: 28rpx;
+}
+
+.top-action-icon {
+  height: 38rpx;
+  opacity: 0.66;
+  width: 38rpx;
+}
+
+.notice {
+  background: #fff8e8;
+  border: 2rpx solid #eadfbe;
+  border-radius: 20rpx;
+  color: #6f5c2d;
+  font-size: 24rpx;
+  line-height: 1.5;
+  margin-bottom: 20rpx;
+  padding: 20rpx 24rpx;
+}
+
+.notice.error {
+  background: #fff2ef;
+  border-color: #ead0ca;
+  color: #81463e;
+}
+
+.weekly-summary {
+  background: #eef2ed;
+  border: 2rpx solid #dde3de;
+  border-radius: 32rpx;
+  box-sizing: border-box;
+  min-height: 278rpx;
+  padding: 32rpx 36rpx 26rpx;
+}
+
+.weekly-kicker {
+  color: #6b7771;
+  font-size: 27rpx;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.weekly-title {
+  color: #18231f;
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: -1rpx;
+  line-height: 1.28;
+  margin-top: 18rpx;
+}
+
+.weekly-copy {
+  color: #6b7771;
+  font-size: 27rpx;
+  line-height: 1.5;
+  margin-top: 12rpx;
+}
+
+.weekly-link {
+  align-items: center;
+  color: #267d69;
+  display: flex;
+  font-size: 27rpx;
+  font-weight: 600;
+  line-height: 64rpx;
+  margin-top: 12rpx;
+  min-height: 64rpx;
+  padding-right: 24rpx;
+}
+
+.weekly-chevron {
+  height: 34rpx;
+  margin-left: auto;
+  opacity: 0.5;
+  width: 34rpx;
+}
+
+.fitness-ledger {
+  align-items: center;
+  display: flex;
+  min-height: 112rpx;
+}
+
+.fitness-ledger-item {
+  align-items: baseline;
+  color: #6b7771;
+  display: flex;
+  flex: 1;
+  font-size: 25rpx;
+  gap: 8rpx;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.fitness-ledger-value {
+  color: #267d69;
+  font-size: 32rpx;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.fitness-ledger-divider {
+  background: #dde3de;
+  height: 54rpx;
+  width: 2rpx;
+}
+
+.fitness-section {
+  margin-top: 24rpx;
+}
+
+.reminder-section,
+.report-section {
+  margin-top: 32rpx;
+}
+
+.fitness-section-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.fitness-section-title {
+  color: #18231f;
+  font-size: 36rpx;
+  font-weight: 700;
+  letter-spacing: -1rpx;
+}
+
+.fitness-section-action,
+.fitness-section-note {
+  color: #267d69;
+  font-size: 27rpx;
+  font-weight: 600;
+  line-height: 68rpx;
+  min-height: 68rpx;
+  padding-left: 24rpx;
+}
+
+.fitness-group,
+.fitness-empty {
+  background: #fffdf9;
+  border: 2rpx solid #dde3de;
+  border-radius: 28rpx;
+  overflow: hidden;
+}
+
+.fitness-row,
+.report-row {
+  align-items: center;
+  display: flex;
+  gap: 24rpx;
+  margin: 0 28rpx;
+  min-height: 122rpx;
+  padding: 18rpx 0;
+}
+
+.fitness-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-leading-icon {
+  flex: 0 0 auto;
+  height: 42rpx;
+  opacity: 0.68;
+  width: 42rpx;
+}
+
+.row-chevron {
+  flex: 0 0 auto;
+  height: 34rpx;
+  opacity: 0.5;
+  width: 34rpx;
+}
+
+.fitness-row-title {
+  color: #18231f;
+  font-size: 31rpx;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.fitness-row-meta,
+.fitness-row-helper,
+.report-date {
+  color: #6b7771;
+  font-size: 24rpx;
+  line-height: 1.45;
+  margin-top: 8rpx;
+}
+
+.fitness-row-helper {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+
+.fitness-row-side,
+.report-status {
+  color: #6b7771;
+  flex: 0 0 auto;
+  font-size: 25rpx;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.report-side {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8rpx;
+}
+
+.reminder-row {
+  min-height: 146rpx;
+}
+
+.reminder-switch {
+  flex: 0 0 auto;
+  transform: scale(0.92);
+  transform-origin: right center;
+}
+
+.report-list {
+  overflow: hidden;
+}
+
+.report-row + .report-row {
+  border-top: 2rpx solid #e5e9e5;
+}
+
+.report-date {
+  margin-top: 0;
+}
+
+.report-title {
+  margin-top: 8rpx;
+}
+
+.report-status.unread {
+  color: #267d69;
+  font-weight: 600;
+}
+
+.fitness-empty {
+  padding: 34rpx 30rpx;
+}
+
+.fitness-empty .fitness-row-meta {
+  line-height: 1.6;
+  margin-top: 12rpx;
+}
+
+.fitness-empty-action {
+  color: #267d69;
+  display: inline-block;
+  font-size: 27rpx;
+  font-weight: 600;
+  line-height: 80rpx;
+  margin-top: 12rpx;
+  min-height: 80rpx;
+  padding-right: 24rpx;
+}
+
+.weekly-link:active,
+.fitness-section-action:active,
+.fitness-row:active,
+.report-row:active,
+.fitness-empty-action:active {
+  opacity: 0.86;
+  transform: scale(0.98);
+}

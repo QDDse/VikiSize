@@ -1,21 +1,21 @@
 .day-tabs {
-  margin-top: 24rpx;
+  margin-top: 28rpx;
   white-space: nowrap;
 }
 
 .day-tab {
   background: #ffffff;
-  border-radius: 22rpx;
-  color: #667386;
+  border-radius: 24rpx;
+  color: #64746e;
   display: inline-flex;
   font-size: 24rpx;
-  font-weight: 900;
+  font-weight: 800;
   margin-right: 14rpx;
   padding: 18rpx 24rpx;
 }
 
 .day-tab.active {
-  background: #172554;
+  background: #1f705f;
   color: #ffffff;
 }
 
@@ -26,8 +26,15 @@
 .node-title {
   margin-top: 16rpx;
 }
-.node-actions { display: flex; gap: 12rpx; margin-top: 18rpx; }
-.mini-action { background: #f1f5f9; border: 0; border-radius: 12rpx; color: #526071; font-size: 22rpx; line-height: 52rpx; margin: 0; min-height: 52rpx; padding: 0 18rpx; }
-.mini-action.primary { background: #2f7dff; color: #fff; }
-.add-node { margin-top: 20rpx; width: 100%; }
-.view-switch { background: #dfe6ee; border-radius: 16rpx; display: flex; margin-top: 24rpx; padding: 6rpx; }.switch-item { border-radius: 12rpx; color: #667386; flex: 1; font-size: 26rpx; font-weight: 800; padding: 16rpx; text-align: center; }.switch-item.active { background: #fff; color: #172033; }.travel-map { height: 720rpx; width: 100%; }.map-panel { overflow: hidden; }.empty-map { color: #667386; text-align: center; }.active-node { outline: 4rpx solid #2f7dff; }
+.node-actions { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 18rpx; }
+.mini-action { background: #eaf2ef; border: 0; border-radius: 16rpx; color: #536861; font-size: 22rpx; line-height: 54rpx; margin: 0; min-height: 54rpx; padding: 0 18rpx; }
+.mini-action.primary { background: #2b8a75; color: #fff; }
+.add-node { margin-top: 22rpx; width: 100%; }
+.view-switch { background: #e3eeea; border-radius: 24rpx; display: flex; margin-top: 28rpx; padding: 8rpx; }
+.switch-item { border-radius: 18rpx; color: #64746e; flex: 1; font-size: 26rpx; font-weight: 700; padding: 16rpx; text-align: center; }
+.switch-item.active { background: #fff; box-shadow: 0 6rpx 16rpx rgba(21,65,55,.06); color: #16342d; }
+.travel-map { border-radius: 30rpx; height: 720rpx; width: 100%; }
+.map-panel { overflow: hidden; }
+.empty-map { color: #64746e; text-align: center; }
+.active-node { box-shadow: 0 0 0 4rpx #a4dcc9, 0 14rpx 28rpx rgba(21,65,55,.08); }
+.time-icon { font-size: 18rpx; padding: 0 8rpx; text-align: center; }

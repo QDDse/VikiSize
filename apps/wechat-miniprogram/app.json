@@ -18,23 +18,27 @@
   ],
   "window": {
     "navigationBarTitleText": "VikiSize",
-    "navigationBarBackgroundColor": "#eef2f5",
+    "navigationBarBackgroundColor": "#f3f8f6",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#eef2f5"
+    "backgroundColor": "#f3f8f6"
   },
   "tabBar": {
-    "color": "#8a96a8",
-    "selectedColor": "#2f7dff",
-    "backgroundColor": "#ffffff",
+    "color": "#6b7771",
+    "selectedColor": "#267d69",
+    "backgroundColor": "#fffdf9",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/plans/index",
-        "text": "旅行"
+        "text": "旅行",
+        "iconPath": "assets/icons/travel.png",
+        "selectedIconPath": "assets/icons/travel.png"
       },
       {
         "pagePath": "pages/fitness/index",
-        "text": "健身"
+        "text": "健身",
+        "iconPath": "assets/icons/fitness.png",
+        "selectedIconPath": "assets/icons/fitness.png"
       }
     ]
   },
