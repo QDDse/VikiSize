@@ -48,6 +48,16 @@ async function createChannel() {
   return callFunction("createFitnessChannel");
 }
 
+async function getNotificationSettings() {
+  if (!cloudAvailable()) return { configured: false, templateId: "", status: "disabled", message: "当前为本地模式" };
+  return callFunction("getFitnessNotificationSettings");
+}
+
+async function subscribeWeeklyReport(templateId) {
+  if (!cloudAvailable()) throw new Error("请先配置并部署微信云开发环境");
+  return callFunction("subscribeFitnessWeeklyReport", { templateId, accepted: true });
+}
+
 async function listBodyMeasurements() {
   if (cloudAvailable()) {
     try {
@@ -81,7 +91,9 @@ module.exports = {
   createChannel,
   decidePlanPatch,
   getDelivery,
+  getNotificationSettings,
   importBodyMeasurement,
   listBodyMeasurements,
-  listDeliveries
+  listDeliveries,
+  subscribeWeeklyReport
 };

@@ -1,57 +1,108 @@
 <view class="page fitness-page">
-  <view class="topbar">
-    <view class="page-title">Fitness PlanOps</view>
-    <button plain="true" class="top-action" bindtap="createPipelineChannel">接入 Pipeline</button>
-  </view>
-
-  <view class="fitness-hero">
-    <view class="fitness-kicker">训练 × 身体 × 恢复</view>
-    <view class="fitness-title">让计划跟着身体反馈迭代</view>
-    <view class="fitness-copy">Pipeline 汇总训记、Apple 健康与体测数据，GPT 生成周报和计划 Diff；最终变更由你确认。</view>
-    <view class="fitness-stats">
-      <view><text class="stat-number">{{deliveries.length}}</text><text class="stat-label">份报告</text></view>
-      <view><text class="stat-number">{{unreadCount}}</text><text class="stat-label">待阅读</text></view>
-      <view><text class="stat-number">{{bodyMeasurements.length}}</text><text class="stat-label">条体测</text></view>
+  <view class="topbar fitness-topbar">
+    <view class="title-cluster">
+      <view class="page-title">健身</view>
+      <view class="page-subtitle">训练回顾</view>
+    </view>
+    <view class="top-action" role="button" bindtap="createPipelineChannel">
+      <text>接入数据</text>
+      <image class="top-action-icon" src="/assets/icons/link.png" mode="aspectFit" />
     </view>
   </view>
 
   <view class="notice" wx:if="{{cloudWarning}}">{{cloudWarning}}</view>
   <view class="notice error" wx:if="{{loadError}}">{{loadError}}</view>
 
-  <view class="section">
-    <view class="section-head">
-      <view class="section-title">分析收件箱</view>
-      <view class="section-note">报告与计划变更</view>
+  <view class="weekly-summary">
+    <view class="weekly-kicker">本周回顾 · {{weekRangeText}}</view>
+    <view class="weekly-title">{{weeklyStatusTitle}}</view>
+    <view class="weekly-copy">{{weeklyStatusCopy}}</view>
+    <view class="weekly-link" wx:if="{{deliveries.length}}" bindtap="openActiveDelivery"><text>查看训练记录</text><image class="weekly-chevron" src="/assets/icons/chevron.png" mode="aspectFit" /></view>
+    <view class="weekly-link" wx:else bindtap="createPipelineChannel"><text>开始接入</text><image class="weekly-chevron" src="/assets/icons/chevron.png" mode="aspectFit" /></view>
+  </view>
+
+  <view class="fitness-ledger">
+    <view class="fitness-ledger-item">
+      <text>周报</text>
+      <text class="fitness-ledger-value">{{deliveries.length}}</text>
+      <text>份</text>
     </view>
-    <view class="stack" wx:if="{{deliveries.length}}">
-      <view class="report-card" wx:for="{{deliveries}}" wx:key="deliveryId" data-id="{{item.deliveryId}}" bindtap="openDelivery">
-        <view class="report-top">
-          <view class="report-date">{{item.generatedDate}}</view>
-          <view class="decision-badge {{item.decision ? 'done' : ''}}">{{item.decisionText}}</view>
-        </view>
-        <view class="item-title">{{item.report.summary}}</view>
-        <view class="item-subtitle">{{item.periodText}}</view>
-        <view class="unread-dot" wx:if="{{!item.readAt}}"></view>
-      </view>
+    <view class="fitness-ledger-divider"></view>
+    <view class="fitness-ledger-item">
+      <text>待确认</text>
+      <text class="fitness-ledger-value">{{pendingCount}}</text>
+      <text>项</text>
     </view>
-    <view class="empty-card" wx:else>
-      <view class="empty-title">还没有 Pipeline 报告</view>
-      <view class="item-subtitle">创建发布通道后，周报和训练计划会推送到这里。</view>
+    <view class="fitness-ledger-divider"></view>
+    <view class="fitness-ledger-item">
+      <text>体测</text>
+      <text class="fitness-ledger-value">{{measurementCount}}</text>
+      <text>份</text>
     </view>
   </view>
 
-  <view class="section">
-    <view class="section-head">
-      <view class="section-title">体脂秤报告</view>
-      <view class="section-note" bindtap="openBodyImport">导入一份</view>
+  <view class="fitness-section">
+    <view class="fitness-section-head">
+      <view class="fitness-section-title">最近体测</view>
+      <view class="fitness-section-action" bindtap="openBodyImport">导入</view>
     </view>
-    <view class="body-row" wx:for="{{bodyMeasurements}}" wx:key="measurementId">
-      <view>
-        <view class="item-title">{{item.measuredDate}}</view>
-        <view class="item-subtitle">微信小程序报告 · 已人工确认</view>
+    <view class="fitness-group">
+      <view class="fitness-row" bindtap="openBodyImport">
+        <image class="row-leading-icon" src="/assets/icons/document.png" mode="aspectFit" />
+        <view class="fitness-row-main" wx:if="{{latestMeasurement}}">
+          <view class="fitness-row-title">{{latestMeasurement.measuredDisplayDate}}体测记录</view>
+          <view class="fitness-row-meta">原始报告已保留</view>
+        </view>
+        <view class="fitness-row-main" wx:else>
+          <view class="fitness-row-title">还没有体测记录</view>
+          <view class="fitness-row-meta">导入第一份报告图</view>
+        </view>
+        <view class="fitness-row-side">{{measurementCount}} 份</view>
+        <image class="row-chevron" src="/assets/icons/chevron.png" mode="aspectFit" />
       </view>
-      <view class="body-metric">{{item.metrics.weightKg}} kg · {{item.metrics.bodyFatPct}}%</view>
     </view>
-    <button class="import-button" bindtap="openBodyImport">上传体测报告图</button>
+  </view>
+
+  <view class="fitness-section reminder-section">
+    <view class="fitness-section-head">
+      <view class="fitness-section-title">提醒</view>
+    </view>
+    <view class="fitness-group">
+      <view class="fitness-row reminder-row">
+        <image class="row-leading-icon" src="/assets/icons/reminder.png" mode="aspectFit" />
+        <view class="fitness-row-main">
+          <view class="fitness-row-title">下一个周报提醒</view>
+          <view class="fitness-row-meta">周日 20:00</view>
+          <view class="fitness-row-helper">{{reminderNote}}</view>
+        </view>
+        <switch class="reminder-switch" checked="{{notificationStatus === 'granted'}}" disabled="{{notificationStatus === 'granted'}}" color="#267d69" bindchange="toggleWeeklyReminder" />
+      </view>
+    </view>
+  </view>
+
+  <view class="fitness-section report-section">
+    <view class="fitness-section-head">
+      <view class="fitness-section-title">周报归档</view>
+      <view class="fitness-section-note">{{unreadCount ? unreadCount + ' 份未读' : '已读完'}}</view>
+    </view>
+
+    <view class="fitness-group report-list" wx:if="{{deliveries.length}}">
+      <view class="report-row" wx:for="{{deliveries}}" wx:key="deliveryId" data-id="{{item.deliveryId}}" bindtap="openDelivery">
+        <view class="fitness-row-main">
+          <view class="report-date">{{item.archiveDate}} · {{item.archiveWeekday}}</view>
+          <view class="fitness-row-title report-title">{{item.archiveTitle}}</view>
+        </view>
+        <view class="report-side">
+          <view class="report-status {{item.readAt ? '' : 'unread'}}">{{item.readAt ? '已读' : item.decisionText}}</view>
+          <image class="row-chevron" src="/assets/icons/chevron.png" mode="aspectFit" />
+        </view>
+      </view>
+    </view>
+
+    <view class="fitness-empty" wx:else>
+      <view class="fitness-row-title">这里会保存你的周报</view>
+      <view class="fitness-row-meta">接入数据后，训练回顾和需要确认的变更会按时间留在这里。</view>
+      <view class="fitness-empty-action" bindtap="createPipelineChannel">开始接入</view>
+    </view>
   </view>
 </view>

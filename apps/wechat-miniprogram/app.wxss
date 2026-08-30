@@ -1,59 +1,71 @@
 page {
   min-height: 100vh;
-  background: #eef2f5;
-  color: #172033;
+  background: #f3f8f6;
+  color: #16342d;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
 }
 
 .page {
   min-height: 100vh;
   box-sizing: border-box;
-  padding: 18rpx 40rpx 64rpx;
+  padding: 20rpx 40rpx 80rpx;
 }
 
 button::after {
   border: 0;
 }
 
+button {
+  transition: opacity 180ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+button:active,
+.service-card:active,
+.list-card:active,
+.report-card:active {
+  opacity: 0.88;
+  transform: scale(0.985);
+}
+
 .topbar {
   align-items: center;
   display: flex;
-  height: 108rpx;
+  height: 116rpx;
   justify-content: space-between;
 }
 
 .page-title {
-  color: #172033;
-  font-size: 44rpx;
-  font-weight: 900;
+  color: #16342d;
+  font-size: 46rpx;
+  font-weight: 800;
   line-height: 1;
 }
 
 .top-action {
   background: transparent;
   border: 0;
-  color: #2f7dff;
+  color: #267d69;
   font-size: 26rpx;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   margin: 0;
   padding: 0;
 }
 
 .space-header {
-  background: #172554;
-  border-radius: 44rpx;
+  background: linear-gradient(145deg, #153b32 0%, #275348 100%);
+  border-radius: 40rpx;
   box-sizing: border-box;
   color: #ffffff;
   margin-top: 0;
-  min-height: 300rpx;
+  min-height: 312rpx;
   overflow: hidden;
-  padding: 36rpx;
+  padding: 40rpx;
   position: relative;
 }
 
 .space-header::after {
-  background: rgba(47, 125, 255, 0.22);
+  background: rgba(105, 214, 179, 0.2);
   border-radius: 50%;
   content: "";
   height: 220rpx;
@@ -64,9 +76,9 @@ button::after {
 }
 
 .space-kicker {
-  color: #dbeafe;
+  color: #c6e6dc;
   font-size: 22rpx;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 1rpx;
   position: relative;
   text-transform: uppercase;
@@ -85,9 +97,9 @@ button::after {
 
 .space-title {
   color: #ffffff;
-  font-size: 44rpx;
-  font-weight: 950;
-  line-height: 1.2;
+  font-size: 46rpx;
+  font-weight: 800;
+  line-height: 1.18;
 }
 
 .space-role {
@@ -102,6 +114,7 @@ button::after {
 
 .space-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 16rpx;
   margin-top: 24rpx;
   position: relative;
@@ -109,12 +122,12 @@ button::after {
 }
 
 .link-button {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   border: 0;
   border-radius: 999rpx;
   color: #ffffff;
   font-size: 24rpx;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 64rpx;
   margin: 0;
   min-height: 64rpx;
@@ -122,9 +135,9 @@ button::after {
 }
 
 .hero-copy {
-  color: #dbeafe;
+  color: #c6e6dc;
   font-size: 26rpx;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.55;
   margin-top: 20rpx;
   position: relative;
@@ -153,8 +166,8 @@ button::after {
 }
 
 .hero-card {
-  background: #172554;
-  border-radius: 44rpx;
+  background: linear-gradient(145deg, #153b32 0%, #275348 100%);
+  border-radius: 40rpx;
   box-sizing: border-box;
   color: #ffffff;
   margin-top: 28rpx;
@@ -165,7 +178,7 @@ button::after {
 .hero-title {
   color: #ffffff;
   font-size: 48rpx;
-  font-weight: 950;
+  font-weight: 800;
   line-height: 1.16;
 }
 
@@ -191,16 +204,16 @@ button::after {
 }
 
 .pill-button {
-  background: #2f7dff;
+  background: #2b8a75;
 }
 
 .ghost-button {
-  background: #f1f5f9;
-  color: #526071;
+  background: #e8f2ee;
+  color: #31594e;
 }
 
 .section {
-  margin-top: 28rpx;
+  margin-top: 36rpx;
 }
 
 .section-head {
@@ -211,21 +224,21 @@ button::after {
 }
 
 .section-title {
-  color: #172033;
+  color: #16342d;
   font-size: 32rpx;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .section-note {
-  color: #667386;
+  color: #64746e;
   font-size: 24rpx;
   font-weight: 700;
 }
 
 .card {
   background: #ffffff;
-  border-radius: 36rpx;
-  box-shadow: 0 10rpx 36rpx rgba(15, 23, 42, 0.06);
+  border-radius: 32rpx;
+  box-shadow: 0 14rpx 32rpx rgba(21, 65, 55, 0.06);
   box-sizing: border-box;
   padding: 32rpx;
 }
@@ -233,22 +246,22 @@ button::after {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 20rpx;
 }
 
 .list-card {
   background: #ffffff;
-  border-radius: 32rpx;
+  border-radius: 30rpx;
   box-sizing: border-box;
-  box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.04);
+  box-shadow: 0 12rpx 28rpx rgba(21, 65, 55, 0.05);
   padding: 26rpx;
 }
 
 .service-card {
   align-items: center;
   background: #ffffff;
-  border-radius: 32rpx;
-  box-shadow: 0 8rpx 28rpx rgba(15, 23, 42, 0.04);
+  border-radius: 30rpx;
+  box-shadow: 0 12rpx 28rpx rgba(21, 65, 55, 0.05);
   box-sizing: border-box;
   display: flex;
   gap: 24rpx;
@@ -273,9 +286,9 @@ button::after {
 }
 
 .badge {
-  background: #eef4ff;
+  background: #dff2ea;
   border-radius: 999rpx;
-  color: #1d5fd1;
+  color: #246e5d;
   display: inline-flex;
   font-size: 22rpx;
   font-weight: 900;
@@ -283,18 +296,18 @@ button::after {
 }
 
 .badge.soft {
-  background: #f1f5f9;
-  color: #526071;
+  background: #edf3f0;
+  color: #536861;
 }
 
 .muted {
-  color: #667386;
+  color: #64746e;
 }
 
 .empty {
   background: #ffffff;
-  border-radius: 28rpx;
-  color: #667386;
+  border-radius: 30rpx;
+  color: #64746e;
   font-size: 26rpx;
   font-weight: 700;
   padding: 34rpx;
@@ -303,13 +316,13 @@ button::after {
 
 .space-header .ghost-button,
 .detail-hero .ghost-button {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
 }
 
 .segmented {
-  background: #ffffff;
-  border-radius: 28rpx;
+  background: #e6efeb;
+  border-radius: 30rpx;
   display: flex;
   gap: 8rpx;
   margin-top: 24rpx;
@@ -318,7 +331,7 @@ button::after {
 
 .segment {
   border-radius: 22rpx;
-  color: #667386;
+  color: #64746e;
   flex: 1;
   font-size: 24rpx;
   font-weight: 900;
@@ -327,12 +340,12 @@ button::after {
 }
 
 .segment.active {
-  background: #172554;
+  background: #1f6758;
   color: #ffffff;
 }
 
 .card-title {
-  color: #172033;
+  color: #16342d;
   font-size: 32rpx;
   font-weight: 900;
   margin-bottom: 22rpx;
@@ -349,19 +362,19 @@ button::after {
 }
 
 .soft-blue {
-  background: #eaf7ff;
+  background: #e3f1ec;
 }
 
 .soft-green {
-  background: #e8f7ef;
+  background: #e3f1ec;
 }
 
 .soft-amber {
-  background: #fff4e6;
+  background: #f4f0e7;
 }
 
 .soft-violet {
-  background: #f1edff;
+  background: #edf3f0;
 }
 
 .icon-box,
@@ -369,10 +382,16 @@ button::after {
 .service-icon,
 .menu-icon,
 .avatar {
-  background: #eaf7ff;
-  border-radius: 28rpx;
+  align-items: center;
+  background: #e3f1ec;
+  border-radius: 24rpx;
+  color: #246e5d;
+  display: flex;
+  font-size: 22rpx;
+  font-weight: 800;
   flex: 0 0 auto;
   height: 88rpx;
+  justify-content: center;
   width: 88rpx;
 }
 
@@ -381,24 +400,24 @@ button::after {
   color: #ffffff;
   display: flex;
   font-size: 28rpx;
-  font-weight: 950;
+  font-weight: 800;
   justify-content: center;
 }
 
 .icon-brand {
-  background: #2f7dff;
+  background: #2b8a75;
 }
 
 .item-title {
-  color: #172033;
+  color: #16342d;
   display: block;
   font-size: 28rpx;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1.35;
 }
 
 .item-subtitle {
-  color: #667386;
+  color: #64746e;
   display: block;
   font-size: 24rpx;
   font-weight: 700;
@@ -407,7 +426,7 @@ button::after {
 }
 
 .chevron {
-  color: #8a96a8;
+  color: #8a9893;
   font-size: 34rpx;
   font-weight: 800;
 }
@@ -422,9 +441,9 @@ button::after {
 .chip {
   align-items: center;
   background: #ffffff;
-  border: 1rpx solid #d8e0e8;
+  border: 1rpx solid #d8e8e1;
   border-radius: 999rpx;
-  color: #526071;
+  color: #536861;
   display: flex;
   flex: 0 0 auto;
   font-size: 24rpx;
@@ -434,9 +453,9 @@ button::after {
 }
 
 .chip.active {
-  background: #eaf2ff;
-  border-color: #2f7dff;
-  color: #1d5fd1;
+  background: #dff2ea;
+  border-color: #88cdb9;
+  color: #246e5d;
 }
 
 .shortcut-row {
@@ -447,7 +466,7 @@ button::after {
 
 .shortcut-card {
   background: #ffffff;
-  border-radius: 32rpx;
+  border-radius: 30rpx;
   box-sizing: border-box;
   flex: 1;
   min-height: 180rpx;
@@ -455,14 +474,14 @@ button::after {
 }
 
 .shortcut-mark {
-  background: #2f7dff;
+  background: #2b8a75;
   border-radius: 18rpx;
   height: 56rpx;
   width: 56rpx;
 }
 
 .shortcut-title {
-  color: #172033;
+  color: #16342d;
   font-size: 26rpx;
   font-weight: 900;
   line-height: 1.25;
@@ -470,7 +489,7 @@ button::after {
 }
 
 .shortcut-detail {
-  color: #667386;
+  color: #64746e;
   font-size: 22rpx;
   font-weight: 700;
   line-height: 1.35;

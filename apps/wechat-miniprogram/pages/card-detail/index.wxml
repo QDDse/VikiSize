@@ -35,7 +35,7 @@
     <button plain="true" class="pill-button comment-button" bindtap="addComment">添加评论</button>
     <view class="stack">
       <view class="service-card" wx:for="{{detail.comments}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon">评</view>
         <view class="service-main">
           <view class="item-title">{{item.body}}</view>
           <view class="item-subtitle">{{item.createdAt}}</view>
@@ -51,7 +51,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{detail.opinions}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon">议</view>
         <view class="service-main">
           <view class="item-title">{{item.value}}</view>
           <view class="item-subtitle">{{item.updatedAt}}</view>
@@ -66,7 +66,7 @@
     </view>
     <view class="stack">
       <view class="service-card" wx:for="{{detail.activities}}" wx:key="id">
-        <view class="service-icon"></view>
+        <view class="service-icon">动</view>
         <view class="service-main">
           <view class="item-title">{{item.summary}}</view>
           <view class="item-subtitle">{{item.createdAt}}</view>

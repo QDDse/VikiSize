@@ -3,8 +3,20 @@ const test = require("node:test");
 
 const {
   isMissingFunctionError,
+  mergeEnvironmentVariables,
   uploadWithCreateFallback
 } = require("../lib/wechat-cloudfunction-deploy");
+
+test("merges selected cloud-function environment variables without deleting existing values", () => {
+  assert.deepEqual(
+    mergeEnvironmentVariables([{ key: "KEEP", value: "yes" }, { key: "REPLACE", value: "old" }], {
+      REPLACE: "new",
+      ADDED: "value",
+      EMPTY: ""
+    }),
+    [{ key: "KEEP", value: "yes" }, { key: "REPLACE", value: "new" }, { key: "ADDED", value: "value" }]
+  );
+});
 
 test("recognizes CloudBase missing-function errors", () => {
   assert.equal(isMissingFunctionError({ code: "ResourceNotFound.Function" }), true);

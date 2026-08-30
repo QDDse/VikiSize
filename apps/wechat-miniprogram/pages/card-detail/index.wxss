@@ -1,9 +1,10 @@
 .detail-hero {
-  background: #172554;
-  border-radius: 44rpx;
+  background: linear-gradient(145deg, #153b32 0%, #275348 100%);
+  border-radius: 40rpx;
   box-sizing: border-box;
+  box-shadow: 0 18rpx 36rpx rgba(21, 65, 55, 0.14);
   color: #ffffff;
-  padding: 36rpx;
+  padding: 40rpx;
 }
 
 .detail-hero .badge {
@@ -17,7 +18,7 @@
 }
 
 .hero-copy {
-  color: #dbeafe;
+  color: #c6e6dc;
   margin-top: 14rpx;
 }
 
@@ -27,9 +28,9 @@
 
 .comment-box {
   background: #ffffff;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   box-sizing: border-box;
-  color: #172033;
+  color: #16342d;
   font-size: 26rpx;
   min-height: 150rpx;
   padding: 24rpx;

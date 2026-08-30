@@ -15,6 +15,15 @@ on:
         description: WeChat upload robot number
         required: false
         default: "1"
+      cloud_functions:
+        description: Optional comma-separated cloud functions; empty deploys all
+        required: false
+        default: ""
+      upload_miniprogram:
+        description: Upload a WeChat Mini Program development version after cloud deployment
+        required: false
+        type: boolean
+        default: true
   push:
     tags:
       - "wechat-v*"
@@ -32,6 +41,12 @@ jobs:
       WECHAT_VERSION: ${{ github.event.inputs.version || github.ref_name }}
       WECHAT_DESC: ${{ github.event.inputs.desc || github.event.head_commit.message || 'GitHub Actions upload' }}
       WECHAT_ROBOT: ${{ github.event.inputs.robot || '1' }}
+      WECHAT_CLOUD_FUNCTIONS: ${{ github.event.inputs.cloud_functions || '' }}
+      FITNESS_WEEKLY_REPORT_TEMPLATE_ID: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_ID }}
+      FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS: ${{ vars.FITNESS_WEEKLY_REPORT_TEMPLATE_BINDINGS }}
+      FITNESS_MINIPROGRAM_STATE: ${{ vars.FITNESS_MINIPROGRAM_STATE }}
+      FITNESS_SERVERCHAN_DETAIL_LEVEL: ${{ vars.FITNESS_SERVERCHAN_DETAIL_LEVEL || 'report' }}
+      XUNJI_TRAINING_API_KEY: ${{ secrets.XUNJI_TRAINING_API_KEY }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -53,6 +68,9 @@ jobs:
 
       - name: Deploy Fitness cloud functions
         run: npm run deploy:wechat:cloud
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
 
       - name: Upload Mini Program development version
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.upload_miniprogram }}
         run: npm run deploy:wechat
