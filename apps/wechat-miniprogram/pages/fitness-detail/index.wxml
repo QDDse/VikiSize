@@ -26,14 +26,12 @@
       <view>最后决定</view>
     </view>
 
-    <scroll-view class="metric-rail" scroll-x="true" enable-flex="true" show-scrollbar="{{false}}">
-      <view class="metric-rail-track">
-        <view class="metric-card" wx:for="{{delivery.report.metrics}}" wx:key="key">
-          <view class="metric-label">{{item.label}}</view>
-          <view><text class="metric-value">{{item.value}}</text><text class="metric-unit">{{item.unit}}</text></view>
-        </view>
+    <view class="metric-grid">
+      <view id="metric-card-{{index + 1}}" class="metric-card" wx:for="{{delivery.report.metrics}}" wx:key="key">
+        <view class="metric-label">{{item.label}}</view>
+        <view><text class="metric-value">{{item.value}}</text><text class="metric-unit">{{item.unit}}</text></view>
       </view>
-    </scroll-view>
+    </view>
 
     <view class="section insight-section">
       <view class="section-head">

@@ -1,24 +1,22 @@
 <view class="page" wx:if="{{instance}}">
-  <view class="topbar">
-    <view class="page-title">行程</view>
-  </view>
-
   <view class="space-header">
-    <view class="space-kicker">旅行计划</view>
+    <view class="space-kicker">{{instance.days.length}} 天行程 · {{instance.status === 'planning' ? '规划中' : instance.status}}</view>
     <view class="space-title-row">
       <view class="space-title">{{instance.title}}</view>
       <view class="space-role">{{context.member.role === 'owner' ? '管理员' : context.member.role === 'member' ? '成员' : '访客'}}</view>
     </view>
-    <view class="hero-copy">{{instance.startDate}} 至 {{instance.endDate}} · {{instance.days.length}} 天 · {{instance.status === 'planning' ? '规划中' : instance.status}}</view>
+    <view class="hero-copy">{{instance.startDate}} — {{instance.endDate}}</view>
     <view class="space-actions">
       <button class="link-button" bindtap="openCandidates">待安排 {{instance.candidatePlaces.length}}</button>
       <button class="link-button" wx:if="{{context.canWrite}}" bindtap="openDayEditor">新增日期</button>
     </view>
   </view>
 
-  <scroll-view scroll-x="true" class="day-tabs">
-    <view class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
-      D{{index + 1}}
+  <scroll-view scroll-x="true" class="day-tabs" show-scrollbar="{{false}}">
+    <view class="day-tabs-track">
+      <view id="day-tab-{{index + 1}}" class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
+        D{{index + 1}}
+      </view>
     </view>
   </scroll-view>
 
@@ -27,8 +25,8 @@
   <view class="section map-panel" wx:if="{{viewMode === 'map'}}"><map wx:if="{{mapView.markers.length}}" class="travel-map" latitude="{{mapView.latitude}}" longitude="{{mapView.longitude}}" scale="{{mapView.scale}}" markers="{{mapView.markers}}" polyline="{{mapView.polyline}}" bindmarkertap="markerTap"/><view class="card empty-map" wx:else>当天还没有可显示的坐标，请在节点中补充地点。</view></view>
 
   <view class="section" wx:if="{{selectedDay && viewMode === 'timeline'}}">
-    <view class="card">
-      <view class="section-head">
+    <view class="card day-summary-card">
+      <view class="section-head day-summary-head">
         <view class="card-title">{{selectedDay.theme}}</view>
         <button class="top-action" wx:if="{{context.canWrite}}" data-id="{{selectedDay.id}}" bindtap="openDayEditor">编辑日期</button>
       </view>

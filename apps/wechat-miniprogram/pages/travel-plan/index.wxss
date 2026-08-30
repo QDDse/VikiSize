@@ -1,17 +1,47 @@
+.space-header {
+  min-height: 0;
+  padding: 36rpx 40rpx 38rpx;
+}
+
+.space-actions {
+  flex-wrap: nowrap;
+  margin-top: 22rpx;
+}
+
+.space-actions .link-button {
+  flex: 1;
+  min-width: 0;
+  padding: 0 18rpx;
+}
+
 .day-tabs {
-  margin-top: 28rpx;
+  margin-top: 24rpx;
   white-space: nowrap;
+  width: 100%;
+}
+
+.day-tabs-track {
+  box-sizing: border-box;
+  display: inline-flex;
+  gap: 10rpx;
+  min-width: 100%;
+  padding-right: 2rpx;
 }
 
 .day-tab {
+  align-items: center;
   background: #ffffff;
-  border-radius: 24rpx;
+  border-radius: 20rpx;
+  box-sizing: border-box;
   color: #64746e;
   display: inline-flex;
-  font-size: 24rpx;
+  flex: 0 0 72rpx;
+  font-size: 22rpx;
   font-weight: 800;
-  margin-right: 14rpx;
-  padding: 18rpx 24rpx;
+  justify-content: center;
+  line-height: 1;
+  min-height: 58rpx;
+  padding: 16rpx 0;
 }
 
 .day-tab.active {
@@ -21,6 +51,21 @@
 
 .node-stack {
   margin-top: 24rpx;
+}
+
+.day-summary-head {
+  align-items: flex-start;
+  gap: 20rpx;
+}
+
+.day-summary-card .card-title {
+  margin-bottom: 0;
+}
+
+.day-summary-card .top-action {
+  flex: 0 0 auto;
+  line-height: 1.35;
+  padding-top: 4rpx;
 }
 
 .node-title {
