@@ -14,7 +14,7 @@ Page({
   switchSpace(event) {
     store.switchSpace(event.currentTarget.dataset.id);
     wx.showToast({ title: "已切换空间", icon: "success" });
-    wx.switchTab({ url: "/pages/today/index" });
+    wx.switchTab({ url: "/pages/plans/index" });
   },
 
   createSpace(event) {
@@ -25,6 +25,6 @@ Page({
     }
     store.createSpace({ templateType });
     wx.showToast({ title: "已创建空间", icon: "success" });
-    wx.switchTab({ url: "/pages/today/index" });
+    wx.switchTab({ url: "/pages/plans/index" });
   }
 });

@@ -27,7 +27,7 @@ Page({
     try {
       store.acceptInvitation(this.data.token);
       wx.showToast({ title: "已加入空间", icon: "success" });
-      wx.switchTab({ url: "/pages/today/index" });
+      wx.switchTab({ url: "/pages/plans/index" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
     }

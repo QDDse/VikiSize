@@ -62,7 +62,7 @@ Page({
     const invitation = this.data.invitation;
     const space = this.data.context && this.data.context.space;
     if (!invitation || !space) {
-      return { title: "VikiSize 生活助手", path: "/pages/today/index" };
+      return { title: "VikiSize 生活助手", path: "/pages/plans/index" };
     }
     return {
       title: `加入 ${space.name}`,
