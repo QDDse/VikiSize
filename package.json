@@ -25,7 +25,7 @@
     "validate:wechat": "node scripts/validate-miniprogram.js"
   },
   "devDependencies": {
-    "eslint": "9.39.2",
+    "eslint": "10.10.0",
     "miniprogram-ci": "2.1.31"
   }
 }
