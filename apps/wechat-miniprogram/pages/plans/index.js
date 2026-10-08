@@ -112,8 +112,9 @@ Page({
     wx.navigateTo({ url: "/pages/space-settings/index" });
   },
 
-  openTravelPlan() {
-    wx.navigateTo({ url: "/pages/travel-plan/index" });
+  openTravelPlan(event) {
+    const data = event && event.currentTarget.dataset || {};
+    wx.navigateTo({ url: `/pages/travel-plan/index?tab=${data.tab || "itinerary"}&dayId=${data.id || ""}` });
   },
 
   openTravelTemplates() {

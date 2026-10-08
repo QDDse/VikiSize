@@ -364,6 +364,7 @@ page {
 }
 
 .travel-utility-links {
+  flex-wrap: wrap;
   color: #6b7771;
   display: flex;
   font-size: 25rpx;

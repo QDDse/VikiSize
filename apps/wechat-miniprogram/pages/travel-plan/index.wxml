@@ -1,60 +1,58 @@
-<view class="page" wx:if="{{instance}}">
-  <view class="space-header">
-    <view class="space-kicker">{{instance.days.length}} 天行程 · {{instance.status === 'planning' ? '规划中' : instance.status}}</view>
-    <view class="space-title-row">
-      <view class="space-title">{{instance.title}}</view>
-      <view class="space-role">{{context.member.role === 'owner' ? '管理员' : context.member.role === 'member' ? '成员' : '访客'}}</view>
+<view class="travel-page">
+  <view wx:if="{{loadError}}" class="empty-state">{{loadError}}<button bindtap="onShow">重试</button></view>
+  <block wx:elif="{{instance}}">
+    <view class="travel-hero">
+      <view class="eyebrow">VIKISIZE · 旅行随行</view>
+      <view class="trip-title">{{instance.title}}</view>
+      <view class="hero-meta">{{instance.startDate}} — {{instance.endDate}} · {{instance.days.length}} 天</view>
+      <view class="hero-actions"><text>{{context.canWrite ? '共同编辑' : '访客 · 只读'}}</text><button bindtap="openCandidates">待安排 {{instance.candidatePlaces.length}}</button><button wx:if="{{context.canWrite}}" bindtap="openDayEditor">新增日期</button></view>
     </view>
-    <view class="hero-copy">{{instance.startDate}} — {{instance.endDate}}</view>
-    <view class="space-actions">
-      <button class="link-button" bindtap="openCandidates">待安排 {{instance.candidatePlaces.length}}</button>
-      <button class="link-button" wx:if="{{context.canWrite}}" bindtap="openDayEditor">新增日期</button>
+    <view class="date-strip"><text>今天 {{today}} · {{instance.timezone || 'Asia/Tokyo'}}</text><button bindtap="selectToday">回到今天</button></view>
+    <view class="companion-tabs">
+      <button class="{{tab === 'itinerary' ? 'selected' : ''}}" data-tab="itinerary" bindtap="setTab">行程</button>
+      <button class="{{tab === 'receipts' ? 'selected' : ''}}" data-tab="receipts" bindtap="setTab">小票</button>
+      <button class="{{tab === 'phrases' ? 'selected' : ''}}" data-tab="phrases" bindtap="setTab">开口</button>
     </view>
-  </view>
-
-  <scroll-view scroll-x="true" class="day-tabs" show-scrollbar="{{false}}">
-    <view class="day-tabs-track">
-      <view id="day-tab-{{index + 1}}" class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay">
-        D{{index + 1}}
-      </view>
-    </view>
-  </scroll-view>
-
-  <view class="view-switch"><view class="switch-item {{viewMode === 'timeline' ? 'active' : ''}}" data-mode="timeline" bindtap="switchView">时间线</view><view class="switch-item {{viewMode === 'map' ? 'active' : ''}}" data-mode="map" bindtap="switchView">地图</view></view>
-
-  <view class="section map-panel" wx:if="{{viewMode === 'map'}}"><map wx:if="{{mapView.markers.length}}" class="travel-map" latitude="{{mapView.latitude}}" longitude="{{mapView.longitude}}" scale="{{mapView.scale}}" markers="{{mapView.markers}}" polyline="{{mapView.polyline}}" bindmarkertap="markerTap"/><view class="card empty-map" wx:else>当天还没有可显示的坐标，请在节点中补充地点。</view></view>
-
-  <view class="section" wx:if="{{selectedDay && viewMode === 'timeline'}}">
-    <view class="card day-summary-card">
-      <view class="section-head day-summary-head">
-        <view class="card-title">{{selectedDay.theme}}</view>
-        <button class="top-action" wx:if="{{context.canWrite}}" data-id="{{selectedDay.id}}" bindtap="openDayEditor">编辑日期</button>
-      </view>
-      <view class="item-subtitle">{{selectedDay.date}} · {{selectedDay.weekday}}</view>
-      <view class="item-subtitle">{{selectedDay.tip}}</view>
-    </view>
-
-    <view class="stack node-stack">
-      <view class="service-card {{activeNodeId === item.id ? 'active-node' : ''}}" wx:for="{{selectedDay.nodes}}" wx:key="id" data-id="{{item.id}}" bindtap="activateNode">
-        <view class="service-icon time-icon">{{item.startTime || item.time}}</view>
-        <view class="service-main">
-          <view class="badge">{{item.period}} · {{item.startTime || item.time}}</view>
-          <view class="item-title node-title" data-id="{{item.id}}" bindtap="openNodeEditor">{{item.title}}</view>
-          <view class="item-subtitle">{{item.locationName || item.location}} · {{item.transport.mode || item.route}}</view>
-          <view class="item-subtitle" wx:if="{{item.needsBooking}}">需要预约</view>
-          <view class="meta-row">
-            <view class="badge soft">预算 ¥{{item.estimatedCost}}</view>
-          </view>
-          <view class="item-subtitle">{{item.notes}}</view>
-          <view class="node-actions" wx:if="{{context.canWrite}}">
-            <button class="mini-action" data-id="{{item.id}}" data-direction="up" bindtap="moveNode">上移</button>
-            <button class="mini-action" data-id="{{item.id}}" data-direction="down" bindtap="moveNode">下移</button>
-            <button class="mini-action primary" data-id="{{item.id}}" bindtap="openNodeEditor">编辑</button>
-            <button class="mini-action" wx:if="{{item.coordinate}}" data-id="{{item.id}}" catchtap="openLocation">地图</button>
-          </view>
+    <scroll-view wx:if="{{tab !== 'phrases'}}" scroll-x="true" class="day-tabs" scroll-into-view="day-{{selectedDayId}}">
+      <button id="day-{{item.id}}" class="day-tab {{selectedDayId === item.id ? 'active' : ''}}" wx:for="{{instance.days}}" wx:key="id" data-id="{{item.id}}" bindtap="selectDay"><text>D{{index + 1}}</text><text>{{item.date}}</text><text>{{item.weekday}}</text></button>
+    </scroll-view>
+    <view class="content" wx:if="{{tab === 'itinerary'}}">
+      <block wx:if="{{selectedDay}}">
+        <view class="section-heading"><view><view class="eyebrow">{{overview.label}} · {{selectedDay.date}}</view><view class="heading">{{selectedDay.theme}}</view></view><button wx:if="{{context.canWrite}}" data-id="{{selectedDay.id}}" bindtap="openDayEditor">编辑日期</button></view>
+        <view class="hint" wx:if="{{selectedDay.tip}}">{{selectedDay.tip}}</view>
+        <view class="execution" wx:if="{{overview.current}}" data-id="{{overview.current.id}}" bindtap="activateNode"><text class="label">此刻</text><view>{{overview.current.displayTime}} · {{overview.current.title}}</view></view>
+        <view class="execution" wx:if="{{overview.next}}" data-id="{{overview.next.id}}" bindtap="activateNode"><text class="label">{{overview.label === '今日' ? '下一站' : '首站'}}</text><view>{{overview.next.displayTime}} · {{overview.next.title}}</view></view>
+        <view class="hint" wx:if="{{overview.label === '今日' && !overview.current && !overview.next}}">今日没有后续定时行程，可查看下方完整时间线。</view>
+        <view class="view-switch"><button class="{{viewMode === 'timeline' ? 'selected' : ''}}" data-mode="timeline" bindtap="switchView">时间线</button><button class="{{viewMode === 'map' ? 'selected' : ''}}" data-mode="map" bindtap="switchView">地图</button></view>
+        <view wx:if="{{viewMode === 'map'}}"><map wx:if="{{mapView.markers.length}}" class="travel-map" latitude="{{mapView.latitude}}" longitude="{{mapView.longitude}}" scale="{{mapView.scale}}" markers="{{mapView.markers}}" polyline="{{mapView.polyline}}" bindmarkertap="markerTap"/><view class="empty-state" wx:else>当天暂无地点坐标，请编辑地点补充。</view></view>
+        <view wx:else class="timeline">
+          <view class="timeline-row" wx:for="{{timelineNodes}}" wx:key="id"><view class="time">{{item.displayTime}}</view><view class="place-card" data-id="{{item.id}}" bindtap="activateNode"><view class="place-title">{{item.title}}</view><view class="muted">{{item.locationName || item.location || '地点待补充'}}</view><view class="place-meta">{{item.stay}} · {{item.transportText}}</view><view class="hint" wx:if="{{item.status === 'cancelled'}}">已取消</view><view class="hint" wx:if="{{item.needsBooking}}">需自行确认预约</view><view class="node-actions" wx:if="{{context.canWrite}}"><button data-id="{{item.id}}" data-direction="up" catchtap="moveNode">上移</button><button data-id="{{item.id}}" data-direction="down" catchtap="moveNode">下移</button><button data-id="{{item.id}}" catchtap="openNodeEditor">编辑</button></view></view></view>
+          <view class="empty-state" wx:if="{{!timelineNodes.length}}">这一天还没有行程。</view>
         </view>
-      </view>
-      <button class="pill-button add-node" wx:if="{{context.canWrite}}" bindtap="openNodeEditor">新增行程节点</button>
+        <button class="primary-button" wx:if="{{context.canWrite}}" bindtap="openNodeEditor">＋ 添加行程地点</button>
+        <view class="simulation-card"><view class="heading">延误情景 · 模拟</view><view class="muted">将当天时间整体顺延作比较，不代表实时交通，不更改正式行程。</view><view class="delay-options"><button data-minutes="15" bindtap="previewDelay">模拟 +15 分钟</button><button data-minutes="30" bindtap="previewDelay">模拟 +30 分钟</button><button data-minutes="60" bindtap="previewDelay">模拟 +60 分钟</button></view></view>
+      </block>
+      <view class="empty-state" wx:else>暂无行程日期，可使用上方“新增日期”。</view>
     </view>
-  </view>
+    <view class="content" wx:if="{{tab === 'receipts'}}">
+      <view class="section-heading"><view class="heading">旅行小票</view><picker mode="date" value="{{receiptDate}}" bindchange="changeReceiptDate"><view class="date-picker">{{receiptDate}} ▾</view></picker></view>
+      <view class="ledger-summary"><view><text class="muted">当日合计 · JPY</text><view class="total">¥{{ledger.dayTotal}}</view></view><view><text class="muted">全程 {{ledger.count}} 张</text><view>¥{{ledger.tripTotal}} JPY</view></view></view>
+      <view class="category-summary"><text wx:for="{{ledger.categories}}" wx:key="name">{{item.name}} ¥{{item.amount}}</text></view>
+      <view class="receipt-row" wx:for="{{ledger.rows}}" wx:key="id"><view class="receipt-info"><view class="place-title">{{item.merchant}}</view><view class="muted">{{item.date}} · {{item.category}}</view></view><view class="receipt-amount">¥{{item.amount}}</view><button wx:if="{{context.canWrite}}" data-id="{{item.id}}" bindtap="deleteReceipt">删除</button></view>
+      <view class="empty-state" wx:if="{{!ledger.rows.length}}">这一天还没有小票。<view class="muted">账本只保存你添加的记录，不含示例账单。</view></view>
+      <button class="primary-button" wx:if="{{context.canWrite}}" bindtap="openReceiptForm">＋ 添加小票</button>
+      <view class="hint">金额单位为日元 JPY；小票独立于任务预算，保存在本机当前旅行中。</view>
+    </view>
+    <view class="content" wx:if="{{tab === 'phrases'}}">
+      <view class="heading">把想说的话，递给对方</view><view class="muted">点击复制日语，也可以直接向对方展示。</view>
+      <view class="phrase-tabs"><button wx:for="{{phraseCategories}}" wx:key="id" class="{{phraseCategory === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectPhraseCategory">{{item.label}}</button></view>
+      <view class="phrase-card" wx:for="{{phrases}}" wx:key="id"><view class="muted">{{item.chinese}}</view><text class="japanese" selectable="true">{{item.japanese}}</text><button data-id="{{item.id}}" bindtap="copyPhrase">复制日语</button></view>
+      <view class="hint">当前未接入日语朗读，暂仅支持文字展示与复制。</view>
+    </view>
+  </block>
+  <view class="empty-state" wx:else>当前空间没有旅行计划，请返回旅行首页选择空间。</view>
+
+  <view class="sheet-mask" wx:if="{{activeNode}}" bindtap="closeDetails"><view class="sheet" catchtap="stopPropagation"><view class="section-heading"><view class="heading">地点详情</view><button bindtap="closeDetails">关闭</button></view><scroll-view scroll-y="true" class="sheet-body"><view class="trip-title">{{activeNode.title}}</view><view class="muted">{{activeNode.address || activeNode.locationName || activeNode.location}}</view><view class="detail-row">计划时间：{{activeNode.displayTime}} {{activeNode.endTime ? '— ' + activeNode.endTime : ''}}</view><view class="detail-row">预计停留：{{activeNode.stay}}</view><view class="detail-row">交通方式：{{activeNode.transportText}} {{activeNode.transportDuration}}</view><view class="detail-row" wx:if="{{activeNode.openingHours}}">营业时间：{{activeNode.openingHours}}</view><view class="detail-row" wx:if="{{activeNode.needsBooking}}">需自行确认预约；本工具不提供预订。</view><view class="heading">临场提示</view><view class="tip-box">{{activeNode.tip}}</view><button class="primary-button" wx:if="{{activeNode.coordinate}}" data-id="{{activeNode.id}}" bindtap="openLocation">在地图中打开</button><button wx:if="{{context.canWrite}}" data-id="{{activeNode.id}}" bindtap="openNodeEditor">编辑地点</button></scroll-view></view></view>
+  <view class="sheet-mask" wx:if="{{receiptForm}}" bindtap="closeReceiptForm"><view class="sheet" catchtap="stopPropagation"><view class="section-heading"><view class="heading">添加小票</view><button bindtap="closeReceiptForm">取消</button></view><scroll-view scroll-y="true" class="sheet-body"><view class="field-label">消费日期</view><picker mode="date" value="{{receiptForm.date}}" data-field="date" bindchange="editReceipt"><view class="form-control">{{receiptForm.date}}</view></picker><view class="field-label">商家</view><input class="form-control" value="{{receiptForm.merchant}}" maxlength="80" placeholder="输入商家名称" data-field="merchant" bindinput="editReceipt"/><view class="field-label">分类</view><picker range="{{receiptCategories}}" bindchange="changeReceiptCategory"><view class="form-control">{{receiptForm.category}} ▾</view></picker><view class="field-label">整数金额 · JPY</view><input class="form-control" type="number" value="{{receiptForm.amount}}" maxlength="9" placeholder="例如 1200" data-field="amount" bindinput="editReceipt"/><view class="form-error" wx:if="{{receiptError}}">{{receiptError}}</view><button class="primary-button" loading="{{savingReceipt}}" disabled="{{savingReceipt}}" bindtap="saveReceipt">保存小票</button></scroll-view></view></view>
+  <view class="sheet-mask" wx:if="{{delayMinutes}}" bindtap="closeDelay"><view class="sheet" catchtap="stopPropagation"><view class="section-heading"><view class="heading">模拟延误 +{{delayMinutes}} 分钟</view><button bindtap="closeDelay">关闭</button></view><view class="hint">仅演示比较，不保存、不应用。预约及营业时间需自行确认。</view><scroll-view scroll-y="true" class="sheet-body"><view class="delay-row" wx:for="{{delayRows}}" wx:key="id"><view>{{item.title}}</view><view class="muted">原计划 {{item.original}} → 模拟 {{item.shifted}}</view></view><view class="empty-state" wx:if="{{!delayRows.length}}">当天没有可模拟的行程。</view><button class="primary-button" bindtap="closeDelay">取消模拟，返回行程</button></scroll-view></view></view>
 </view>

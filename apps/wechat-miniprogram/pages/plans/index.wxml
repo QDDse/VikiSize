@@ -57,7 +57,7 @@
       <view class="travel-section-action" bindtap="openTravelPlan"><text>查看全部</text><image class="section-chevron" src="/assets/icons/chevron.png" mode="aspectFit" /></view>
     </view>
     <view class="grouped-list itinerary-list">
-      <view class="itinerary-row" wx:for="{{previewDays}}" wx:key="id" bindtap="openTravelPlan">
+      <view class="itinerary-row" wx:for="{{previewDays}}" wx:key="id" data-id="{{item.id}}" bindtap="openTravelPlan">
         <view class="day-marker">D{{index + 1}}</view>
         <view class="row-main">
           <view class="row-meta">{{item.displayDate}} · {{item.weekday}}</view>
@@ -68,6 +68,8 @@
       </view>
     </view>
     <view class="travel-utility-links">
+      <view data-tab="receipts" bindtap="openTravelPlan">旅行小票</view>
+      <view data-tab="phrases" bindtap="openTravelPlan">日语开口</view>
       <view data-tab="activity" bindtap="setTab">旅行动态</view>
       <view bindtap="openTravelTemplates">浏览模板</view>
     </view>

@@ -15,6 +15,8 @@ const { tokyoTravelTemplate } = require("../data/tokyoTravelTemplate");
 const travelTemplateRegistry = require("../data/travelTemplateRegistry");
 const { buildTodayTravelView } = require("./travelExecution");
 
+const { normalizeReceipt, receiptKey } = require("./travelCompanion");
+
 const STORAGE_KEY = "vikisize_life_assistant_state_v1";
 let memoryState = null;
 
@@ -182,11 +184,11 @@ function readRawState() {
 }
 
 function saveRawState(state) {
-  memoryState = clone(state);
   const storage = getStorage();
   if (storage) {
     storage.setStorageSync(STORAGE_KEY, state);
   }
+  memoryState = clone(state);
 }
 
 function createInitialState() {
@@ -849,6 +851,33 @@ function getTravelInstanceRecord(state, instanceId) {
   return instance;
 }
 
+// Optional additive field: v1/v2/v3 instances without receipts keep an empty ledger.
+function addTravelReceipt(instanceId, input) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  if (instance.archivedAt) throw new Error("已归档旅行不能记账");
+  const receipt = normalizeReceipt(input);
+  const receipts = instance.receipts || [];
+  if (receipts.some((item) => receiptKey(item) === receiptKey(receipt))) throw new Error("这张小票已记录，请勿重复添加");
+  if (!Number.isSafeInteger(receipts.reduce((sum, item) => sum + item.amount, receipt.amount))) throw new Error("小票总额超出可保存范围");
+  const saved = Object.assign({}, receipt, { id: newId("receipt"), createdBy: state.currentUserId, createdAt: now() });
+  instance.receipts = receipts.concat(saved);
+  touchTravelInstance(instance);
+  saveRawState(state);
+  return clone(saved);
+}
+
+function deleteTravelReceipt(instanceId, receiptId) {
+  const state = readRawState();
+  const instance = getTravelInstanceRecord(state, instanceId);
+  if (instance.archivedAt) throw new Error("已归档旅行不能记账");
+  const receipts = instance.receipts || [];
+  if (!receipts.some((item) => item.id === receiptId)) throw new Error("小票不存在");
+  instance.receipts = receipts.filter((item) => item.id !== receiptId);
+  touchTravelInstance(instance);
+  saveRawState(state);
+}
+
 function touchTravelInstance(instance) {
   instance.updatedAt = now();
   instance.revision = Number(instance.revision || 0) + 1;
@@ -1318,6 +1347,8 @@ function setCurrentUserRoleForPreview(role) {
 }
 
 module.exports = {
+  addTravelReceipt,
+  deleteTravelReceipt,
   acceptInvitation,
   addComment,
   advanceCardStatus,
