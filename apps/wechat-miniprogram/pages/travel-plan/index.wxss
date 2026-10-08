@@ -1,33 +1,56 @@
-.day-tabs {
-  margin-top: 24rpx;
-  white-space: nowrap;
-}
-
-.day-tab {
-  background: #ffffff;
-  border-radius: 22rpx;
-  color: #667386;
-  display: inline-flex;
-  font-size: 24rpx;
-  font-weight: 900;
-  margin-right: 14rpx;
-  padding: 18rpx 24rpx;
-}
-
-.day-tab.active {
-  background: #172554;
-  color: #ffffff;
-}
-
-.node-stack {
-  margin-top: 24rpx;
-}
-
-.node-title {
-  margin-top: 16rpx;
-}
-.node-actions { display: flex; gap: 12rpx; margin-top: 18rpx; }
-.mini-action { background: #f1f5f9; border: 0; border-radius: 12rpx; color: #526071; font-size: 22rpx; line-height: 52rpx; margin: 0; min-height: 52rpx; padding: 0 18rpx; }
-.mini-action.primary { background: #2f7dff; color: #fff; }
-.add-node { margin-top: 20rpx; width: 100%; }
-.view-switch { background: #dfe6ee; border-radius: 16rpx; display: flex; margin-top: 24rpx; padding: 6rpx; }.switch-item { border-radius: 12rpx; color: #667386; flex: 1; font-size: 26rpx; font-weight: 800; padding: 16rpx; text-align: center; }.switch-item.active { background: #fff; color: #172033; }.travel-map { height: 720rpx; width: 100%; }.map-panel { overflow: hidden; }.empty-map { color: #667386; text-align: center; }.active-node { outline: 4rpx solid #2f7dff; }
+page { background: #f6f2e9; }
+.travel-page { color: #203d40; padding-bottom: 60rpx; }
+.travel-page button { border: 0; border-radius: 14rpx; font-size: 24rpx; line-height: 1.5; margin: 0; padding: 16rpx 22rpx; background: #ece8de; color: #26464a; }
+.travel-page button::after { border: 0; }
+.travel-hero { background: #183e44; color: #fffaf0; padding: 40rpx 32rpx 30rpx; }
+.eyebrow { font-size: 22rpx; letter-spacing: 2rpx; opacity: .8; }
+.trip-title { font-size: 40rpx; font-weight: 700; margin: 18rpx 0; overflow-wrap: break-word; }
+.hero-meta { font-size: 24rpx; opacity: .8; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx; font-size: 22rpx; margin-top: 24rpx; }
+.hero-actions button { background: #31565a; color: #fffaf0; }
+.date-strip { display: flex; align-items: center; justify-content: space-between; padding: 14rpx 24rpx; font-size: 21rpx; border-bottom: 1rpx solid #ded8cc; gap: 8rpx; }
+.date-strip button { flex-shrink: 0; font-size: 21rpx; }
+.companion-tabs, .view-switch, .phrase-tabs { display: flex; gap: 12rpx; padding: 20rpx 24rpx; }
+.companion-tabs button, .view-switch button, .phrase-tabs button { flex: 1; }
+.travel-page .selected { background: #b9573d; color: #fff; }
+.day-tabs { white-space: nowrap; box-sizing: border-box; padding: 4rpx 24rpx 18rpx; }
+.travel-page .day-tab { display: inline-flex; flex-direction: column; margin-right: 12rpx; min-width: 130rpx; padding: 16rpx; background: #fffcf5; border: 1rpx solid #e1dbd0; font-size: 20rpx; }
+.day-tab text:first-child { font-size: 27rpx; font-weight: 700; }
+.travel-page .day-tab.active { background: #234b50; color: #fff; }
+.content { padding: 10rpx 24rpx; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin: 16rpx 0 24rpx; }
+.section-heading button { flex-shrink: 0; }
+.heading { font-size: 30rpx; font-weight: 700; }
+.muted, .hint { color: #68726e; font-size: 24rpx; line-height: 1.65; }
+.hint { margin: 18rpx 0; }
+.execution { display: flex; align-items: center; gap: 18rpx; padding: 24rpx; background: #e5ece4; border-radius: 18rpx; margin-top: 14rpx; font-size: 28rpx; }
+.label { flex-shrink: 0; font-size: 21rpx; color: #a44e36; }
+.view-switch { padding: 24rpx 0; }
+.timeline-row { display: flex; gap: 14rpx; margin-bottom: 20rpx; }
+.time { width: 100rpx; flex-shrink: 0; font-size: 24rpx; padding-top: 24rpx; font-weight: 700; }
+.place-card { flex: 1; min-width: 0; padding: 24rpx; border-left: 5rpx solid #bf644b; background: #fffcf5; border-radius: 16rpx; }
+.place-title { font-size: 29rpx; font-weight: 650; overflow-wrap: break-word; }
+.place-meta { color: #8a624c; font-size: 22rpx; margin-top: 14rpx; }
+.node-actions { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: 20rpx; }
+.node-actions button { padding: 12rpx 18rpx; font-size: 22rpx; }
+.travel-page .primary-button { background: #b9573d; color: #fff; margin: 24rpx 0; width: 100%; padding: 22rpx; font-size: 28rpx; }
+.empty-state { text-align: center; padding: 60rpx 24rpx; color: #68726e; font-size: 28rpx; line-height: 1.8; }
+.simulation-card { margin-top: 36rpx; border: 2rpx dashed #c6a78c; border-radius: 20rpx; padding: 24rpx; }
+.delay-options { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 18rpx; }
+.delay-options button { font-size: 22rpx; }
+.travel-map { width: 100%; height: 680rpx; }
+.ledger-summary { display: flex; justify-content: space-between; align-items: center; padding: 30rpx; border-radius: 20rpx; background: #fffcf5; gap: 16rpx; }
+.total { color: #b9573d; font-size: 54rpx; font-weight: 700; margin-top: 10rpx; }
+.date-picker { font-size: 24rpx; border-bottom: 1rpx solid #b9573d; padding: 12rpx 0; }
+.category-summary { display: flex; flex-wrap: wrap; gap: 16rpx; color: #68726e; font-size: 22rpx; margin: 24rpx 0; }
+.receipt-row { display: flex; align-items: center; gap: 12rpx; padding: 24rpx 0; border-bottom: 1rpx solid #ded8cc; }
+.receipt-info { flex: 1; min-width: 0; }.receipt-amount { font-size: 26rpx; }.receipt-row button { font-size: 22rpx; }
+.phrase-tabs { padding: 28rpx 0; }.phrase-tabs button { padding: 16rpx 12rpx; }
+.phrase-card { padding: 30rpx; border-radius: 20rpx; background: #fffcf5; margin-bottom: 22rpx; }
+.japanese { display: block; font-size: 36rpx; line-height: 1.6; margin: 18rpx 0 24rpx; }
+.sheet-mask { position: fixed; inset: 0; z-index: 100; background: rgba(13, 35, 38, .55); display: flex; align-items: flex-end; }
+.sheet { width: 100%; box-sizing: border-box; padding: 24rpx 30rpx calc(24rpx + env(safe-area-inset-bottom)); border-radius: 32rpx 32rpx 0 0; background: #f6f2e9; max-height: 90vh; }
+.sheet-body { height: 60vh; }.detail-row { padding: 18rpx 0; font-size: 27rpx; border-bottom: 1rpx solid #ded8cc; }
+.tip-box { padding: 24rpx; background: #e7ecdf; border-radius: 16rpx; margin: 18rpx 0; font-size: 27rpx; line-height: 1.7; }
+.field-label { margin: 18rpx 0 10rpx; font-size: 24rpx; }.form-control { background: #fffcf5; border: 1rpx solid #d5ccbd; border-radius: 12rpx; padding: 20rpx; font-size: 28rpx; min-height: 44rpx; }
+.form-error { color: #a02e22; font-size: 25rpx; margin-top: 20rpx; }.delay-row { padding: 20rpx 0; border-bottom: 1rpx solid #ded8cc; font-size: 28rpx; }
